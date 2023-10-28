@@ -1,19 +1,117 @@
 /////////////////////////////////////////////////////////////////////////////////1. Ders///////////////////////////////////////////
 
+C in C++
 
+undefined behavior
+unspecidied behavior
+  implementation defined
 
+==================================
 
+static typeing : koda bakarak veri türü anlaşılır
+dinamik typeing : verilerin ne olduğu run time sırasında anlaşılıyor
 
+====================================
+C ve C++ arasındaki temel farklılıklar :
 
+implicit int (gizli int): 
+C dilinde artık kullanılmaz C++ dilinde sentax hatası verir
 
+func(int x)
+{
+return x + 5;
+}
 
+-------------
 
+old-style function definitons: C'nin eski kodlarında kullanılıyor c++'da geçerli değil
 
+func(a,b,c)
+double a,b,c;
+{
+return a + b + c;
+}
 
+-------------
+implicit function declaration:
 
+int main
+{
+func(1,3,5); // c dilinde legal c++'da error
+}
 
+-------------
+C dilinde aşağıdaki farklılık gösterir ancak c++'da parantez içini boş bırakmak ile
+bırakmamak arasında fark yoktur.
 
+int foo();
+int bar(void);
 
+int main(void)
+{
+foo(12,56,67);
+foo(12,56,67);
+}
+
+!! implicit int, implicit function declaration ve void içini boş
+bırakmak C++'da yok
+
+-----------
+
+int foo()
+{
+printf("merhaba"); 
+//c++'da geri dönüş değeri bildirmek zorundayız
+}
+
+-----------
+
+equality operators: == !=
+relational operator: < <= > >=
+
+==========================================
+
+Tür dönüşümleri:
+
+!! C++ da Pointer türlerinden tam sayı türlerine, tam sayı türlerinden pointer türlerine dönüşüm yok
+
+int main(void)
+{
+in x = 10;
+int * p = x;
+
+}
+
+-------------
+
+!! aritmetik türlerinden pointer türlerine örtülü dönüşüm yok
+!! pointer  türlerinden aritmetik türlerine tür dönüşüm yok
+!! farklı pointer türlerine arasında dönüşüm yok
+
+int main()
+{
+int x = 10;
+char * p = &x;
+}
+
+-----------
+
+int main()
+{
+int x = 10;
+void * vptr = &x;
+
+int * p = vptr;
+char * = malloc(1024); //c++ da error
+}
+
+-------
+öyle bir pointer değişken tanımlaki tür dönüştürme operatörü kullanmadan kendi
+nesnesini tutsun
+int main()
+{
+void * vp = &vp; //c++ da sentax hatası değildir
+}
 
 
 
