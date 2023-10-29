@@ -113,6 +113,67 @@ int main()
 void * vp = &vp; //c++ da sentax hatası değildir
 }
 
+////////////////////////////////////////////////////////////2. Ders/////////////////////////////////////////7
+
+int main(void)
+{
+int x; //default initialzing olur
+
+!! ilk değerini sabit nesnelerden almış nesneler sabit ifadesi gereken yerde kullanılıyor
+const int x = 10;
+int a[x];//legal
+
+switch (foo()){
+case x; //legal
+}
+}
+
+-------------
+
+const int x = 10; //c dilinde external linkage, C++ dilinde içi bağlantı olur
+
+-------------
+
+int main()
+{
+int x = 10;
+int * const p = &x;
+//top level const, const pointer to int, right const olarak adlandırılabilinir
+}
+
+-------------
+
+int main()
+{
+int x = 10;
+int y = 34;
+
+const int * p = &x; //ikisi arasıda fark yoktur 
+int const *p = &x;
+}
+
+
+---------------
+!! mülakat sorusu
+typedef int * IPTR;
+int main()
+{
+int x = 10;
+const IPTR p = &x;
+
+//hangisi olucak
+int * const p = &x; //bu olur
+const int * p = &x; 
+}
+
+48
+
+
+
+
+
+
+
 
 
 
