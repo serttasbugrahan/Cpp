@@ -210,9 +210,77 @@ const char * p = "furkan"; //c++ dilinde legal
 
 ---------------
 
-C++ dilinde struct ile c d
+struct Data {
+int a,b,c;
+};
 
-1:13
+enum Color {Blue, Black, Purple};
+
+int main()
+{
+Data mydata;//C dilinde illegal c++ dilinde bu şekilde kullanılır
+Color mycolor
+}
+
+---------
+
+for (int i = 0; i < 10; ++i){
+int i = 34; //c++ dilinde hata
+}//i'nin scopu c dilinde olduğu gibi for parantezinde değil burada biter
+
+
+=====================================================================================================
+CPP
+
+initializng:
+
+int main()
+{
+int x(10); //direct initializng
+int x{10}; //uniform init, brace init
+int x{}; //value init, 0 ile başlar
+int x; //default init
+int x = 10; //copy init
+}
+
+Neden uniform initializng vardır?
+1. uniform
+2. narrowing conversion
+3. most vexing parse
+
+!! küme parantezi ile ilk değer verdiğimiz zaman narrowing conversion sentex hatasına düşer
+
+int main(void)
+{
+double dval{4.436};
+int ival{dval};
+}
+
+most vexing parse : hem fonksiyon bildirimi hemde değişken tanımlama var ise fonksiyon bildirini öncelik olur
+
+------------------
+aynı anlamdadır
+
+void foo(int[]);
+void foo(*p);
+
+void func(int(*)(int));
+void func(int(int));
+---------------------
+
+nullptr: bir pointerın türünü null pointer yapıcak isek kullanılır
+
+-keyworddür
+-türü nullptr_t
+-ilk değer ve atama yapılabilinir.
+-pointer olmayan bir değişkene atanamaz
+
+int * p = nullptr; //bunu kullan
+int * p = 0; //bunu kullanma
+
+//////////////////////////////////////////////////3. Ders////////////////////////////////////////
+
+
 
 
 
