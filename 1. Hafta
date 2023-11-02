@@ -166,14 +166,53 @@ int * const p = &x; //bu olur
 const int * p = &x; 
 }
 
-48
+----
+
+int main(void)
+{
+int x = 10;
+
+cont int * const ptr = &x;
+//const pointer to const int
+}
+
+---------
+
+int main()
+{
+int a[5] = { 1,2,3,5,4};
+int(*p)[5] = &a;
+*p //a dizisinin kendisidir
+}
 
 
+-------
 
+int main()
+{
+char * p = "furkan"; //c'de hata yok
+}
 
+"furkan" ==> c de char dizi
+"furkan" ==> c++ de const char dizi
 
+--------
 
+!! const char diziden char diyize dönüşüm c++ dilinde yoktur
 
+----------
+
+int main(void)
+{
+char * p = "furkan"; //c++ dlinde illegal
+const char * p = "furkan"; //c++ dilinde legal
+}
+
+---------------
+
+C++ dilinde struct ile c d
+
+1:13
 
 
 
