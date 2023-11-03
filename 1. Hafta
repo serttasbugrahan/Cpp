@@ -280,6 +280,411 @@ int * p = 0; //bunu kullanma
 
 //////////////////////////////////////////////////3. Ders////////////////////////////////////////
 
+Referans Semantiği
+------------------
+3 ayrı referans çeşiti var:
+
+L value referance
+R value referance
+Universal (forwarding reference)
+
+------
+C ve eski C++ için value category şu şekilde tanımlanır
+L value : İfade bir nesne gösteriyor ise, başına & operatörü koyulup test edilir
+R value : ifade nesne göstermiyor ise
+------
+
+primary value categories
+L value
+PR value
+X value
+
+combined / unified value category
+Pr value ya da X value demek yerine ==> R value diyoruz
+L value ya da X value demek yerine ==> GL value diyourz
+
+L value ifadeler
+----------------
+x
+++x
+--x
+*ptr
+ptr[35]
+x,y
+a ? b : c
+
+
+PR value ifadeler
+-----------------
+a + b
++x
+-c
+!a
+a > b
+a == b
+&x
+
+-------------------
+
+int main()
+{
+int x = 10;
+int * ptr = &x
+*ptr 
+
+üstteki yapının daha soyutlanmış semantik yapısı
+int x = 10;
+int& r = x; //r x'e bir referans, r kullanmak ile x kullanmak arasında fark yok
+r = 45;// x = 45 oldu
+++r; //x 1 arttı
+r = y;// bu mümkün değil r her zaman x olur
+}
+
+---------------
+int main()
+{
+int x = 10;
+int * p = &x; //buradaki * declarator
+*p = 56; //buradaki * operatör
+}
+---------------
+
+int main()
+{
+const int x; //const değişkenler default init. yapılamaz
+int &r; // ref. değişkneler default int yapılamaz
+
+}
+
+!! L value l value expression ile ilk değer vermek mecburi
+L value'ya R value ile init. yapmak sentex hatası
+
+int main()
+{
+int & r = 10; //hata
+}
+
+int main()
+{
+int x = 345;
+int & r1 = x; //legal
+int& r2 = +x; //hata
+}
+
+------------------------------------------
+
+int main()
+{
+int x = 10;
+int * p = &x;
+
+//p değişkenine bağlanacak ismi r olan referans tanımlayın
+int* & r = p;
+}
+
+-------
+
+int main()
+{
+int ** ptr{};
+//ptr ye referans r yi bağlayıp 
+int** & r = ptr
+}
+
+-------
+
+int main()
+{
+int x = 10;
+int y = 45;
+int * p = &x;
+int *& r = p;
+
+r = &y; //p & y;
+++* r; //++* p;
+}
+
+-------
+
+int main()
+{
+int x = 10;
+int& r1 = x;
+int& r2(x); //aynı anlamda
+int& r3{x};
+
+}
+
+!! referans sementiği için r value gerekiyor l value olamaz
+!! refereans semantiği için aynı türden olması gerekiyor
+
+---------
+
+int main()
+{
+int a[10]{};
+//pointer array
+int (*p)[10] = &a //a dizisini pointer değişkeninde c de bu şekilde yapılırdı
+int(&r)[10] = a; //c++'da bu şekilde kullanılır 
+}
+
+
+-----------------------------------------------------------
+
+1. call by reference semantiği
+
+2. call by value semantiği
+
+void swap (int & r1, int & r2)
+{
+    int temp = r1;
+    r1 = r2;
+    r2 = temp;
+}
+int main()
+{
+    int a = 10;
+    int b = 5;
+
+    printf("%d %d\n",a,b);
+    swap(a,b);
+    printf("%d %d",a,b);
+    
+}
+
+------
+
+void swap (int & r1, int & r2)
+{
+    int temp = r1;
+    r1 = r2;
+    r2 = temp;
+}
+int main()
+{
+    int a = 10;
+    int b = 5;
+
+  int * p1{ &a };
+  int * p2{ &b };
+  
+  swap(*p1, *p2); //takas yine olur  
+}
+
+-----------
+
+c'de bu şekilde yazılmış bir kod
+void func(T *p); //nesnenn adresi ile çağrı yapıcaz
+c++'da referans semantiği tercih edilirse bu şekilde olur
+void func(T &); // nesnenin kendisi ile çağrı yapıcaz
+
+------------
+
+references are not rebindable : referans yapılan değişken daha sonra 
+başka bir değişkene referans olamaz
+
+int main()
+{
+int x{};
+int y{};
+
+int & r = x;
+int & r = y; //hata
+int & const r = x; // yani bu anlama gelir ama bu şekilde yazma
+}
+
+-----------
+
+int main()
+{
+int x{};
+
+// const lvalue referans
+const int &r1 = x;
+int const &r2 = x;
+}
+
+----------
+
+void set(T *p); //pointer semantiği
+void access(const T * p);
+
+void set(T& t); //referans semantiği
+void access(const T& t)
+
+-----------
+
+int main()
+{
+const int x = 10;
+int * p = &x; //illegal
+const int * p = &x; //legal
+}
+
+int main()
+{
+const int x{56};
+int & = x; //illegal
+const int & = x; //legal
+}
+
+------------
+//pointer semantiği ile yapılması
+int g = 24;
+void foo(int** ptr)
+{
+*ptr = &g;
+}
+int main()
+{
+int * p = nullptr;
+foo(&p);
+}
+-------
+//referans semantik ile yapılması
+int g = 24;
+void foo(int*& r)
+{
+r = &g;
+}
+
+int main()
+{
+int * p = nullptr;
+foo(p);
+}
+
+----------------------------------------------------
+//pointer semantiği ile yapılması
+int g = 33;
+int * foo(void)
+{
+return &g;
+}
+int main()
+{
+int* p = foo();
+*foo();//geçerli
+++* foo();//g ==34 olur
+}
+
+//referans semantik ile yapılması
+int g = 33;
+int & foo(void)
+{
+return g;
+}
+int main()
+{
+foo(); //l value exp.
+foo() = 999; //legal
+++foo(); //legal
+
+int *ptr = &foo();
+++* ptr;
+}
+
+----------
+
+T foo();
+T& bar();
+
+foo() pr value
+bar() L value
+
+----------
+
+int& foo();
+
+int main()
+{
+int & r = foo();
+}
+
+-------------
+
+int& foo(); 
+{
+int x = 45;
+return x; //otomatik ömürlü değişkenin adresini gödnerdiği içn hata
+}
+
+int* bar()
+{
+int x = 45;
+return &x; //otomatik ömürlü değişkenin adresini gödnerdiği içn hata
+}
+
+------------------
+C TEKRARI
+
+adres döndüren bir fonksiyon ancak şunlardan birini döndürebilir
+-Statik ömürlü bir nesne adresi
+
+int g = 46;
+int * foo(void)
+{
+return "furkan"; //string literalleri static ömürlü
+}
+--
+int *foo(void)
+{
+static int x = 46; //static değişkeni static ömürlü
+return &x;
+}
+--
+int *bar(void)
+{
+return &g; //global değişkenler static ömürlü
+}
+--
+int *baz(int* p) //ne alıyorsak onu geri veriyoruz static ömürlü
+{
+return p; 
+}
+--
+int *func(void)
+{
+int* p = (int*)malloc(sizeof(*p));
+*p =432;
+return p;
+}
+
+//referans semantiği ile yazımı
+
+int &func(void)
+{
+int* p = (int*)malloc(sizeof(*p));
+*p =432;
+return *p;
+}
+
+----------
+//a dizisine referans dönen bir fonskiyon yazılması
+int a[100];
+
+//1. yol
+int(&foo())[100]
+{
+return a;
+}
+
+//2. yol
+typedef int inta100[100];
+inta100& foo()
+{
+return a
+}
+
+//3. yol
+auto& f3()
+{
+return a;
+}
+
+----------------
+
+
 
 
 
