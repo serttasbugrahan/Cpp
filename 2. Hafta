@@ -143,14 +143,189 @@ if (x > 10){
 }
 }
 
-//c++ da yukarıdaki ifadeden dolayı böyle yazılır
+//c++ da yukarıdaki ifadeden dolayı böyle yaz
 int main()
 {
-if (int x = foo();x > 10){
+if (int x = foo(); x > 10){
 //use x
 }
 }
- //1.03
+
+--------------------------------
+
+!! referans == pointer (asembly tarafında)
+
+int main()
+{
+int x = 10;
+int * p = &x;
+
+int ** ptr = &p; 
+// pointerın pointerı olur ancak referansın referansı olmaz
+}
+
+
+-------------------
+
+pointerları default init yapılır, referans yapılamaz:
+int *ptr;                               int &r;
+
+pointer to pointer kavramı vardır, referansın yerine referans olma yoktur
+int **p;                             int && r;
+
+nullptr var, null referans yoktur:
+
+-------------------
+
+int main()
+{
+int ar[10]{};
+int&r = ar; //dizinin ilk elemanına referans olmaz
+
+}
+
+---------------------
+
+int main()
+{
+
+myclass &l //l value
+myclass &&r //r value
+}
+
+---------
+int foo();
+
+int main()
+{
+int x = 20;
+
+int&& r = x;
+}
+
+//r value refeansı l value expression ile init. yapılamaz
+
+int & foo();
+
+int main()
+{
+int x = 20;
+int && r = foo();
+}
+
+===============================================================
+
+type deduction (tür çıkarımı) : öyle yerler var ki türü açıkça yazmamamıza rağmen tür çıkarımı ile türü kastetmiş oluruz
+
+!! tür çıkarımı run time ile ilişkisi olmaz derleme zamanında olur her şey
+
+auto type deduction :
+---------------------
+!! tür çıkarımı auto için yapılır
+
+int main()
+{
+auto x = expr; auto yerine gelicek türü derleyici bulur
+}
+
+--------
+
+AAA : almost always auto
+
+--------
+Aşağıdaki 3 ifadeninde kuralı farklıdır
+
+auto x = expr;
+
+auto &y = expr;
+
+auto &&z = expr; //universal reference
+
+----------
+auto x = expr;
+
+int main()
+{
+auto x = 10; //int x = 10;
+}
+
+------
+
+int main()
+{
+const int x = 10;
+auto y = x; //const int y = x; olmaz, const düşer
+}
+
+------
+
+int main()
+{
+int x = 10; //x'in türü int
+int* x = 10; //x'in türü int*
+int & r = x; //r'nin türü int
+
+auto y = r; // auto türü int, int & değil
+}
+
+----
+
+int main()
+{
+int a[10]{};
+const int b[10]{};
+
+auto b = a; //int * b = a;
+auto p = b; //const int *
+}
+-----
+
+int main()
+{
+auto ps = "mucahit"; //const char * = ps
+}
+
+------
+
+int func(int); //türü int(int)
+&func //türü int (*)(int)
+
+-------
+
+int func(int);
+
+int main(int);
+{
+auto x = func; // int (*x)(int) = func;
+}
+
+------
+
+int main(int);
+{
+int x = 10;
+int * p = &x;
+
+const auto y = p; //int * const y
+}
+
+----------------------------------
+auto &y = expr;
+
+int main()
+{
+const int x = 10;
+
+auto& y = x; //const int & = y, burada const düşmez 
+
+//2.24
+
+
+
+
+
+
+
 
 
 
