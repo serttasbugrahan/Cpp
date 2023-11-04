@@ -1,0 +1,160 @@
+//////////////////////////////////////////////////////////1. Ders////////////////////////////////////////////////////
+
+int * const p = &x; //top level const
+const int * p = &x //low level const 
+
+!! referans semantiğinde bu const gereksiz çünkü referansların tanımı gereği
+başka bir nesneye bağlanması mümkün değildir
+
+const int & r = x; //sadece okuma amaçlı
+
+T * ===> const T * //legal
+const T* ===> T * //illegal
+
+-----------
+
+struct Data {
+int a;
+};
+
+void func(const Data&);
+
+int main()
+{
+Data mydata = {23};
+const Data cdata = {23};
+func(mydata);
+func(cdata);
+}
+
+----------
+
+int * func(void)
+{
+int x = 10;
+
+return &x; //hayatı bitmiş değeri geri dönüş ile yollamayız static olması gerekiyor
+//dangling pointer
+}
+
+----
+
+int & func(void)
+{
+int x = 10;
+return x; //referans semantiği ile de u.b.
+}
+
+-------------------------
+int (*func())(int, int)
+{
+
+}
+
+trailing return type ile yazımı
+auto func() -> int (*)(int, int)
+{
+
+}
+
+-------------
+
+struct Data {
+int x,y,z;
+};
+
+Data& bar(Data & r) //fonksiyon adlığı nesneyi döndürüyor
+{
+++r.x;
+++r.y;
+++r.z;
+
+return r;
+}
+
+int main()
+{
+using namespace std;
+
+Data mydata{1, 5, 7};
+Data & dr = bar(Mydata);
+
+cout << dr.x << dr.y<<dr.z<<"\n";
+}
+
+------------
+
+pointer ile yazımı
+
+struct Data {
+int x,y,z;
+};
+
+Data * bar(Data * r) //fonksiyon adlığı nesneyi döndürüyor
+{
+++r->x;
+++r->y;
+++r->z;
+
+return p;
+}
+
+int main()
+{
+using namespace std;
+
+Data mydata{1, 5, 7};
+Data * dr = bar(&Mydata);
+
+cout << dr->x << dr->y<<dr->z<<"\n";
+}
+
+------------
+!! R value ve L value ifadelerini böyle incele
+
+int x = 5;
+++(x = 9); 
+
+++ operatörünün operandı L value olmalı ancak (x= 9) r value o yüzden sentax hatası
+
+---------------------------------------------------
+!! eğer referans cons L value referans ise R value expression ile ilk değer verebiliriz
+
+int main()
+{
+int x = 10;
+
+double &r = x; //illegal
+const double &r = x; //legal
+}
+
+           L value         const L value    R value
+T &     :  bağlanabilir    bağlanamaz       bağlanamaz
+const T&:  bağlanabilir    bağlanabilir     bağlanabilir
+
+------------------------------------------------------
+
+// c dilinde bu şekilde yaz mak okuyucaya x başka yerde de kullanılcak anlamı verebilir
+int main()
+{
+int x = 10;
+if (x > 10){
+//use x
+}
+}
+
+//c++ da yukarıdaki ifadeden dolayı böyle yazılır
+int main()
+{
+if (int x = foo();x > 10){
+//use x
+}
+}
+ //1.03
+
+
+
+
+
+
+
