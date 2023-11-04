@@ -317,19 +317,73 @@ int main()
 const int x = 10;
 
 auto& y = x; //const int & = y, burada const düşmez 
+}
 
-//2.24
+-------
+
+int main()
+{
+int a[5]{};
+
+auto &b = a; //int (&b)[5] = a; 
+}
+
+-----
+
+int main()
+{
+auto & x = "eren"; //const char (&x)[5]
+}
+
+--------
+
+int foo(int);
+
+int main()
+{
+auto f = foo; //auto ==> int(int)
+int(&f)(int) = foo;
+}
+
+================================================
+
+using : typedef yerine kullanılır
+
+using Word = int;
+
+typedef const int * cptr; //using ciptr = const int *
+
+typedef int inta20[10]; //using inta20 = int[20]
+
+typeded int (*FCMP)(const char*, const char *); //using FCMP = int (*)(const char*, const char *)
 
 
+-------------------------------------
+c++ dlinde referansa referans olmamasına karşın 
+öyle yerler var ki referansa referans oluyor
 
+reference collapsing :
 
+using rref = int&&;
+rref && x = 10;
+-----
 
+T&  &   ===>  T&
+T&  &&  ===>  T&
+T&& &   ===>  T&
+T&& &&  ===>  T&&
 
+-----
+using lref = int&;
 
+int main()
+{
+int x = 45;
+lref& r = x; //l value
 
+int x = 45;
+rref&& r = x; //r value olur
 
-
-
-
+}
 
 
