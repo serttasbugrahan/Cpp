@@ -109,7 +109,7 @@ Data * dr = bar(&Mydata);
 cout << dr->x << dr->y<<dr->z<<"\n";
 }
 
-------------
+------------------------------------------------
 !! R value ve L value ifadelerini böyle incele
 
 int x = 5;
@@ -118,7 +118,7 @@ int x = 5;
 ++ operatörünün operandı L value olmalı ancak (x= 9) r value o yüzden sentax hatası
 
 ---------------------------------------------------
-!! eğer referans cons L value referans ise R value expression ile ilk değer verebiliriz
+!! eğer referans const L value referans ise R value expression ile ilk değer verebiliriz
 
 int main()
 {
@@ -134,7 +134,7 @@ const T&:  bağlanabilir    bağlanabilir     bağlanabilir
 
 ------------------------------------------------------
 
-// c dilinde bu şekilde yaz mak okuyucaya x başka yerde de kullanılcak anlamı verebilir
+// c dilinde bu şekilde yazmak okuyucaya x başka yerde de kullanılcak anlamı verebilir
 int main()
 {
 int x = 10;
@@ -276,7 +276,7 @@ int a[10]{};
 const int b[10]{};
 
 auto b = a; //int * b = a;
-auto p = b; //const int *
+auto p = b; //const int *, arraylerde const düşmez
 }
 -----
 
@@ -309,7 +309,7 @@ int * p = &x;
 const auto y = p; //int * const y
 }
 
-----------------------------------
+------------------------------------------
 auto &y = expr;
 
 int main()
@@ -363,6 +363,7 @@ c++ dlinde referansa referans olmamasına karşın
 öyle yerler var ki referansa referans oluyor
 
 reference collapsing :
+---------------------
 
 using rref = int&&;
 rref && x = 10;
@@ -385,5 +386,372 @@ int x = 45;
 rref&& r = x; //r value olur
 
 }
+
+//////////////////////////////////////////////////////////////2. Ders///////////////////////////////////////////////
+
+Kaç çeşit referans vardır :
+
+R value --> int& x =
+L value --> int&& x =
+
+Universel referans 
+-------------------
+
+auto &&r = 
+
+Yukarıdaki durumda yani r bir universal referance ise 
+- her değer kategorisindeki ifadeye bağlanabilir
+           L value / R value (Pr || X)
+           const ya da non cost
+
+int main()
+{
+int x = 5;
+const int y = 67;
+
+auto && r1 = x;
+auto && r2 = 10;
+auto && r3 = y;
+}
+
+--------
+auto &&r = x;
+
+eğer ilk değer veren ifadenin değer kategorisi L value ise
+o zaman auto için yapılan çıkarım sol taraf referans türü olur
+ama r değişkenin türü yine "referans collapsing" ile l value ref. olur T &
+
+int &&r = 10;
+eğer ilk değer veren ifadenin değer kategorisi R value ise
+o zaman auto için yapılan çıkarım sol taraf referans olmayan tür olur ==> T
+ama r değişkenin türü yine l value ref. olur
+
+!! kural : Universal referansa l value ile ilk değer verirsek l value referans olur 
+                    R value ilk ilk değer verirsek R value referans olur 
+
+int main()
+{
+auto && x = 10; //int && x = 10;
+}
+
+int main()
+{
+int ival { 4 };
+//int& && -> referans collapsing devreye girer derleyici gözüyle int & x yazmış oluruuz
+  auto && x = ival; //int && x = 10;
+}
+
+... devamı daha sonra işlenice
+
+=======================================================================
+
+declytype specifier :
+---------------------
+
+decltype(expr) : 
+//derleyici gözüyle bir tür bilgisi, derleme(compiler) time ile ilgili
+
+!! decltype specifier ile yapışan tür çıkarımında iki ayrı kural seti var
+
+------------------
+1. kural seti : decltype expr isim olmalı
+
+declytype(x)
+declytype(a.b)
+declytype(ptr->c)
+
+------------------
+2. kural seti : decltype operandı isim olmayan bir ifade olması
+
+decltype(10)
+decltype(x + 10)
+declytype((x))
+
+-------------------
+1. kural seti örnekleri :
+
+int main()
+{
+int x = 120;
+decltype(x) //int yerine her yerde kullanılabilinir
+decltype(x) y; //int y
+
+const int x = 120;
+decltype(x) //const int
+
+int x = 5;
+int & r{ x };
+decltype(r) y = x; //int &y = x;
+
+int &&r = 10;
+decltype(r) x = 56; //int&& x
+
+int && r = 10;
+decltype(r)& x = 56; // hata olur sol taraf ref. r value ile ilk değer verilmez
+}
+
+int && r = 10;
+decltype(r)&& x = 56; //legal, sağ taraf referansına sağ taraf referansı olur
+//int  &&r = 56; 
+}
+
+int main()
+{
+int a[5]{};
+//int[5]
+decltype(a)b = a; //hata var
+//int b[5] = a; diziye diziyle ilk değer verilmez
+}
+
+----
+
+int main()
+{
+int [5]{};
+decltype(a) b = {1, 4,}; //legal
+}
+
+----
+
+int main()
+{
+int a[20]{};
+
+decltype(a) * p = &a;
+auto p = &a; //bu şekilde de yazılır
+int(*p)[20] = &a; //bu şekilde de yazılır
+}
+
+-----------------
+2. kural seti örnekleri :
+
+Diyelim ki, (T bir tür olmak üzere) exp ifadesinin türü T olsun
+
+eğer exp ifadesinin primary value category'si
+           PR value ise elde edilen türü T 
+           L value ise elde edilen türü T&
+           x value ise elde edilen türü T&& 
+
+---------
+
+int main()
+{
+int x = 10;
+decltype(x + 5); //int, (x + 5) PR value ise elde edilen türü T 
+}
+
+---------
+
+int main()
+{
+int a[5]{};
+decltype(a[2]); //int&, a[2] L value ise elde edilen türü T&
+}
+
+--------
+
+int foo();
+int & bar();
+int && baz();
+
+int main()
+{
+//foo() ==> PR value
+//bar() ==> L value
+//baz() ==> x value
+}
+
+-------
+
+int main()
+{
+int x = 10;
+int y = 20;
+
+decltype(x)a = y; //int a = y;
+
+decltype(x)a = y; //int &b = y
+
+}
+
+-----------------------------------------
+!! sizeof operatörünün operandı için işlem kodu üretilmez
+
+unevaluted context (işlem kodu üretilmeyen bağlam) : işlem kodu yürütülmiyceği için tanımısz davranış olmasının önemi yok
+
+int main()
+{
+int * ptr = nullptr;
+auto x = sizeof(*ptr); //ub yok
+}
+
+--------
+
+int main()
+{
+int a[5]{};
+int ival = 72;
+
+auto b = a[5];
+
+int x = 98;
+
+int y;
+
+auto c1 = a[5]; //ub
+auto c2 = y; //ub
+auto c3 = ival << x; //ub
+
+sizeof c1 = a[5]; //ub değil işlem kodu üretilmez
+sizeof(y); //ub değil işlem kodu üretilmez
+sizeof(ival << x); //ub değil işlem kodu üretilmez
+}
+
+!! decltype verilen ifade unevaluted context
+
+int main()
+{
+int x = 10;
+decltype(++x) y = x; //x'in değeri hala 10 çünkü işlem kodu üretilmez
+
+}
+
+==============================================================
+
+default argument (varsayılan argüman) : gereksiz risk almasından kaçınamsında kullanılıyır
+---------------
+
+void foo(...); //c'de geçerli değl c++ da geçerli
+
+varsayılan argüman derleyici zamanında gerçekleşir
+
+// normalde bu fonksiyonun 3 parametre değişkeni var ama ben 3. parametre değişkenine
+argüman göndermeme hakkına sahibim
+
+------
+
+void func(int,int, int = 0); 
+
+int main()
+{
+func (1,2,3);
+func(1,2); //1,2,0
+}
+
+-----
+
+void func(int = 1, int = 2, int = 3);
+
+int main()
+{
+func(50,60,70);
+func(50,60); //func(50,60,3);
+func(50); //func(50,2,3);
+func(); //func(1,2,3);           
+}
+
+----------------
+
+int main()
+{
+int a = 10;
+int b = 10;
+int c = a+++b;
+
+}
+
+---------------
+
+!! maximal munc kuralı : int c = a+++b; // a++ + b
+
+---------------
+
+void foo(const char*= "mustafa");
+void foo(const char* = "mustafa");
+
+----------------
+
+void foo(int x, int y = x); //sentex hatası
+
+---------------
+
+int foo(int x = 5);
+int bar(int x = foo());
+
+int main()
+{
+bar(); //bar(foo(5));
+}
+
+------------
+
+ali.h
+
+void foo(int,int,int);
+
+//include "ali.h"
+
+void foo(int, int, int = 10);
+
+int main()
+{
+foo(2,5);
+}
+
+----------
+
+void foo(int, int, int = 67);
+void foo(int, int = 5, int);
+
+int main()
+{
+foo(1); //foo(1, 5, 67);
+}
+
+-----------
+
+// önceden belirlenmiş değerlerin girilmesi için kullanılabilinir
+void process_date(int day = -1, int mon = -1, int year = -1)
+
+int main()
+{
+process_date(); //process_date(2,8,2023);
+}
+
+--------------
+
+void print_date(int day = -1, int mon = -1, int year = -1)
+{
+if (year == -1){
+
+}
+
+===========================================================
+
+constexpr : değişkenin oluşturduğu ifade sabit ifadesi olarak kullanılabilir
+
+const int x = 10;
+
+!! const anahtar sözcüğü ile tanımlanan bir değişkene sabit
+bir ifadeyle ilk değer verme mecburiyeti yok.
+
+!! constexpr anahtar sözcüğü ile tanımlanan bir değişkene sabit
+bir ifadeyle ilk değer verme mecburiyeti var.
+
+int main()
+{
+int y = 245;
+constexpr int x = y; //hata 
+// x'in türü const int
+}
+
+
+
+
+
+
+
+
+
 
 
