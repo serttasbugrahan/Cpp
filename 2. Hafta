@@ -940,7 +940,37 @@ mycolor = 3; //cpp'de hata
 
 C++ dilinde (modern c++ öncesi) enum türlerinin istenmeyen özellikleri :
 
-//2.20
+1. underlying type derleyiceye bağlı olduğu için enum türleri başlık
+dosylarında incompliete type olarak kullanılamıyor
+
+2. enum türlerinden tamsayı türlerine dönüşüm yok
+
+3. enumatör scopu enumutöre sahip türün scopu ile aynıdır
+
+//traffic_light.h
+enum TrafficLight {Red, Yellow, Green};
+enum TrafficLight : int {Red, Yellow, Green}; //hata bu şekilde düzeltildi yeni sürümlerde
+
+//screen.h
+enum ScreenColor{Magente, White, Black, Red}
+enum class ScreenColor{Magente, White, Black, Red} //yeni versiyonlarda geldi
+
+//hata olur (isim çakışmasından dolayı, Red)
+
+
+
+--------------------------
+
+scoped enums
+
+traditional enum
+conventional enum
+unscoped
+
+enum class
+scoped enums
+
+
 
 
 
