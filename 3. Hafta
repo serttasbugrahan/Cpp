@@ -1,0 +1,210 @@
+///////////////////////////////////////////////////////1. Ders///////////////////////////////////////////////
+
+enum class TrafficLight {Red, Yellow, Green};
+!! c++ da bu enum türündeki hataları ortadan kaldırmak için class kullanılmıştır           
+!! enum class is not a class
+
+enum Pos : int {On, Off, Hold, Standby};
+enum Pos : long {On, Off, Hold, Standby};
+
+// bu şekilde bellek ihtiyacını ayarlayabiliyoruz
+
+enum Class Pos : int{On, Off, Hold, Standby};
+
+------------------------------------
+
+//sıralaması:
+önce isim arama gerçekleşir bulunamassa sentaks hatası, daha sonra o ismin dilin kurallarını çiğneyip çiğnemediği kontrol edilir en sonda bağlam kontrolü yapılır
+
+name lookup 
+context control (sen
+access control
+
+
+int main()
+{
+int printf = 10;
+printf("merhaba"); //sentaks hatası olur isim aramadan dolayı, 
+isim 1 kere aranır
+}
+
+----------------------------------------------------
+
+:: // scope resolution operator (çözünürlük operatörü)
+binary ve unary şekilde kullanılır
+
+int main()
+{
+int printf = 10;
+::printf("merhaba"); //bu şekilde isim global isim alanında aranıcak
+isim 1 kere aranır
+}
+
+----------
+
+int g = 56;
+
+int main()
+{
+int g = 10;
+
+std::cout << "g = " << g << '\n'; //10
+std::cout << "g = " << ::g << '\n'; //56
+}
+
+-----------
+
+void func(int x)
+{
+int func = 40;
+::func(func); //recursive fonksiyon çağrısı, fınc fonksiyonunu func değeri ile çağırırıyorum 
+}
+
+-------------
+
+!! ::x //global isim alaında x yok ise hata olur
+--------------
+isimlerin kullanımı şu şekilde olur
+
+unqualified name :
+a
+
+qualified name :
+x::a
+::b
+x.y
+c->y
+
+------------------------------------------------------
+
+enum class Color {blue, red, purple, white, black};
+enum class TrafficLight {yellow,white, black};
+!! class sayesinde isimler aynı olmasına rağmen çakışma olmaz
+
+int main()
+{
+Color :: blue; //bu isimleri bu şekilde kullanırız
+}
+
+enum türlerinin 3. defosu : enum türlerinden aritmetik türlere örtülü dönüşüm vardı
+
+int main()
+{
+Color mycolor{ Color:: Red};
+int ival = mycolor; //Hata olur           
+}
+
+!! zorunda kalmadıkça uncscope enum kullanma, scope enum kullan
+
+------------
+
+enum class Color {blue, red, purple, white, black};
+
+void func()
+{
+using enum Color; //c++20  nitelemeden kullanmamızı sağlar
+
+Color c1 = Red; 
+c1 = White;
+Color c2 = Black
+}
+
+using Color :: Blue;
+
+Color c1 = Blue;
+Color c2 = Red; // hata sadece Blue nitelemden kullanılını
+
+==============================================================
+
+int getval();
+
+int main()
+{
+if (int x = getval()) { //c dilinde gçerli değil c++'da bu şekilde kullanılabilinir
+//scope leekage engellenir
+}
+
+x = 5; //hata olur
+
+while (int x = getval()) {
+}
+
+switch (int z = getval()){ 
+}
+
+--------
+
+int *getptr();
+
+int main()
+{
+if (int* ptr = getptr()){ //getptr NULL değil ise if deyimine girer
+}
+}
+
+-------------------------
+
+if with initializing :
+----------------------
+
+//c'de bu şekilde kullanılır
+int foo();
+
+int main()
+{
+int x = foo();
+
+if (x != -1){
+//may use x
+}
+else {
+//may use x
+}
+}
+
+//if with initializing ile yazımı
+
+if (int x = foo(); x != -1){ //auto kullanılabilinir
+}
+
+------
+
+int * get_ptr();
+
+int main()
+{
+if (int * p = get_ptr()){
+}
+
+if (int * p = get_ptr(); p){
+}
+
+if (int * p = get_ptr(); p != nullptr){
+}
+
+}
+
+===================================================
+
+Tür dönüştürme operatörleri :
+
+C dilinde 1 tane dönüştürme operatörü vardır
+
+(target type)expr
+
+(int)dval
+
+(char *)iptr
+
+(double)ival
+
+!! bu yapı c++'da da var ancak bunu çok kullanma birazdan anlatılacak yapıyı kullan
+
+//1.20
+
+
+
+
+
+
+
