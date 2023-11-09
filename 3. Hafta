@@ -366,7 +366,46 @@ int main()
 double dval{4343.232};
 
 }
-//2.26
+
+char * p = reinterpret_cast<char *>(& dval);
+
+------
+
+int main()
+{
+using namespace std;
+
+double dval;
+const double* dptr = &dval;
+
+char *p = reinterpret_cast<char*>(dptr); //hata çünkü constlukta var
+
+auto cp1 = const_cast<char*>(reinterpret_cast<const char*>(dptr)); //bu şekilde yapılabilinir
+auto cp1 = reinterpret_cast<char*>(const_cast<double*>(dptr)); //bu şekilde yapılabilinir
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+int x = 10;
+void* vp = &x;
+
+int* ip1 = static_cast<int *>(vp);
+}
+
+
+=========================================================================
+
+Function Overloading:
+---------------------
+Fonksiyonların yüklenmesi
+
+!! dilin en faydalı araçlarından biridir
+
+
 
 
 
