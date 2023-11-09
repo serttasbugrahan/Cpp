@@ -200,7 +200,175 @@ C dilinde 1 tane dönüştürme operatörü vardır
 
 !! bu yapı c++'da da var ancak bunu çok kullanma birazdan anlatılacak yapıyı kullan
 
-1.27
+----------
+
+//const - cast
+char  * Strchr(const char* p, int ch)
+{
+while (*p) {
+if (*p == ch)
+return (char *)p;
+++p;
+}
+if (ch == '\0')
+return (char *)p;
+return nullptr;
+}
+
+int main()
+{
+double dval = 3.77;
+char * p = &dval; //cpp de legal değildir
+char * p = (char *) &dval; //bu şekilde yazmak gerekir
+
+for (size_t i = 0; i < sizeof(d);
+//*p++
+}
+
+--------------------
+
+int main()
+{
+int x = 497;
+unsigned int * p = (unsigned *) &x; //bu şekilde yapılmalı
+}
+
+---------------------------------
+
+cpp de c deki tür dönüşümlerine ek olarak yeni tür dönüşümlerinin eklenmesinin nedeni :
+farklı amaçlarla yapılan tür dönüşümlerinin niyetini kod belli etsin diye.
+
+tür dönüştürme operatörleri :
+
+-static_cast
+-const_cast 
+-reinterpret_cast
+-dynamic_cast
+
+------------------------------
+
+xxxx_cast<type>(expr)
+
+-static_cast: Tam sayı türleri ile gerçek sayı türleri arasında, numaralandırma ile tam sayı türleri arasında
+
+static_cast<int> dval
+
+
+int main()
+{
+int x = 10;
+int y = 30;
+
+double dval = static_cast<double>(x) / y;
+!! c deki gibi tür dönüşümü yapar isek c style cast denir
+}
+
+------
+
+int main()
+{
+double dval{ 456.783};
+int ival = static_cast<int>(dval);
+}
+
+-----
+enum color {Blue, black, green};
+
+int main()
+{
+int ival = 2;
+Color mycolor{ black };
+mycolor = static_cast<Color>(ival);
+ival = static_cast<int>(mycolor);
+}
+
+------
+
+enum color {blue, black, green, white};
+const char* const pcolors[] = {"blue", "black", "green", "white"};
+
+int main()
+{
+Color mycolor{ Color::green };
+std::cout << pcolors[static_cast<int>(mycolor)] << "\n";
+}
+
+-----------------------
+
+const_cast
+
+int main()
+{
+int x{56};
+const int* cp = &x;
+
+int* iptr = const_cast<int *>(cp); //bu şekilde asla yapma kendisi const nesneye bu uygulanmaz
+}
+
+-------
+
+int main()
+{
+int x = 120;
+const int & cr{ x };
+
+int & r = const_cast<int&>(cr); 
+}
+
+-----
+
+char  * Strchr(const char* p, int ch)
+{
+while (*p) {
+if (*p == ch)
+return const_cast<char *>(p);
+++p;
+}
+if (ch == '\0')
+return const_cast<char *>(p);
+return nullptr;
+}
+
+----
+
+int main()
+{
+int ival = 221;
+
+auto x = static_cast<double>(ival);
+}
+
+-----
+
+bool isprime(int val);
+int foo();
+
+// to discard the return value (geri dönüş değerini kullanmamaya denir
+int main()
+{
+int x = foo();
+isprime(x); //hata 
+}
+
+!! eğer bildirdiğiniz bir fonksiyonun geri dönüş değerinn kullanılması lojik bir 
+zorunluluk ise [[nodiscard]] kullanılır.
+
+[[nodiscard]] bool isprime(int val); //attritube denir 
+
+bool isprime(int val);
+
+-----------------------
+
+reinterpret_cast : bir nesneyi farklı türden bir nesne gibi kullanmaya denir
+
+int main()
+{
+double dval{4343.232};
+
+}
+//2.26
+
+
 
 
 
