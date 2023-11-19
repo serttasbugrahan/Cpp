@@ -399,15 +399,205 @@ int* ip1 = static_cast<int *>(vp);
 
 =========================================================================
 
-Function Overloading:
+Function Overloading: aynı isme sahip birden fazla fonksiyonun tanımlanabilmesini ifade eder.
 ---------------------
 Fonksiyonların yüklenmesi
 
 !! dilin en faydalı araçlarından biridir
 
+i1 + i2
+d1 + d2
+
+function overloading çalışma zamanına ek maaliyeti yoktur
+
+a) compile-time  
+  sttaic binding
+  early binding
+
+b) runtime
+  dynamic binding
+  late binding
+
+function overloading var mı yok mu?
+-----------------------------------
+
+signature (imza)
+int foo(int, int); //burada imza parametre değişkenlerine denir
+
+function overloading sağlanması için gerekli şart
+-aynı scope'da olması 
+
+---------------------
+C++ scope kategorisi :
+namespace scope
+block scope
+class scope
+function prototype scope
+function scope
+
+C scope kategorisi :
+file scope
+block scope
+function prototype scope
+function scope
+-----------------
+
+int foo(int, int);
+
+int main()
+{
+int foo(int); //function overloading yok farklı scopedalar
+foo(12,23); //hata olur
+::foo(12,23); //bu şekilde hata aşılır
+}
+
+----------------
+
+-imzaları farklı olucak
+
+-eğer kapsam aynı ise imzaları ve geri dönüş değeri aynı ise function overloading yok.
+
+-function redeclaration: imzaları ve gdd türleri aynı ise
+
+int foo(int, int); //funtion redeclaration
+int foo(int, int);
+
+int foo(int);
+int foo(const int); //funtion redeclaration
+
+void func(int * ptr);
+void func(const int* ptr); //function overloading
+
+void func(int * ptr);
+void func(int* const ptr); //function redeclaration
+
+-imzalar aynı ama gdd türleri farklı ise sentax hatası
+
+-----------------
+
+void func(int*); //funtion redeclaration
+void func(int[]); 
+
+void func(int(int)); //funtion redeclaration
+void func(int(*)(int))); 
+
+void func(int(*)[10]; //funtion overloading
+void func(int(*)[29); 
+
+void func(int(&)[10]; //funtion overloading
+void func(int(&)[29]; 
+
+void func(int(*)[10]; //funtion redeclaration
+void func(int[][10]; 
+
+typedef int Nec;
+void func(int); //funtion redeclaration
+void func(Nec);
+
+void func(int); //funtion overloading
+void func(int32_t);
+
+void func(char); //3 tane funtion overloading var
+void func(signed char); 
+void func(unsigned char);
+
+void func(int); //funtion overloading
+void func(int &);
+
+void func(int &); //funtion overloading 4 tane
+void func(int &&);
+void func(const int &);
+void func(const int &&);
+
+void func(int *); //funtion overloading 
+void func(int&);
+
+int foo(int); // funtion overloading 2 tane 
+int foo(int);
+int foo(int);
+int foo(int, int);
+int foo(int, int);
+int foo(int, int);
+int foo(int, int);
+
+-------------------------
+
+void func(long double); funtion overloading 
+void func(char); 
+
+int main()
+{
+func(12.5); //hata verir, long double'dan dolayı
+}
 
 
+-------------
 
+23 //int
+23l //long 
+23LL //long long
+23u//unsigned int
+23ul//unsigned long
+23lu//unsigned long
+23llu//unsigned long long
+23. //double
+
+-------------------------------------------------
+function overloading süreçleri:
+
+1. süreç
+  aday fonskiyonların saptanması
+
+2. süreç
+ viable functions (uygun fonksiyon) 
+
+void func(int); //viable functions
+//void func(int *);
+void func(double); //viable functions
+//void func(std::string);
+//void func(std::string, int);
+
+-----
+
+void func(void *); //viable
+void func(int *); //viable
+void func(double); //viable değil
+
+int main()
+{
+int x{ 5 };
+func(&x);
+}
+
+-------
+
+void func(void *);
+void func(int *);
+void func(int, int);
+
+int main()
+{
+func(56);
+}
+
+---------------------
+standart conversion (standart dönüşümler)
+user defined conversion
+
+sturct Data {
+Data();
+Data(int);
+};
+
+int main()
+{
+Data mydata;
+
+mydata = 5;
+//int ==> Data
+}
+
+//1.16
 
 
 
