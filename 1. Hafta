@@ -683,7 +683,6 @@ return a;
 }
 
 ----------------
-
 int main()
 {
 	int x{ 1 }, y{ };
@@ -692,10 +691,16 @@ int main()
 	const int &r2 = x > 0 ? x : ++y; //x değerine bağlanır ++y olduğu için
 	x = 5;
 	std::cout << r1 << r2;
-
 }
+----------------
+const int x = 10;
+auto a = x; //const düşer
+auto &b = x; //const düşmez 
+decltype(x) c = 0; //const düşmez
 
-
+const int *p = &x;
+auto a = p; //const düşmez
+----------------
 
 
 
