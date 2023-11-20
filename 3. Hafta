@@ -581,8 +581,10 @@ func(56);
 }
 
 ---------------------
-standart conversion (standart dönüşümler)
-user defined conversion
+2 türlü dönüşüm vardır:
+
+1-standart conversion (standart dönüşümler), dillin kuralları ile alakalı (int ==> double vb.)
+2-user defined conversion (de
 
 sturct Data {
 Data();
@@ -594,14 +596,306 @@ int main()
 Data mydata;
 
 mydata = 5;
-//int ==> Data
+//int ==> Data, data türünden int türüne örtülü dönüşüm yoktur
 }
 
-//1.16
+------------
+3. süreç
+-exact match (tam uyum) 
+-promotion (terfi - yükseltme)
+-conversion (dönüşüm)
 
 
+-exact match : argüman olan ifadenin türü ile parametre türünün aynı olması
+----------
+aşağıdaki durumlarda kullanılır:
 
+L value  ==> R value
+const conversion
+array decay (array to pointer conversion)
+function to pointer conversion
+----
 
+void func(int);
+void func(long);
+void func(float);
+void func(double);
 
+int main()
+{
+func(1); //int çağrılır, intten inte exact match var
+func(2L); //long çağrılır
+func(3.4f); //float çağrılır
+func(4.); //double çağrılır
+}
 
+exact match detayları:
+
+void func(int*);
+int main()
+{
+int a[5]{};
+func(a); //array to pointer conversion
+//array decay 
+//exact match
+}
+
+----
+
+void func(int (*)(int));
+
+int foo(int);
+int main()
+{
+func(foo); //(int(int)
+//func(&foo);
+}
+
+----
+
+- promotion 
+  integral promotion (innten küçük türlerin inte dönüştürülmesi)
+  char ==> int
+  bool ==> int
+  short ==> int
+  float ==> double
+
+----
+
+void func(int);
+void func(double);
+void func(long);
+void func(long double);
+
+int main()
+{
+func(12) //exact match int kazanır
+func('A'); //int kazanır chardan inte
+func(2.3F) //double kazanır 
+}
+
+-------
+
+void func(unsigned int);
+void func(char);
+
+int main()
+{
+int ival{};
+func(ival); //hata, embugi
+}
+
+------------------
+
+özel durumlar
+-------------
+const overloading
+
+void func(int *)
+{
+std::cout << "int *\n";
+}
+
+void func(const int *)
+{
+std::cout << "const int *\n";
+}
+
+int main()
+{
+const int x = 5;
+func(&x); //const int* çağrılır 
+}
+
+-------
+
+class Myclass {};
+
+void foo(Myclass*);
+void foo(const Myclass*); 
+
+----
+
+class Myclass {};
+
+void foo(Myclass&)
+{
+std::cout << "Myclass &\n";
+}
+
+void foo(const Myclass&)
+{
+std::cout << "const Myclass &\n";
+}
+
+int main()
+{
+Myclass m;
+foo(m);
+}
+
+-----
+
+void func(int, int = 10);
+void func(int);
+
+int main()
+{
+//func(3); hata olur ambigous
+}
+
+----
+
+void func(int&);
+void func(int);
+
+int main()
+{
+int x = 67;
+func(x); //ambigous
+func(23); //hata olmaz func(int) çağrılır
+}
+
+----
+
+void func(const int&);
+void func(int);
+
+int main()
+{
+func(12);
+}
+
+----
+
+void func(int*);
+
+int main()
+{
+func(nullptr); //hata olmaz
+}
+
+---
+
+#include <cstddef>
+
+void func(int*);
+void func(double *);
+void func(std::nullptr_t);
+
+int main()
+{
+func(nullptr); //hata olmaz
+}
+
+-----
+
+T is a type 
+
+void func(const T &); //
+void func(T &); //function overloading 3 tane
+void func(T &&);
+
+-----
+
+void foo(int&)
+{
+std::cout << "L VALUE REF";
+}
+
+void foo(int&&)
+{
+std::cout << "R VALUE REF";
+}
+
+int main()
+{
+int x = 10;
+
+foo(x); //L çağrılır
+foo(56); //R çağrılır
+}
+
+-----
+
+void foo(const int&)
+{
+std::cout << "L VALUE REF";
+}
+
+void foo(int&&)
+{
+std::cout << "R VALUE REF";
+}
+
+int main()
+{
+foo(12); //sağ tarafa üstünlüğü verir
+}
+
+-----
+//ierlede karşımıza çok çıkıcak bir yapı
+//sağ taraf değeri için ayrı sol taraf değeri için ayrı bir muamele yapmamızı sağlar
+
+void func(const T&);
+void func(T&&);
+
+-------
+
+void foo(int&)
+{
+std::cout << "L VALUE REF";
+}
+
+void foo(const int&)
+{
+std::cout << "CONST L VALUE REF";
+}
+
+void foo(int&&)
+{
+std::cout << "R VALUE REF";
+}
+
+int main()
+{
+int x{25}; //L value yazar
+const int cx{25};
+foo(x);
+foo(cx);
+foo(12);
+}
+
+------
+
+//bir istisna
+
+void func(bool){
+std::cout<<"bool\n";
+}
+
+void func(bool){
+std::cout<<"void *\n";
+}
+
+int main()
+{
+int x{562};
+func(&x); //void * çağrılır, void * bool'a üstünlüğü var  
+}
+
+------
+
+void foo(int, double, long);
+void foo(bool, float, int);
+void foo(long, double, float);
+
+bu fonksiyonlardan birinin seçilmesi için:
+en az bir argüman için o paramterede diğerlerine üstünlük kuracak 
+diğer argümanlarda da daha kötü olmayacak
+
+int main()
+{
+foo(12u, 4.5L, true); //2. çağrılır true üstünlük sağlar(int) 
+}
 
