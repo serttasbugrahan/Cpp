@@ -684,7 +684,16 @@ return a;
 
 ----------------
 
+int main()
+{
+	int x{ 1 }, y{ };
 
+	const int &r1 = x > 0 ? x : y++; //geçici nesneye bağlanır y++ olduğu için
+	const int &r2 = x > 0 ? x : ++y; //x değerine bağlanır ++y olduğu için
+	x = 5;
+	std::cout << r1 << r2;
+
+}
 
 
 
