@@ -397,7 +397,7 @@ int* ip1 = static_cast<int *>(vp);
 }
 
 
-=========================================================================
+//////////////////////////////////////////////////2. Ders//////////////////////////////////////////////////
 
 Function Overloading: aynı isme sahip birden fazla fonksiyonun tanımlanabilmesini ifade eder.
 ---------------------
@@ -408,7 +408,7 @@ Fonksiyonların yüklenmesi
 i1 + i2
 d1 + d2
 
-function overloading çalışma zamanına ek maaliyeti yoktur
+!!function overloading çalışma zamanına ek maaliyeti yoktur
 
 a) compile-time  
   sttaic binding
@@ -482,7 +482,7 @@ void func(int(int)); //funtion redeclaration
 void func(int(*)(int))); 
 
 void func(int(*)[10]; //funtion overloading
-void func(int(*)[29); 
+void func(int(*)[29]); 
 
 void func(int(&)[10]; //funtion overloading
 void func(int(&)[29]; 
@@ -522,7 +522,7 @@ int foo(int, int);
 
 -------------------------
 
-void func(long double); funtion overloading 
+void func(long double); //funtion overloading 
 void func(char); 
 
 int main()
@@ -682,7 +682,7 @@ void func(char);
 int main()
 {
 int ival{};
-func(ival); //hata, embugi
+func(ival); //hata, ambigous
 }
 
 ------------------
@@ -752,7 +752,7 @@ void func(int);
 int main()
 {
 int x = 67;
-func(x); //ambigous
+func(x); //ambigous (derleyicinin birden fazla anlam çıkarmasına denir)
 func(23); //hata olmaz func(int) çağrılır
 }
 
@@ -763,7 +763,7 @@ void func(int);
 
 int main()
 {
-func(12);
+func(12); //hata verir
 }
 
 ----
@@ -898,4 +898,168 @@ int main()
 {
 foo(12u, 4.5L, true); //2. çağrılır true üstünlük sağlar(int) 
 }
+
+class Myclass {};
+
+void func(const Myclass&); //const L value (L valuelar bana gelsin)
+void func(Myclass&&); //R value (R valuelar bana gelsin)
+
+///////////////////////////////////////////////////////////3. Ders///////////////////////////////////////////
+
+Classes: problem domaininde verinin soyutlanması sağlar
+--------
+
+struct Myclass {
+
+};
+class Myclass {
+
+};
+
+//struct ve class aynı anlamda neredeyse hiç fark yok
+
+class Myclass {
+//member
+//sınıfın öğeleri/elemanları
+}
+
+-----------------
+
+Sınıfın :
+a) data member
+  -non-static data members
+  -static data members
+b) member function
+c) member type / type member / nested type olabilir
+
+class Myclass {
+class Nec { //type member
+
+};
+
+void foo(); //member function
+
+int mx; //data member
+};
+
+-------------
+name lookup
+//bu isimler class definitian içinde aranır 
+
+. -> //member selection
+.x
+->y
+::a 
+
+-------
+object.x ise o classın scopunda aranır
+
+struct Data {
+int a,b,c;
+};
+
+int main()
+{
+Data mydata;
+Data * p = &mydata;
+
+(*p).b //967 ile aynı anlamda
+p->b
+}
+-----
+struct Data {
+private:
+int a, b, c;
+};
+
+int main()
+{
+a = 5; //hata
+a:: //olmalı
+}
+----------
+
+empty class : elemanı olmayan class
+c++ da var c de yok
+
+struct Data {
+
+};
+
+------------------
+
+access control : sınıfın elemanlarının iismlerini her bir elemanın kullanma yetkiis yoktur
+
+-public members : bütün clientlara açık
+-private members : sadece kendi kodlarına açık, sınıfın kendi kodlarına açık
+-protected members : clientlera kapalı sınıfın kendisine açık
+
+class Data {
+public int mx;
+public int my;
+private int foo(int);
+
+};
+
+class Data {
+public:
+int mc;
+
+private:
+int mx;
+};
+
+!! default erişim alanı class anahtar sözcüğü ile sınıfı tanımladığımızda private
+struct anahtar sözcüğü ile sınıfı tanımladığımızda public
+
+class Data {
+int mx; //private
+};
+
+class Data {
+private:
+int mx; //aynı anlamda
+};
+
+-----------
+
+class Data {
+private:
+  int x;
+public:
+  int y;
+private:
+  int z;
+protected:
+  int t;
+public:
+  int z;
+};
+
+--------
+
+struct Data{
+int mx;
+//defaulut erişim public
+};
+
+------
+class Data {
+int mx;
+};
+
+int main()
+{
+Data mydata;
+mydata.mx = 10; //hata olur (access private)
+}
+
+//1.03
+
+
+
+
+
+
+
 
