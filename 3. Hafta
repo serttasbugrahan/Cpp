@@ -1054,10 +1054,64 @@ Data mydata;
 mydata.mx = 10; //hata olur (access private)
 }
 
-//1.03
+---
 
+class Data {
+public:
+int mx;
+};
 
+int main()
+{
+Data mydata;
+mydata.mx = 10; //hata olmaz
+}
 
+mülakat sorusu :
+c++'da public interface denildiği zaman sadece sınıfın public bölümündeki öğeler değil 
+başlık dosyalarındaki öğelerde dahil edilir
+
+public interface = public öğeleri + başlık dosyalarındaki öğeler
+
+!! public, private, protected bölümleri ayrı scopeları yoktur
+
+---------
+
+// fighter.h
+class Fighter{
+public:
+
+private:
+//burası seni ilgilendirmiyor
+};
+
+------------------
+
+member function: sınıfın içinde kullanıldığı zaman member function denir
+
+class Fighter{
+public:
+  void func(); //member function
+};
+-----
+class Fighter{
+public:
+
+};
+void func(); //member function değil, free function/global function/stand-alone function denir
+--------
+
+sınıfın üye fonksiyonları ikiye ayrılır :
+static - non static
+
+class Fighter{
+public:
+static void func(); //static member function
+void func(); //non-static member function
+
+};
+
+//1.31.15
 
 
 
