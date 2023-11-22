@@ -1308,7 +1308,81 @@ sınıfların üye fonksiyonları içinde isim arama (name lookup) :
 
 sırlama bu şekildedir
 
+isim aramam ifade içindeki ismin neyin ismi olduğunu anlama sürecidir
 
+void foo()
+{
+if (expre) {
+//statement
+while (expr) {
+//isim aramam en içten en dışa doğru gerçekleşir
+}
+}
+}
 
+-----
+
+//sınıf fonksiyonlarında isim arama daha farklıdır
+
+//nec.h
+class Nec {
+
+public:
+void foo();
+private:
+void x();
+int y;
+};
+
+int y = 45;
+
+//nec.cpp
+void Nec::foo()
+{
+x = 45; //isim arama hatası olmaz, contex hatası olur
+int y = 67; //yerel x global x'i gizler (name shadowing)
+
+//sınıfın veri elemanına yerel değişken olan x'in değerini atamak için 
+Nec::y = y + ::y; //bu şekilde yapılabilinir
+}
+
+-------
+
+//nec.h
+class Nec {
+
+public:
+void foo();
+private:
+int x;
+};
+
+int main()
+{
+Nec mynec;
+mynec.Nec::foo(); //geçerlidir
+mynec.Nec::x //geçerli  
+}
+
+------
+ÖZET
+
+class Nec {
+public:
+void foo();
+private:
+};
+
+int main()
+{
+Nec::foo();//contex hatası
+Nec mynec;
+Nec& r{ mynec };
+Nec* p{ &myec };
+
+mynec.foo();
+r.foo();
+p->foo();
+}
 
 
