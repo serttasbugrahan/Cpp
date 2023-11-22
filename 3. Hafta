@@ -904,7 +904,7 @@ class Myclass {};
 void func(const Myclass&); //const L value (L valuelar bana gelsin)
 void func(Myclass&&); //R value (R valuelar bana gelsin)
 
-///////////////////////////////////////////////////////////3. Ders///////////////////////////////////////////
+///////////////////////////////////////////////////////////3.Ders///////////////////////////////////////////
 
 Classes: problem domaininde verinin soyutlanması sağlar
 --------
@@ -1340,7 +1340,7 @@ int y = 45;
 void Nec::foo()
 {
 x = 45; //isim arama hatası olmaz, contex hatası olur
-int y = 67; //yerel x global x'i gizler (name shadowing)
+int y = 67; //yerel y global y'i gizler (name shadowing)
 
 //sınıfın veri elemanına yerel değişken olan x'in değerini atamak için 
 Nec::y = y + ::y; //bu şekilde yapılabilinir
