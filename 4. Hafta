@@ -1,9 +1,394 @@
 /////////////////////////////////////////////1. Ders/////////////////////////////////////////////////////
 
+class hatırlatma:
+----------------
+
+class Nec {
+public:
+  void func(int);
+};
+
+int main(void)
+{
+Nec mynec;
+auto p = &mynec;
+
+//mynec.func(13);
+(*p).func(34);
+p->func(46); 
+}
+
+---------------------
+protected : kalıtım ile işimize yarıycak
+
+--------------------
+// sınıfın üye fonksiyonları sınıfın private bölümüne erişebilir
+
+class Nec {
+public:
+void func(Nec &r);
+private:
+int mx, my;
+};
+
+//nec.cpp
+Nec gnec;
+void Nec::func(Nec &r)
+{
+mx++;
+r.mx = 56;
+--gnec.my;
+}
+
+------------
+
+//nec.h
+class Nec {
+public:
+  void func() //ODR çiğnenmez
+  {
+    ///
+  }
+private:
+  int mx, my;
+};
+
+-----------
+!!BURAYU NET ANLAMADIM
+constexpr int foo(int x)
+{
+return x * x;
+}
+
+int main()
+{
+int a[foo(10)];
+
+constexpr auto val = foo(5); //bu şekilde derleme zamanında çalışma garantisi olur
+
+std::array<int, foo(29)> ar{};
+}
+
+---------------------------------------------------
+!! bu şekilde headder ve cpp dosyalarında yazılır class
+
+//bugra.h
+#ifndef BUGRA_INCUDED
+#define BUGRA_INCUDED
+
+class Myclass {
+public:
+  void foo(int);
+private:
+  void bar(int, int);
+};
+
+#endif
+
+//bugra.cpp
+#include "bugra.h"
+
+#define PUBLIC
+#define PRIVATE
+
+PUBLIC void Myclass::foo(int x)
+{
+
+}
+
+PRIVATE void Myclass::bar(int x, int y)
+{
+///...
+}
+
+------------------------------------------------------------
+
+this keyword:
+-------------
+
+'this' is a keyword
+
+'this' is a pointer, hangi nesne için çağrıldıysa o nesnenin adresini kullanır
+
+herhangi bir başlık dosyasını eklememize gerek yoktur
+
+sadece non-static'de kullanılır, global(free function) veya static de kullanılamaz
+
+void foo()
+{
+this; //hata verir
+}
+
+----
+
+class Myclass {
+void func()
+{
+this; //hata vermez
+}
+
+static void foo()
+{
+this; //hata verir
+}
+}
+
+----
+hangi nesne için çağrıldıysa o nesnenin adresini kullanır
+
+class Myclass {
+public:
+void foo()
+{
+std::cout << "this = " << this << '\n';
+}
+private:
+int mx{}, my{};
+};
+
+int main()
+{
+Myclass m;
+
+std::cout << "&m = " << &m << '\n'; //aynı adres yazar
+m.foo(); 
+Myclass* pm = &m; //aynı anlama gelir
+pm->foo();
+}
+
+----
+
+this is a pr value  
+
+class Myclass {
+public:
+void foo();
+private:
+int mx{}, my{};
+};
+
+void Myclass::foo()
+{
+Myclass m;
+this = &m; //sentax hatası olur
+}
+
+----
+
+class Myclass {
+public:
+void foo();
+private:
+int mx{}, my{};
+};
+
+void Myclass::foo()
+{
+Myclass mz;
+*this = mx; //hata olmaz
+
+(*this).mx = 56;
+this->mx =56;
+Myclass::mx = 56;
+mx = 56; //hepsi aynı anlama gelir
+}
+
+int main()
+{
+Myclass m;
+m.foo();
+}
+
+
+!! non-static üye fonksiyonu içinde this fonksiyon hangi nesne iiçn çağrıldıysa onun adresi olur
+
+!! non-static üye fonksiyonu içinde *this fonksiyon hangi nesne iiçn çağrıldıysa onun kendisi  olur
+
+-------------------
+
+this kullanımının önemli olduğu alanlar
+
+class Myclass {
+public:
+void foo();
+private:
+int mx{}, my{};
+};
+
+void gfunc1(Myclass* p)
+{
+
+}
+
+void gfunc2(Myclass& r)
+{
+
+}
+
+void Myclass::foo()
+{
+//gfunc çağırmanın tek yolu this çağırmaktır
+gfunc1(this);
+gfunc2(*this);
+
+}
+
+int main()
+{
+Myclass m;
+m.foo();
+}
+
+----------
+
+C# java gibi dillerde fluent API terimi vardır
+c++'da bunun yerine chainig terimi kullanılır
+
+class Myclass {
+public:
+Myclass& foo();
+Myclass& bar();
+Myclass& baz();
+
+private:
+int mx{}, my{};
+};
+
+Myclass& Myclass::foo()
+{
+++mx;
+++my;
+
+return *this;
+}
+
+Myclass& Myclass::bar()
+{
+++mx;
+++my;
+
+return *this;
+}
+
+Myclass& Myclass::baz()
+{
+++mx;
+++my;
+
+return *this;
+}
+int main()
+{
+Myclass m;
+
+//m.foo();
+//m.bar();
+//m.baz(); //bu şekilde yazmak yerine aşğıdaki gibide yazılabilinir
+
+//m.foo().bar().baz();   //channing
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+int x{34};
+int y{323};
+double dval{4565.1};
+
+cout << x << y << dval; //channing örneği
+
+cout.operator<<(x)..operator<<(y).operator<<(dval); //301 ile aynı anlamda 
+}
+
+---------
+
+this pointerını mecburi kılan kısımmlar:
+bir üye fonksiyonu içinde nesnenin kendisini veya adresini global bir fonksiyona göndermemiz gerektiği 
+zaman kullanırız
+
+class Tamer {
+public:
+Tamer* foo() {return this};
+Tamer* bar() {return this};
+Tamer* baz() {return this};
+};
+
+int main()
+{
+Tamer* p = new Tamer;
+
+p->bar()->foo()->baz();
+}
+
+!! bu durumlar dışında this keywordü çok kullanma, çirkin bir görüntü
+
+----------------------------------------------------
+
+const member function:
+---------------------
+!! burası çok önemli 
+
+Mutator : Değiştirici
+Accessor : Erişimci
+
+void func(T *);
+void foo(T &);
+
+void func(const T*);
+void foo(const T&);
+
+class Fighter {
+public:
+  void shoot();
+};
+
+---
+
+class Nec{
+public:
+  void foo(); //mutator, non-cost member function
+  void foo()const; //accessorx, const member function
+};
+
+-----
+sentaks kuralalrı 
+
+a) const üye fonksiyonları içinde 
+sınıfın non-static veri elemanlarına atama yapamayız
+
+b) const üye fonksiyonu içinde non-const üye fonksiyonu doğrudan ismi ile çağırılamaz ( const T* ==> T* olmaz)
+
+
+class Myclass {
+public:
+void foo()const
+{
+(*this).mx = 56; //hata olur
+mx = 34; //hata, 369 ile aynı anlamda
+
+Myclass m;
+auto b = mx; //Legal
+m.mx; //legal
+
+bar(); //illegal, const T* ==> T* olmaz
+}
+
+void bar()
+{
+foo(); //legal
+}
+
+private:
+int mx;
+
+};
 
 
 
-
+//1.50
 
 
 
