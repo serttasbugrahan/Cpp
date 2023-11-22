@@ -1111,7 +1111,202 @@ void func(); //non-static member function
 
 };
 
-//1.31.15
+-----
+inline : Derleyici, bu fonksiyonun çağrıldığı yerde, fonksiyon çağrısı yerine doğrudan fonksiyonun içeriğini yerleştirmeye çalışacaktır.
+class Fighter{
+public:
+  inline void func(); //inline yazılması ile yazılmamamıs arasında fark yoktur
+  {
+  
+  }
+};
+
+---------------
+
+üye fonksiyon ne demek ?
+
+struct fighter {
+int a,b, xc;
+};
+
+void func(Fighter* p)
+{
+p-> a; //fonksiyondan struct yapısına erişilir
+}
+
+int main()
+{
+struct Fighter myfighter;
+func(&myfighter);
+}
+
+//bunu yapmanın daha kolay yolu vardır
+//yukarıdaki gibi global bir fonksiyon yazmak yerine kullanılır
+
+class Fighter{
+public:
+           //Fighter *, aslında gizli bir bu yapı vardır
+void func(            );
+
+};
+
+int main()
+{
+Fighter f;
+f.func();
+}
+
+-----
+
+attack(&myfighter, &enemyfighter)
+
+myfighter.attack(enemyfighter); //bu şekilde yazılabilie, üye fonksiyon denir buna
+myaccount.transfer(other_account, 500.); //daha anlaşılırdır
+
+-----
+
+#include <string>
+
+int main()
+{
+using namespace std;
+
+string name{ "mehmet bal"};
+name.assign(
+}
+
+---------------
+
+//sınıfın adı nec ve bir üye fonksiyon bildirilsin
+
+class Nec{
+public:
+  void foo(int x);
+  void foo(int);//bu şekilde de yazılabilinir
+};
+
+int main()
+{
+Nec mynec;
+mynec.foo();
+}
+
+-------
+
+//üye fonskiyonlar overload olabilir
+
+class Nec{
+public:
+  int foo(int x);
+};
+
+int foo(int x, iny y); //overload olmaz aynı scope da olması lazım
+
+-------
+
+class Nec{
+public:
+  int foo(int); //redaclaration olmaz sentax hatası cevabı alırız
+  int foo(int);
+
+};
+
+-----
+
+class Nec{
+private:
+  int foo(double); //function overloading olur, foo fonksiyonu çağrılamaz
+public:
+  int foo(int);
+};
+
+-----
+
+class Nec{
+private:
+  int foo(double); //function overloading olur, foo fonksiyonu çağrılamaz
+public:
+  int foo(int);
+};
+
+int main()
+{
+Nec mynec;
+
+mynec.foo(12); // access kontrol hatası olur
+mynec.foo(1.2); //hata olmaz
+}
+
+------------
+
+//üye fonksiyonlar nasıl tanımlanır
+
+class Nec {
+public:
+  void set(int x, int y);
+private:
+  int mx, my;
+};
+
+
+//sınıfın public, private ve protected member fuctionu nasl tanımlanır
+
+//nec.h
+class Nec {
+public:
+  void set(int x, int y);
+private:
+  int mx, my;
+};
+
+//nec.cpp
+#include "nec.h"
+
+void Nec::set(int x, int y) //Nec::set kullanmasaydık global bir fonskyion olurdu sınıfa girmezdi
+{
+mx = x; //sınıfın üye fonksiyonları private bölüme erişebilir
+mx = y; //derleyici isim arama kurallarına göre direk y bulur. gizli 'param->' bulunru
+}
+
+//main.cpp
+
+int main()
+{
+Nec mynec;
+mynec.set(12. 56); //set fonksiyonu mynec üzerinde işlem gerçekleştirir
+
+}
+
+----------
+
+class Point {
+
+public:
+  void foo();
+private:
+  int mx, my;
+};
+
+//point.cpp
+
+Point gp;
+
+void Point::foo()
+{
+gp.mx = 4; //sentax hatası olmaz, sınıfın üye fonksiyonları o sınıf türünden herhangi bir nesnenin private bölümüne erişebilir
+gp.my = 5;
+
+}
+
+--------------
+
+sınıfların üye fonksiyonları içinde isim arama (name lookup) :
+                                               -------------
+1-name lookup
+2-context control 
+3-access control
+
+sırlama bu şekildedir
 
 
 
