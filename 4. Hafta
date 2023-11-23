@@ -353,7 +353,7 @@ public:
   void foo()const; //accessorx, const member function
 };
 
------
+---------------------------------
 sentaks kuralalrı 
 
 a) const üye fonksiyonları içinde 
@@ -361,6 +361,7 @@ sınıfın non-static veri elemanlarına atama yapamayız
 
 b) const üye fonksiyonu içinde non-const üye fonksiyonu doğrudan ismi ile çağırılamaz ( const T* ==> T* olmaz)
 
+c) const sınıf fonksiyonları için sadece sınıfın const üye fonksiyonlarını çağırabiliriz
 
 class Myclass {
 public:
@@ -386,9 +387,301 @@ int mx;
 
 };
 
+---
+
+class Myclass{
+public:
+void foo()const
+{
+bar(); //burada hata olmaz
+//const fonksiyonlar const çağırabilir
+}
+void bar()const;
+
+private:
+int mx;
+};
+
+int main()
+{
+}
+
+------
+
+class Myclass{
+public:
+void foo()const;
+void bar()const;
+
+private:
+int mx;
+};
+
+int main()
+{
+Myclass m;
+m.foo(); //hata olmaz
+m.bar(); //hata olmaz
+
+}
+
+----
+
+class Myclass{
+public:
+void foo()const;
+void var();
+
+private:
+int mx;
+};
+
+int main()
+{
+const Myclass m;
+m.foo(); //hata olmaz
+m.bar(); //hata olur //const t* ==> t* dönüşüm yoktur
+
+}
+
+----
+
+class Myclass{
+public:
+Myclass* foo()const
+//const Myclass* foo() //böyle yaparsak hata olmaz, const t* ==> const t* dönüşüm olur
+//const Myclass* foo()const //böyle yaparsak hata olmaz
+{
+return this; //hata olur const t* ==> t* dönüşüm olmaz
+}
+
+private:
+int mx;
+};
+
+int main()
+{
+const Myclass m;
+
+m.bar(); 
+
+}
+
+-----
+
+class Myclass{
+public:
+Myclass& foo()
+
+{
+return *this; //hata olmaz 
+}
+
+private:
+int mx;
+};
+
+int main()
+{
+const Myclass m;
+
+m.bar(); 
+}
+
+-----
+
+class Myclass{
+public:
+const Myclass& foo()
+//Myclass& foo()const //hata olur
+{
+return *this; //hata olmaz, t& ==> const t& dönüşüm var
+}
+
+private:
+int mx;
+};
+
+int main()
+{
+const Myclass m;
+
+m.bar(); 
+}
+
+-----
+
+class Myclass{
+public:
+void foo(); //burası nesneyi değiştirmek istiyor
+
+private:
+int mx;
+};
+
+int main()
+{
+const Myclass m; //burası kendini değiştirmek istemiyor
+m.foo(); //hata olur
+}
+
+-------
+
+class Myclass{
+public:
+
+private:
+};
+
+void foo(Myclass*); //function overloading olur
+void foo(const Myclass*);
+void foo(Myclass* const); //function redaclaration
+
+-------
+
+class Myclass{
+public:
+
+private:
+};
+
+void foo(Myclass*); //function overloading olur
+void foo(const Myclass*);
+
+int main()
+{
+Myclass m;
+
+foo(&m); //548 çağrılır
+}
+
+-----
+
+class Myclass {
+public:
+void foo();
+void foo()const; //ovarloading olur
+
+private:
+};
+
+int main()
+{
+Myclass m;
+m.foo();//562 çağrılır
+
+const Myclass m;
+m.foo(); //563 çağrılır
+}
+
+------
+
+#include <iostream>
+#include <string>
+
+int main()
+{
+using namespace std;
+
+const string name{ "TAMER"};
+
+std::cout << name << '\n';
+auto c = name[0];
+name[0] = 'K'; //buraya hata verir
+std::cout << name >> '\n';
+}
+
+-----
+
+class String {
+public:
+char & front();
+const char & front()const;
+};
+
+int main()
+{
+string name;
+name.front() = 'A'; // hata olmaz
+
+}
+
+-----
+
+class String {
+public:
+char & front();
+const char & front()const;
+};
+
+int main()
+{
+const string name;
+name.front() = 'A'; // hata olur
+
+const string name;
+auto val = name.front();
+
+}
+
+------
+
+int main()
+{
+using namespace std;
+string name{ "mert" };
+//const string name{ "mert" }; //bu şekilde hata olır
+
+name.front() = 'b'; //Hata olmaz
+name.back() = 'k';
+}
+
+-----
+
+mülakatlarda en sık sorulan sorulardan birisi
+
+class Fighter {
+
+public:
+void foo()const
+{
+m_age++; //hata olur 
+//++debug_call_count; //sentax hatası olur, bunu aşmak için mutable kullanılır
+
+}
+private:
+  std::string m_name;
+  int m_age;
+  int power;
+  //int debug_call_count; //üye fonskiyonların kaç kez çağrıldığına bakacak
+  mutable int debug_call_count;
+
+!! mutable sayesinde artık debug_call_count değiştirilmesi hata olmaz
+};
+int main()
+{
+
+}
+
+----------------------------------------------------------
+// bir sınıf nesnesinin hayata gelmesi için sınıfn üye fonksiyonunun çağrılması gerekir
+
+constructor (kurucu işlev): sınıf nesnesini hayata getiren fonksiyon
+destructor (sonlandırıcı işlev): sınıf nesnesinin hayatını bitiren fonksiyon
+
+constructor:
+-sınıfın non-static member function olmalı global olamaz
+-constructor keyfi olarak isimlendirilemez, sınıfın ismi ile aynı olmalı
+-geri dönüş değeri yoktur
 
 
-//1.50
+
+
+
+
+
+
+
 
 
 
