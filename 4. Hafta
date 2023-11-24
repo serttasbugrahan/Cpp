@@ -664,29 +664,743 @@ int main()
 
 }
 
-----------------------------------------------------------
+
+/////////////////////////////////////////////////////////2. Ders///////////////////////////////////////////////////
+
 // bir sınıf nesnesinin hayata gelmesi için sınıfn üye fonksiyonunun çağrılması gerekir
 
 constructor (kurucu işlev): sınıf nesnesini hayata getiren fonksiyon
 destructor (sonlandırıcı işlev): sınıf nesnesinin hayatını bitiren fonksiyon
 
-constructor:
+constructor(ctor):
+------------------
 -sınıfın non-static member function olmalı global olamaz
 -constructor keyfi olarak isimlendirilemez, sınıfın ismi ile aynı olmalı
+-const member function olamaz
 -geri dönüş değeri yoktur
+-sınıfın constructarları birden fazla olabilir, overload edilebilir
+-public olmak zorunda değildir, private ya da protected olabilir
+-sınıfın construcları member selection ile çağrılamıyor
+
+class Myclass {
+public:
+Myclass();
+Myclass() const; //hata
+int Myclass() //Hata;
+
+-sınıfın constructarları birden fazla olabilir, overload edilebilir
+
+Myclass(int);
+Myclass(double);
+Myclass(int, int);
+Myclass(double);
+
+};
+
+------
+-sınıfın construcları member selection ile çağrılamıyor
+
+class Myclass {
+public:
+Myclass();
+void foo();
+};
+
+int main()
+{
+Myclass m;
+Myclass* p { &m };
+m.foo();
+p->foo();
+
+m.Myclass(); //hata
+p->Myclass(); //hata
+}
+
+-----------------------------
+
+default constructer:
+(varsayılan kurucu işlem)
+
+-parametresi olmayan ya da tüm parametreleri default argument alan constructerdır
+
+---------------------------
+
+destructor (dtor): Bir sınıf nesnesinin hayatının (lifespan) bitmesini sağlayan fonksiyon
+-----------------
+~Myclass //bu şekilde gösterilir
+
+-sınıfın non-static member function olmalı global olamaz
+-destructor keyfi olarak isimlendirilemez, sınıfın ismi ile aynı olmalı
+-const member function olamaz
+-geri dönüş değeri yoktur
+-Bir sınıfın destructor'ı paramtere değişkenine sahip olmayan
+-sınıfın destructor birden fazla olabilir, overload edilebilir
+-public olmak zorunda değildir, private ya da protected olabilir
+-sınıfın construcları member selection ile çağrılamıyor
+-sadece ileride öğreniceğimiz özel bir seneryoda kullanılmak üzere bir sınıfın  dtor'ı ismiyle çağırabiliriz
+  placement new
+
+class Myclass {
+public:
+~Myclass();
+}
+
+int main()
+{
+{
+  Myclass m;
+} 
+}
+
+!! sınıfın 
+a) default ctor'ı 
+b) destructor'ı 
+
+aynı zamanda sınfın "special member function" kategorisindedir.
+
+special member functions:
+
+default ctor (constructor)
+destructor 
+copy ctor
+move ctor (C++)
+copy assignment
+move assignment (C++)
+
+Bu fonksiyonlara special member denmesinin nedeni
+bu fonksiyonların kodlarının (belirli koşullar sağlandığında) derleyici tarafından bizim için yazılabilmesi
+
+derleyicinin bunların kodunu yazması ==> default etmesi
+
+---------------
+
+storage duration (storage class):
+
+-automatic storage class
+-static storage class
+-dynamic storage class
+-thread-local storage
+
+Global sınıf nesneleri :
+-------------------------
+eğer global ise main fonksiyonu çağrılmadan hayat başlar
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor\n";
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor\n";
+}
+};
+
+Myclass g;
+
+int main()
+{
+std::cout << "main basladi\n";
+
+std::cout << "manin sonra eriyor\n";
+}
+
+-----------
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor this =" << this << '\n';
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor this = " << this << '\n';
+}
 
 
-/////////////////////////////////////////////////////////2. Ders///////////////////////////////////////////////////
+void foo()
+{
+std::cout << "Myclass::foo() this " << this << '\n';
+}
+
+};
+
+class Nec {
+public:
+Nec()
+{
+  std::cout << "Nec default ctor this =" << this << '\n';
+}
+
+~Nec()
+{
+  std::cout << "nec destructor this = " << this << '\n';
+}
 
 
+void foo()
+{
+std::cout << "Nec::foo() this " << this << '\n';
+}
+
+};
+
+Myclass g_myc; //sırayla çağrılır
+Nec g_nec; //hayata daha sonra gelen daha önce veda edicek(son giren ilk çıkar)
+
+int main()
+{
+std::cout << "main basladi\n";
+std::cout << "main sonra eriyor\n";
+}
+
+---------------------------------
+
+aynı programın farklı kaynak dosyalarında tanımlanan global sınıf nesnelerinin
+
+ctor'larının çağrılma sırası
+dil tarafından belirlenmiş değildir
+
+emrecan.cpp
+  A ga;
+bilge.cpp
+  b gb;
+melike.cpp
+  C gc;
+
+çağrılmas sırası 
+ga gb gc , bu şekilde de olabilir
+gc ga gb bu şekilde de olabilir
+
+bu soruna static init. fiasco denir.
+          -------------------
+
+-------------------------------------
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor this =" << this << '\n';
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor this = " << this << '\n';
+}
+};
+
+void foo()
+{
+static Myclass m;
+}
+
+int main()
+{
+std::cout << "main basladi\n"; //bunların çıktılarını incele
+foo(); //birden fazla çağırsakta aynı sonuç karşımıza çıkar static olduğu için tekrar oluşturulmaz
+foo();
+foo();
+std::cout << "main sona eriyor\n";
+}
+
+!! static anahtar sözcüğü ile tanımlanan yerel sınıf nesneleri ancak o fonkssiyon çağrıldığında hayata gelicek
+ve programın sonuna kadar hayatları devam edicektir. tekrar çağrırsak aynı nesne olur
+
+-------------------
+!!!
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor this =" << this << '\n';
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor this = " << this << '\n';
+}
+};
+
+int main()
+{
+std::cout << "main basladi  [1]\n"; //ilk bu yazı çıkar
+{
+  std::cout << "main devam ediyır [2]\n"; //sonra bu
+  Myclass m; //Myclass constructerın çağırılıcak
+  std::cout << "main devam ediyor  [3]\n"; //sonra bu çıkıcak
+  //4 yazısı çıkmadan destructor çağırılacak, çünkü nesnein closing braceine gelmeden önce destructor çağırılır
+}
+
+std::cout << "main sona eriyor[4]\n"; //en son burası çağırılıcak  
+}
 
 
+--------
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor this =" << this << '\n';
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor this = " << this << '\n';
+}
+};
+
+void foo()
+{
+Myclass m;
+}
+
+int main()
+{
+foo(); //otomatik ömürlü olduğu için her çağrı için önce constructor sonra destructor  çağırılacak
+foo();
+foo();
+foo();
+}
+
+---------
+
+class Myclass {
+public:
+Myclass()
+{
+  std::cout << "myclass default ctor this =" << this << '\n';
+}
+
+~Myclass()
+{
+  std::cout << "myclass destructor this = " << this << '\n';
+}
+};
+
+Myclass g;
+
+int main()
+{
+Myclass m1;
+{
+Myclass m2;
+{
+Myclass m3;
+
+}
+}
+}
+
+-----------
+
+!! çok popüler bir cpp sorusu
+
+//birden 100'e kadar sayıları ekrana yazdırın ama döngü kullanmadan
+
+class Myclass {
+public:
+Myclass()
+{
+static int cnt{ 0 };
+std::cout << ++cnt << ' ';
+}
+};
+
+int main()
+{
+int a[100]; //her nesne hayata geldiğinde contructar meydana gelicek 
+}
+
+--------------------------------
+RAII idiyomu constructerın kaynağı edinmesi nesnenin bu kaynakları kullanabilmesi 
+nesnenin işi bittiği zaman destructarın o kaynakları geri vermesi
 
 
+!! bir sınıfın default consteructerının olması olmamasına göre çok daha doğal ve sık karşılaşılınır
+yüzde 90-95 default constructer bulnur
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "Myclass default ctor\n";
+}
+};
+
+int main()
+{
+Myclass m1; //sınıf nesneleri default init. yapıldığında default constructer çağırılır
+Myclass m2{} //value init. default constructer çağırılır
+}
+
+---------------------
+
+parametreli constructer :
+
+class Myclass {
+public:
+Myclass(int x)
+{
+std::cout << "Myclass(int x) x = "<< x << "\n";
+}
+};
+
+int main()
+{
+Myclass m1(10); //direct init
+Myclass m2 = 20; //copy init
+Myclass m3{57}; //direct list init
+}
+
+------
+
+class Myclass {
+public:
+Myclass(int x,int y)
+{
+std::cout << "Myclass(int x, int y) x = "<< x << " y = " << y << "\n";
+}
+};
+
+int main()
+{
+Myclass m1(10, 20); //2 paramtereli constructer çağırılıcak
+Myclass m1{30, 40}; //bu şekilde de olur
+}
+
+------
+
+class Myclass {
+public:
+Myclass(int x,int y)
+{
+std::cout << "Myclass(int x, int y) x = "<< x << " y = " << y << "\n";
+}
+
+Myclass(int x,int y)
+{
+std::cout << "Myclass(double x, double y) x = "<< x << " y = " << y << "\n";
+}
+
+Myclass(int x,int y)
+{
+std::cout << "Myclass(int x) x = "<< x << " y = " << y << "\n";
+}
+
+Myclass(int x,int y)
+{
+std::cout << "Myclass(double x) x = "<< x << " y = " << y << "\n";
+}
+};
+
+int main()
+{
+Myclass m1(10); //def ctor
+Myclass m2(3.434f);
+
+Myclass m3(2, 4);
+Myclass m4(2., 4.);
+}
+
+----------------------------------
+
+constructer init. list / member init. lis: 
+sınıfın constructerının sınıfın non-static veri elemanları init. yapma sentexı
+
+önce sınfın veri elemanları init ediliyor ondan sonra programın akışı 
+constructerın ana bloğuna giriyor
+
+class Myclass {
+public :
+Myclass()
+{
+
+}
+private:
+T tx;
+U ux;
+W wx;
+}
 
 
+---------
 
+class Myclass {
+public:
+  Myclass()
+  {
+    mx = 0; //burada init. yapılmıyor yeniden değer veriliyor init çoktan yapılmış
+    my = 0; //ilk değer vermek için constructer init. list / member init. list kullanılmalı
+//BÖYLE ATAMA ASLA YAPMA
+  }
+private:
+int mx, my;
+};
 
+--------
+constructer init. list sentax:
+
+class Myclass {
+public:
+Myclass();
+
+private:
+int mx, my;
+};
+
+Myclass::Myclass() : mx(10), my(20) {}
+Myclass::Myclass() : mx{10}, my{20} //bu şekilde de olur
+{
+//ana blok olmak zorunda
+}
+
+------
+
+class Myclass {
+public:
+Myclass() : mx(19), my(20) {}
+void print()const
+{
+std::cout << "mx = " << mx << " my = " << my << "\n";
+}
+private:
+int mx, my;
+};
+
+int main()
+{
+Myclass m1;
+m1.print();
+}
+
+-------
+
+class Myclass {
+public:
+//ub 
+Myclass() : mx(19), mx(my / 3) {}
+
+private:
+int mx, my;
+};
+
+int main()
+{
+
+}
+
+----------
+class Point {
+
+public:
+point(double x, double y) : mx{x}, my{y} {}
+void print()const
+{
+std::cout << "(" << mx << ", " << my << ")\n";
+}
+private:
+double mx, my;
+};
+
+int main()
+{
+Point p1{4., 7.};
+p1.print();
+}
+
+-----
+
+class Myclass {
+public:
+Myclass()
+{ //burada sentax hatası olur nedeni derleyicinin eklediği kodun mx'İ default init. etme girişimi
+
+}
+private:
+const int mx;
+}
+
+------
+
+class Myclass {
+public:
+Myclass()
+{
+mx = 7; //yine hata olur çünkü burası init.  değil yeniden atama
+}
+private:
+const int mx;
+}
+
+------
+
+class Myclass {
+public:
+Myclass(int &r) : mx(r) //hata olmaz
+{
+
+}
+private:
+int &mx;
+};
+
+------
+
+class Myclass {
+public:
+Myclass(int &r) : mx(r)
+{
+
+}
+private:
+int &mx;
+};
+
+int main()
+{
+using namespace std;
+
+cout << "ival = " << ival << '\n';
+Myclass m(ival);
+m.foo();
+
+cout << "ival = " << ival << '\n';  
+}
+
+------
+
+!! sınıfın veri elemanı eğer referans ise ya da const ise constexture init. list kullanmak zorundıyız
+
+-----
+
+!! çok tipik yapılan bir hata
+
+class Person {
+public:
+Person(const char * p)
+{
+m_address = p;
+}
+
+private:
+std::string m_address;
+};
+
+-----------------
+
+modern c++'da en fazla yanlış anlaşılan konu
+
+class Myclass {
+
+public:
+void print() const
+{
+std::cout << mx << ' ' << my << '\n';
+}
+
+private:
+int mx = 10;
+int mx(10); //hata
+int mx = {10}; //legal
+int my = 20;
+};
+
+//modern c++ c++11 ile geldi
+//yukarıdaki duruma
+//default member init.
+//in-class init.
+
+//derleyici sınıfın default constructerlarını default ederken bütün elemanları default init yapmak zorunda
+
+int main()
+{
+Myclass m; //garbage value olur çünkü derleyici default init yaptı
+m.print();
+}
+
+-------
+
+class Myclass {
+
+public:
+
+Myclass() : mx(46), my(98) //hata olmaz cevap 46, 98 değeri yazar
+//default member init kullanmıyorum diyoruz
+{
+
+}
+
+void print() const
+{
+std::cout << mx << ' ' << my << '\n';
+}
+
+private:
+int mx = 6; //burada biz bunları init. yapmış olmuyoruz, derleyiciye ben init. yapmassam sen bu değerler ile init yap diyoruz
+int my = 9;
+};
+
+int main()
+{
+Myclass m;
+m.print();
+}
+
+----------
+//ileri bir örnek
+class Person {
+public :
+void print() const
+{
+std::cout << "isim : (" << m_name << ")\n";
+std::cout << "soyiism : (" << m_surname << ")\n";
+}
+private :
+std::string m_name;
+std::string m_surname;
+};
+
+int main()
+{
+Person pnec;
+pnec.print();
+}
+
+-------
+
+class Point{
+public:
+
+private:
+double mx{}, my{}, mz{};
+};
+
+int main()
+{
+using namespace std;
+}
+
+--------------------------------
+
+delete : bu fonksiyon var ama bu fonksiyona çağrı yapılırsa çağrı sentax hatası oluşturucak
+-------
+
+class Myclass {
+public:
+Myclass(int)
+}
+
+void func(int) = delete;
+
+//2.41.09
 
 
 
