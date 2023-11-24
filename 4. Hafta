@@ -54,7 +54,6 @@ private:
 };
 
 -----------
-!!BURAYU NET ANLAMADIM
 constexpr int foo(int x)
 {
 return x * x;
@@ -106,13 +105,13 @@ PRIVATE void Myclass::bar(int x, int y)
 this keyword:
 -------------
 
-'this' is a keyword
+- 'this' is a keyword
 
-'this' is a pointer, hangi nesne için çağrıldıysa o nesnenin adresini kullanır
+- 'this' is a pointer, hangi nesne için çağrıldıysa o nesnenin adresini kullanır
 
-herhangi bir başlık dosyasını eklememize gerek yoktur
+- herhangi bir başlık dosyasını eklememize gerek yoktur
 
-sadece non-static'de kullanılır, global(free function) veya static de kullanılamaz
+- sadece non-static'de kullanılır, global(free function) veya static de kullanılamaz
 
 void foo()
 {
@@ -134,7 +133,7 @@ this; //hata verir
 }
 
 ----
-hangi nesne için çağrıldıysa o nesnenin adresini kullanır
+!! hangi nesne için çağrıldıysa o nesnenin adresini kullanır
 
 class Myclass {
 public:
@@ -158,7 +157,7 @@ pm->foo();
 
 ----
 
-this is a pr value  
+- this is a pr value  
 
 class Myclass {
 public:
@@ -201,8 +200,10 @@ m.foo();
 
 
 !! non-static üye fonksiyonu içinde this fonksiyon hangi nesne iiçn çağrıldıysa onun adresi olur
+                                    ----
 
 !! non-static üye fonksiyonu içinde *this fonksiyon hangi nesne iiçn çağrıldıysa onun kendisi  olur
+                                    ------
 
 -------------------
 
@@ -306,7 +307,7 @@ cout.operator<<(x)..operator<<(y).operator<<(dval); //301 ile aynı anlamda
 ---------
 
 this pointerını mecburi kılan kısımmlar:
-bir üye fonksiyonu içinde nesnenin kendisini veya adresini global bir fonksiyona göndermemiz gerektiği 
+!! bir üye fonksiyonu içinde nesnenin kendisini veya adresini global bir fonksiyona göndermemiz gerektiği 
 zaman kullanırız
 
 class Tamer {
@@ -354,7 +355,7 @@ public:
 };
 
 ---------------------------------
-sentaks kuralalrı 
+sentaks kuralları: 
 
 a) const üye fonksiyonları içinde 
 sınıfın non-static veri elemanlarına atama yapamayız
@@ -368,7 +369,7 @@ public:
 void foo()const
 {
 (*this).mx = 56; //hata olur
-mx = 34; //hata, 369 ile aynı anlamda
+mx = 34; //hata, 371 ile aynı anlamda
 
 Myclass m;
 auto b = mx; //Legal
@@ -552,7 +553,7 @@ int main()
 {
 Myclass m;
 
-foo(&m); //548 çağrılır
+foo(&m); //549 çağrılı
 }
 
 -----
@@ -571,7 +572,7 @@ Myclass m;
 m.foo();//562 çağrılır
 
 const Myclass m;
-m.foo(); //563 çağrılır
+m.foo(); //564 çağrılır
 }
 
 ------
@@ -673,6 +674,11 @@ constructor:
 -sınıfın non-static member function olmalı global olamaz
 -constructor keyfi olarak isimlendirilemez, sınıfın ismi ile aynı olmalı
 -geri dönüş değeri yoktur
+
+
+/////////////////////////////////////////////////////////2. Ders///////////////////////////////////////////////////
+
+
 
 
 
