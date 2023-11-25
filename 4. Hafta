@@ -1388,19 +1388,503 @@ int main()
 using namespace std;
 }
 
---------------------------------
+
+//////////////////////////////////////////////////////////3. Ders//////////////////////////////////////
+
 
 delete : bu fonksiyon var ama bu fonksiyona çağrı yapılırsa çağrı sentax hatası oluşturucak
 -------
 
 class Myclass {
 public:
-Myclass(int)
-}
+Myclass(int) = delete;
+void foo(int, int) = delete;
+};
 
 void func(int) = delete;
 
-//2.41.09
+int main()
+{
+func(12); //delete edilmiş bir fonksiyon çağrı yaptığın için sentax hatası
+}
+
+------
+
+void func(int);
+void func(double) = delete;
+void func(long);
+
+
+int main()
+{
+func(1.2); //hata olur
+func(1); //hata olmaz
+}
+
+---------
+
+// mülakat sorusu
+öyle bir fonksiyon oluşur ki sadece int iile çağrılsın
+
+template <typename T>
+void func(T) = delete;
+
+void func(int);
+
+int main()
+{
+func(2.3);
+}
+
+---------------------------------------
+
+sınıfların özel üye fonksiyonları:
+----------------------------------
+
+defauult ctor
+destructor
+copy ctor
+move ctor
+copy assignment
+move assignment
+
+//derleyici bizim yerimize fonksiyonları default eder
+
+
+yukarıda fonksiyonlardan herhangi biri 3 statüden biri olabilir
+
+-not declared : fonksiyonun olmaması demektir
+-user declared : özel üye fonksiyonun kullanıcı tarafından bildirilimesine denir
+  a) user defined
+  b) = default
+  c) = delete
+-implicitly declared : bir fonksiyonun programcı tarafından açıkça bildirilmediği, ancak kullanıldığında derleyicinin otomatik olarak bir bildirim oluşturduğu durumu ifade eder. 
+  a) default
+  b) delete
+
+------------
+not declared  :
+
+class Myclass {
+public:
+Myclass(int); //not declared
+};
+
+int main()
+{
+Myclass m;
+}
+
+--------
+user declared :
+
+class Mycşlass {
+public:
+//deafult bildirimi derleyicye bunu bildiyorum ama emrediyorum sen tanımlıycaksın demek
+Myclass() = default; //user decalred
+};
+
+--------
+
+class Myclass {
+public:
+Myclass() = delete; //user declared, var ama çağrılması sentax hatası anlamında
+};
+
+---------
+implicitly declared :
+sınıfın özel üye fonksiyonunu bildirmesekte derleyici bunu örtülü olarak bildirir
+
+class Myclass {
+public:
+
+private:
+int &r; //sınıfın default constructerı delete edildi
+};
+
+int main()
+{
+Myclass m;
+}
+
+-------
+
+class Member {
+
+};
+
+class Tamer {
+private:
+Member mx; //default init yapıldı
+//default init yapılan sınıf türünden ise onun default init edilmesi default constructarın çağrılması demektir
+};
+
+int main()
+{
+Tamer tx; 
+}
+
+-------
+
+class Member {
+public:
+Member(int); //memberın default constrıctır yok
+//tamerin default constructarını derleyici default ettiğinde olmayan bir default constructara çağrı yapacak
+bu da sentax hatasıı olucak, bu yüzden delete etmek zorunda
+};
+
+class Tamer {
+//implicitly decllared delete
+private:
+Member mx; 
+
+};
+
+int main()
+{
+Tamer tx;  //hata olur
+}
+
+----------
+BURADAKİ KURALLAR ÇOK ÖNEMLİ
+
+1) hangi durumda derleyici bir sınıfın bir "special member function" default eder
+2) Nasıl default eder?
+
+
+!! invariant: bazı önemli bilgilere denir sınıfın içinde yer alır. mesela üçgen ile ilgili bir sınıfta kenarların negatif olmaması invariant bir bilgidir   
+!! eğer biz bir koruma yapmıycaksak invariantların kontrolünü programcıya bırakıcaksak invariant uygulamıycaksak böyle sınıflar ilave kurallara sahip bunlara arrigınt denir
+
+class Myclass { // yanlış bir kod hem elemanları gizlemiş hemde referans vermiş
+
+public:
+int & get_mx()
+{
+return mx;
+}
+
+int &get_my()
+{
+return my;
+}
+
+private:
+int mx;
+int my;
+};
+
+int main()
+{
+Myclass m;
+m.get_mx() = 5;
+m.get_my() = 33;
+}
+
+---------------------------------
+
+copy constructor (cc):  
+---------------------
+
+eğer bir sınıf nesnesi hayata değerini aynı türden 
+bir başka sınıf nesnesinden alarak geliyor ise
+
+Person necati {...};
+
+Person ali = necati; //copt constructor çağırılır
+
+----------
+!! bir fonksiyonun paramtere değişkeni fonksiyon tanımı içinde kullanılmıyacaksa asla ona isim vermeyin
+int func(int x, int y)
+{
+return x *x
+}
+-----------
+
+class Nec {
+public:
+Nec() //default construcor
+{
+std::cout << "default ctor this : " << this << '\n';
+}
+
+~Nec() //destrucator
+{
+std::cout << "destructor this: " << this << '\n';
+}
+};
+
+void foo(Nec) //copy constructor çağırılıyor
+{
+
+}
+int main()
+{
+Nec mynec;
+std::cout << "&mynec = " << &mynec << '\n';
+
+foo(mynec);
+std::cout << "main devam ediyor\n";
+//2 tane dectructor çağırılır çünkü copy constructor çağırılıyor
+}
+
+----------
+
+class Nec {
+public:
+Nec()
+{
+std::cout << "default ctor this : " << this << '\n';
+}
+
+Nec(const Nec& r)
+{
+std::cout << "copy ctor this : " << this << '\n';
+std::cout << "&r in copy ctor : " << &r << '\n';
+}
+
+~Nec() //destrucator
+{
+std::cout << "destructor this: " << this << '\n';
+}
+};
+
+void foo(Nec)
+{
+
+}
+int main()
+{
+Nec mynec;
+std::cout << "&mynec = " << &mynec << '\n';
+
+foo(mynec);
+std::cout << "main devam ediyor\n";
+//2 tane dectructor çağırılır çünkü copy constructor çağırılıyor
+}
+
+------------------------
+
+copy constructer devam...
+
+!! copy constructer ne zmaan çağırılıyor
+a) sınıf nesnesi hayata getirmek gerekiyor
+b) sınıf nesnesini hayata getirirken aynı sınıf türünden bir başka sınıf nesnesi ile onu init yapmak gerekiyor
+
+copy constructer çağrılmasını bekledğimiz tipik sneryolar
+
+class Nec {
+
+};
+
+int main()
+{
+Nec x; //default ctor
+Nec n1 = x; //copy ctor
+Nec n2(x); //copy ctor
+Nec n3{x}; //copy ctor
+auto n4(x); //copy ctor
+auto n5{x}; //copy ctor
+
+!! biz user declaretede yapmaz isek derleyici tarafından implicit olarak bildirilir
+}
+
+//derleyicinin örtülü olarak (implicitly) bildirdiği ve tanımladığı herhangi bir special member function 
+sınıfın non-sttaic, inline, public memer functionlarıdır
+
+
+----------------
+class A {};
+class B {};
+class C {};
+
+class Myclass {
+public:
+~Myclass()
+{
+}
+
+private :
+A ax;
+B bx;
+C cx;
+};
+
+------------
+rule of zero : sınıfın özel üye fonksiyonlarını derleyici tarasıfından yazılmasını sağlamaktır 
+
+class Myclass {
+
+public:
+
+private:
+int mx{}, my{}, mz{}; //default member init.
+};
+
+----------
+class Date {
+public:
+Date() = default; // user declareted yapıp tanımını derleyiciye bırakabiliriz
+Date(int, int, int); //bu şekilde sınıfın default const not declaret hale gelir
+//dolayısıyla derleyici bunu default etmez default etmesini istiyorsak yukarıdaki uygulayabiliriz
+
+private:
+  int m_day{1};
+  int m_mon{1};
+  int m_year{1900};
+};
+
+-----------------------------
+
+value type : 
+value semantics : her nesnenin değeri kendine
+nesneler birbirine atandıkları zaman bağımsızlıklarını koruyolar 
+
+x = y
+
+// mülakat sorusu
+string sınıfı bir value type'Mı ? evet
+
+Date x{12, 6, 2021};
+
+Date y = x;
+
+if (x == y) {
+
+}
+
+//x'i değiştirirsek y kendi değerini korumalır (value type)
+y'i değiştirirsek x kendi değerini korumalır
+
+!! bu açıdan bakılınca pointerlar value type değildir
+
+int main()
+{
+char str[] = "damla kubat";
+
+char * p1 = str;
+char * p2 = p1;
+
+p1[5] = '\0';
+std::cout << p2;
+}
+
+
+-----
+
+derleyicinin yazdığı copt constructer
+
+class A {};
+class B {};
+class C {};
+
+class Myclass {
+public:
+  Myclass(const Myclass& other) : ax(other.ax), bx(other.bx), cx(other.cx) {}
+private :
+  A ax;
+  B bx;
+  C cx;
+};
+
+-----
+
+class Date {
+public:
+  Date() = default;
+  Date(int d, int m, int y) : md(d), mm(m), my(y) {}
+
+void set_year(int y)
+{
+my = y;
+}
+void print()const{
+std::cout << md << '-' << mm << '-' <<my '\n';
+}
+private:
+  int md{1}, mm{1}, my{1900};
+};
+
+int main()
+{
+Date today{18, 8 ,2023};
+today.print();
+
+auto mydate = today;
+mydate.print(); //aynı tarih yazar
+//bu sınıfın copt constructerı vardır çünkü ümlicitly declareted
+
+mydate.set_year(2023);
+mydate.print();
+
+today.print();
+}
+
+// üretimde çok büyük olasıkla copy constructer derleyici tarafından yazılacak
+
+neden copy constructer kendimiz yazmamız gerekir
+
+bazı durumlarda biizm sınfımızın veri elemanları kaynak ya da kaynkları kontorl eden handlelar(pointer veya referans)
+
+#include <string>
+#include <cstring>
+
+class Address {
+public:
+  Address(const char *p) : mlen(std::strlen(p)),
+  mp{static_cast<char *>(std::malloc(mlen + 1));
+  {
+    if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+    }
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
+std::strcpy(mp, p);
+  }
+~Address()
+{
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+
+std::free(mp);
+}
+void print()const;
+{
+std::cout << mp << '\n';
+{
+return mlen;
+}
+}
+  std::size_t lenght()const  
+private:
+std::size_t mlen;
+char *mp;
+};
+
+void process_address(Adress x)
+{
+std::cout << "process_address fonksiyonu cagrildi\n";
+x.print();
+(void)getchar();
+}
+
+int main()
+{
+using namespace srd;
+
+Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+adx.print();
+cout << "adres uzunlugu" << adx.lenght() << '\n';
+}
+process_address(adx);
+std::cout << "main devam ediyo\n";
+
+adx.print(); //ub, dangling pointerdan dolayı,
+//derleyicinin yazdığı copy constrectır işleri bozdu
+//bu durumu düzeltmek için copy constructerı kendimiz yazarız 
+//her snıf türünden nesneler kopyalamaya açık olmayabilir bu yüzden kendimizi yazmamaız gerekebilir
+}
+
+shollow copy : sadece pointerların kopyalanamsı
+deep copy : kaynakların kopyalanması
+
 
 
 
