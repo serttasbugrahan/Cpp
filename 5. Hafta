@@ -789,12 +789,134 @@ B bx;
 C cx;
 }
 
+-----------------------------
 
--
+!! ezber gerektiren bir kısım
 
+hangi durumda derleyici sınıfn hangi özel üye fonskiyonunu yazar
+------
+1)
+//hiçbir özel üye belirtmessek 6 özel üyeyi'de yazar
+class Myclass{
 
+};
 
+class Myclass{
+public:
+Myclass() = default;
+~Myclass() = default;
+Myclass(const Myclass&) = default;
+Myclass(Myclass&&) = default;
+Myclass& operator=(const Myclass&) = default;
+Myclass& operator=(Myclass&&) = default;
+};
 
+----------
+2)eğer sınıfa default ctor olmayann ama special member functionda olmayan
+bir ctor yazarsak default ctor olmaz diğerleir olur
+
+class Myclass{
+public:
+~Myclass() = default;
+Myclass(const Myclass&) = default;
+Myclass(Myclass&&) = default;
+Myclass& operator=(const Myclass&) = default;
+Myclass& operator=(Myclass&&) = default;
+};
+----------
+3)eğer default ctor bildirirsek yani user declareted ise 
+
+class Myclass{
+public:
+Myclass();
+};
+
+class Myclass{
+public:
+Myclass() = default;
+~Myclass() = default;
+Myclass(const Myclass&) = default;
+Myclass(Myclass&&) = default;
+Myclass& operator=(const Myclass&) = default;
+Myclass& operator=(Myclass&&) = default;
+};
+---------
+4)sınıfa destructor bildirirsek
+class Myclass{
+public:
+~Myclass();
+};
+
+class Myclass{
+public:
+Myclass() = default;
+~Myclass() ;
+Myclass(const Myclass&) = default; //felakte yol açar
+Myclass& operator=(const Myclass&) = default; //ASLA YAPMA
+//NO MOVE MEMBERS
+};
+--------
+5)sınıfa copy ctor bildirdik
+class Myclass{
+public:
+Myclass(const Myclass&);
+};
+
+class Myclass{
+public:
+//no default ctor
+~Myclass() ;
+Myclass(const Myclass&);
+Myclass& operator=(const Myclass&) = default; //felaket
+//NO MOVE MEMBERS
+};
+---------
+6)copy assignment biz yazarsak
+class Myclass{
+public:
+Myclass& operator=(const Myclass&);
+};
+
+class Myclass{
+public:
+Myclass() = default;
+~Myclass() = default;
+Myclass(const Myclass&) = default; //felakte yol açar
+Myclass& operator=(const Myclass&); 
+//NO MOVE MEMBERS
+};
+-------
+7)
+class Myclass{
+public:
+Myclass(Myclass&&);
+};
+
+class Myclass{
+public:
+~Myclass() = default;
+Myclass(const Myclass&) = delete
+Myclass(Myclass&&);
+Myclass& operator=(const Myclass&) = delete
+//NO MOVE ASSİGNMENT
+};
+---------
+8)
+class Myclass{
+public:
+Myclass&operator=(Myclass&&);
+};
+
+class Myclass{
+public:
+Myclass() = default;
+~Myclass() = default ;
+Myclass(const Myclass&) = delete
+Myclass(Myclass&&);
+Myclass& operator=(const Myclass&) = delete; //ASLA YAPMA
+Myclass&operator=(Myclass&&);
+//NO MOVE ctor
+};
 
 
 
