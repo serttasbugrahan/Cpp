@@ -61,20 +61,181 @@ adx.print(); //ub, dangling pointerdan dolayı,
 copy constructer yazlması:
 -------------------------
 
+hayata gelen nesne kendi kaynağını edinicek
+
+class Address {
+public:
+  Address(const char *p) : mlen(std::strlen(p)),
+  mp{static_cast<char *>(std::malloc(mlen + 1));
+  {
+    if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+    }
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
+std::strcpy(mp, p);
+}
+
+Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
+{
+  if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+}
+std::strcpy(mp, other.mp);
+}
+~Address()
+{
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+std::free(mp);
+}
+void print()const;
+{
+std::cout << mp << '\n';
+}
+std::size_t lenght()const
+{
+return mlen;
+}
+private:
+std::size_t mlen;
+char *mp;
+};
+
+void process_address(Address x)
+{
+std::cout << "process_address fonksiyonu cagrildi\n"
+x.print();
+(void)getchar();
+}
+
+int main()
+{
+using namespace srd;
+
+Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+adx.print();
+cout << "adres uzunlugu" << adx.lenght() << '\n';
+
+process_address(adx);
+std::cout << "main devam ediyo\n";
+
+adx.print(); //ub, dangling pointerdan dolayı,
+}
 
 
+//diğer öğeleri yine kopyalar pointerlar ve referansları kaynkatan kaynağa kopyalar
+
+------------
+//bu sınıf bu elemanlar ile impremente ediyor olsaydık copy constructerı bizim yazmamız gerekir miydi?
+//-gerekmezdi çünkü kendi kaynağını kendileri yönetir zaten aşağıdakiler
+class Person {
+
+private:
+int m_id;
+std::string m_name;
+std::string m_address;
+std::vector<int> m_grades;
+};
+
+----------------
+
+class Address {
+public:
+  Address(const char *p) : mlen(std::strlen(p)),
+  mp{static_cast<char *>(std::malloc(mlen + 1));
+  {
+    if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+    }
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
+std::strcpy(mp, p);
+}
+
+Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
+{
+  if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+}
+std::strcpy(mp, other.mp);
+}
+~Address()
+{
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+std::free(mp);
+}
+void print()const;
+{
+std::cout << mp << '\n';
+}
+std::size_t lenght()const
+{
+return mlen;
+}
+private:
+std::size_t mlen;
+char *mp;
+};
+
+void process_address(Address x)
+{
+std::cout << "process_address fonksiyonu cagrildi\n"
+x.print();
+(void)getchar();
+}
+
+int main()
+{
+using namespace srd;
+
+Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+
+if (adx.length() > 10) {
+Address ady {"bahcelievler derin sokak 45 / 7 ankara"}
+ady.print();
+ady = adx;
+ady.print();
+(void)getchar();
+}
+adx.print();
+}
+
+//hata olur
+
+//bir sınıf nesnesine başka bir türden sınıf nesnesi atandığında (atama ile init. farklı şeyler)
+bu durumda kendisine atama yapılan nesne için yine sınıfn special member function çağrılır
+
+------------------------
+
+copy assignment:
+----------------
+
+class Myclass {};
+Myclass x, y;
+
+x = y; //artım durum c'de olduğu gibi değil
+x.copy_assignment(y);  //yukarıdaki atama her zman böyle yapılmalı
 
 
+class Myclass {
+public:
+Myclass(const Myclass& other) : ax(other.ax), bx(other.bx), cx(other.mx) {}
+Myclass& operator=(const Myclass& other) //derleyicinin yazdığı atama operatör fonksiyonu
+{
+ax = other.ax;
+bx = other.bx;
+cx = other.cx;
 
+}
+private:
+A ax;
+B bx;
+C cx;
 
+}
 
+--------
 
-
-
-
-
-
-
+a = b //bu şekilde bir atama yapıldığında
+a.operator = (b).foo(); //bu şekilde yapıcağız
 
 
 
