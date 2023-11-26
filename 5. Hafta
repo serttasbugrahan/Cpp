@@ -237,6 +237,146 @@ C cx;
 a = b //bu şekilde bir atama yapıldığında
 a.operator = (b).foo(); //bu şekilde yapıcağız
 
+// pointerları var ise problem çıkıcaktır copy ctor'da olduğu gibi
+
+---------
+//copy assignment yazımı 
+
+class Address {
+public:
+  Address(const char *p) : mlen(std::strlen(p)),
+  mp{static_cast<char *>(std::malloc(mlen + 1));
+  {
+    if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+    }
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
+std::strcpy(mp, p);
+}
+
+Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
+{
+  if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+}
+std::strcpy(mp, other.mp);
+}
+
+Address& operator =(const Address& other)
+{
+std::free(mp);
+mlen = other.mlen();
+mp = static_cast<char*>(std::malloc(mlen + 1))
+if (!mp) {
+throw std::runtime_error{"not enough memory"};
+}
+str::strcpy(mp, other.mp);
+return *yhis;
+}
+~Address()
+{
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+std::free(mp);
+}
+void print()const;
+{
+std::cout << mp << '\n';
+}
+std::size_t lenght()const
+{
+return mlen;
+}
+private:
+std::size_t mlen;
+char *mp;
+};
+
+void process_address(Address x)
+{
+std::cout << "process_address fonksiyonu cagrildi\n"
+x.print();
+(void)getchar();
+}
+
+int main()
+{
+using namespace srd;
+
+Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+
+if (adx.length() > 10) {
+Address ady {"bahcelievler derin sokak 45 / 7 ankara"}
+ady.print();
+ady = adx;
+ady.print();
+(void)getchar();
+}
+adx.print();
+}
+
+------------------------------
+
+eski cpp'de big three
+
+destructor ==> release resources
+copy constructor ==> deep copy
+copy assignment ==> release resources -> deep copy
+
+//bu terim artık popüler değil çünü move'lar geldi
+
+-----------------------------
+
+bir nesnenin kendine atanmasına self assignment denir
+
+x = x; //bunu yapmak dangling pointıra neden olur
+
+bunların aynı olduğunu şu şekilde kontrol ederiz ve sorunu çözeriz :
+
+if (this == &other)
+return *this; 
+
+-----
+//yukarıdaki seneryolardansa aşağıdaki seneryolar için o önlem alınır
+void foo(T& t, const T *p)
+{
+t = *p;
+}
+
+void func(T *p1, T *p2)
+{
+*p1 = *p2;
+}
+
+-------------
+
+class Date {
+public:
+Date() = default;
+Date(int d, int m, int y) : d_{d}, m_{m}, y_{y} {}
+void print()const
+{
+std::cout << "[" << d_ << "-" << m_ << "-" << y_ << "]\n";
+}
+
+private:
+int d_{}, m_{}, y{};
+};
+
+int main()
+{
+Date d1, d2, d3;
+Date d4{21,8,2023};
+
+d1 = d2 = d3 = d4; //hata olmaz
+//d1 = (d2= (d3 = d4)); //derleyici böyle ele alır
+d1.operator=(de.operator=(d3.operator =(d4))); //bu şekilde de yazılır fark yok
+
+}
+
+
+
+
+
 
 
 
