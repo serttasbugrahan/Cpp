@@ -1495,11 +1495,15 @@ Myclass() = delete; //user declared, var ama çağrılması sentax hatası anlam
 implicitly declared :
 sınıfın özel üye fonksiyonunu bildirmesekte derleyici bunu örtülü olarak bildirir
 
+!!bir özel üye fonksiyon implicitly declareted derleyici bunun kodunu yazarken sentax hatası oluşturur derleyici sentax hatası vermek yerine
+özel üye fonksiyonu delete eder. 
+
 class Myclass {
 public:
 
 private:
 int &r; //sınıfın default constructerı delete edildi
+çünkü derleyici default init yapar referans değişkenlerinnin default init yapılması sentax hatası ondan delete eder
 };
 
 int main()
@@ -1508,6 +1512,19 @@ Myclass m;
 }
 
 -------
+class Myclass {
+public:
+
+private:
+const int x; //derleiyici default inşt yapar (imlicitly declaret) const nesnenin default init yapılması geçerli değil
+bundan dolayı delete edilir  
+};
+
+int main()
+{
+
+}
+----------
 
 class Member {
 
@@ -1529,7 +1546,7 @@ Tamer tx;
 class Member {
 public:
 Member(int); //memberın default constrıctır yok
-//tamerin default constructarını derleyici default ettiğinde olmayan bir default constructara çağrı yapacak
+//tamerin default constructarını derleyici default ettiğinde olmayan bir default constructara çağrı yapacak ancak default constructerı yoktur
 bu da sentax hatasıı olucak, bu yüzden delete etmek zorunda
 };
 
@@ -1786,7 +1803,7 @@ private :
   C cx;
 };
 
------
+---------
 
 class Date {
 public:
@@ -1798,7 +1815,7 @@ void set_year(int y)
 my = y;
 }
 void print()const{
-std::cout << md << '-' << mm << '-' <<my '\n';
+std::cout << md << '-' << mm << '-' <<my <<'\n';
 }
 private:
   int md{1}, mm{1}, my{1900};
@@ -1819,11 +1836,15 @@ mydate.print();
 today.print();
 }
 
+--------------
+
 // üretimde çok büyük olasıkla copy constructer derleyici tarafından yazılacak
 
 neden copy constructer kendimiz yazmamız gerekir
 
 bazı durumlarda biizm sınfımızın veri elemanları kaynak ya da kaynkları kontorl eden handlelar(pointer veya referans)
+
+--------------
 
 #include <string>
 #include <cstring>
@@ -1881,6 +1902,8 @@ adx.print(); //ub, dangling pointerdan dolayı,
 //bu durumu düzeltmek için copy constructerı kendimiz yazarız 
 //her snıf türünden nesneler kopyalamaya açık olmayabilir bu yüzden kendimizi yazmamaız gerekebilir
 }
+
+----------
 
 shollow copy : sadece pointerların kopyalanamsı
 deep copy : kaynakların kopyalanması
