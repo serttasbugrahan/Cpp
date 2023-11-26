@@ -54,7 +54,12 @@ adx.print(); //ub, dangling pointerdan dolayı,
 }
 
 
+//bu kod doğru çalışmaz doğru çalışması için copy constructerı kendimiz yazmamız gerekir yukarıdaderleyici yazmıştır
 
+-----------------
+
+copy constructer yazlması:
+-------------------------
 
 
 
