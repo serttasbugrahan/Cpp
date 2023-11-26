@@ -369,15 +369,81 @@ Date d4{21,8,2023};
 
 d1 = d2 = d3 = d4; //hata olmaz
 //d1 = (d2= (d3 = d4)); //derleyici böyle ele alır
-d1.operator=(de.operator=(d3.operator =(d4))); //bu şekilde de yazılır fark yok
+//d1.operator=(de.operator=(d3.operator =(d4))); //bu şekilde de yazılır fark yok
 
+d1.print();
+d2.print();
+d3.print();
+d4.print();
 }
 
 
+-----------------------------------------
+
+copy constructor (kopyalayan kurucu işlev)
+move constructor (taşıyan kurucu işlev)
+copy assignment (kopyalayan atama fonksiyonu)
+move assignmnet (taşıyan atama fonksiyonu)
 
 
+Myclass(); //default ctor
+~Myclass(); //destrucotr
+Myclass(const Myclass&); // copy ctor
+Myclass(Myclass&& r); //move ctor
+Myclass& operator = (const Myclass &); //copy assignment
+Myclass& operator = (Myclass &&); //move assignment
+---------------------------------------------
 
+steal
+T x = T türünden bir başka nesne
 
+y = T türünden bir başka nesne
 
+sınıf türünden bir ifade eğer R value bir değer kategorisindeyse
+
+-------
+
+move constructor:
+-----------------
+
+class Myclass {
+public:
+Myclass(); //default ctor
+~Myclass(); //destrucotr
+Myclass(const Myclass&); // copy ctor, paramtresi L value referans, kaynağını kopyalıycak
+Myclass(Myclass&&); //move ctor, parametresi R value referans, kaynağını çalıcak
+Myclass& operator = (const Myclass &); //copy assignment
+Myclass& operator = (Myclass &&); //move assignment
+}
+
+!! move'da  bütün hikaye diğer nesnenin kaynağını çalıp diğer nesneyi distroctıbıl ama kaynağı geri verilmeyecek bir state sokmamız gerekiyor
+
+--------------------------------
+
+T x = init
+
+!! derleyici copy ctor mı çağırılıcak move ctor mu çağrılıcağını ilk değer veren ifadenin R value'mu L value'mu dilin kurallarına güvenerek
+dayanarak anlıyor
+
+class Myclass {
+
+};
+
+void func(const Myclass&)
+{
+std::cout << "const Myclass&\n";
+}
+
+void func(const Myclass&&)
+{
+std::cout << "const Myclass&&\n";
+}
+
+int main()
+{
+Myclass m;
+func(m);
+func(Myclass{}); //2. çağrılır
+}
 
 
