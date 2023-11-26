@@ -648,12 +648,29 @@ std::move(x); //value kategorisi yok, value kategory değiştiricek bir ifade ya
 Derleyicinin yazdığı move constructer:
 ---------------------------------------
 
+Myclass(Myclass &&other) : ax(other.ax), bx(other.bx), cx(other.mx) {}
+Myclass& operator=(const Myclass& other)
+{
+ax = other.ax;
+bx = other.bx;
+cx = other.cx;
+
+return *this;
+}
+
 Myclass(Myclass &&other) :
 ax(std::move(other.ax)), bx(std::move(other.bx)), cx(std::move(other.cx))
 {
 
 }
 
+  
+
+private:
+A ax;
+B bx;
+C cx;
+}
 --------
 
 class Person {
@@ -681,6 +698,13 @@ std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
 std::strcpy(mp, p);
 }
 
+//move ctor
+Address(Adress&& other) : mlen(other.mlen), mp(other.mp)
+{
+other.mlen = 0;
+other.mp = nullptr;
+}
+
 Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
 {
   if (!mp) {
@@ -688,6 +712,7 @@ Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(
 }
 std::strcpy(mp, other.mp);
 }
+
 ~Address()
 {
 std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
@@ -728,10 +753,44 @@ adx.print(); //ub, dangling pointerdan dolayı,
 }
 
 
+-------------
+
+derleyicinin yazdığı move assignment:
+-------------------------------------
+
+Myclass(const Myclass &&other) : ax(other.ax), bx(other.bx), cx(other.mx) {}
+Myclass& operator=(const Myclass& other)
+{
+ax = other.ax;
+bx = other.bx;
+cx = other.cx;
+
+return *this;
+}
+
+Myclass(Myclass &&other) :
+ax(std::move(other.ax)), bx(std::move(other.bx)), cx(std::move(other.cx)),
+{
+
+}
+
+Myclass& operator=(Myclass &&other)
+{
+ax = std::move(other.ax);
+bx = std::move(other.bx);
+cx = std::move(other.cx);
+
+return * this
+}
+
+private:
+A ax;
+B bx;
+C cx;
+}
 
 
-
-
+-
 
 
 
