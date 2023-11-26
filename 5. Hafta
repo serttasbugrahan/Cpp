@@ -427,6 +427,7 @@ dayanarak anlıyor
 
 class Myclass {
 
+
 };
 
 void func(const Myclass&)
@@ -442,8 +443,299 @@ std::cout << "const Myclass&&\n";
 int main()
 {
 Myclass m;
-func(m);
-func(Myclass{}); //2. çağrılır
+func(m); //1. çağrılır
+func(static<Myclass&&>(m)); //sağ taraf referans türrüne cast ederiz, 2.çağrılır
+func(std::move(m)); //yukarıdaki gibi yazmaktan hiçbir farkı yoktur, misnomer
+func(Myclass{}); //2. çağrılır, R value exp.
 }
+
+!!MOVE DOESEN'T MOVE
+------------------------
+
+//mülakat sorusu
+
+class Myclass {
+public:
+Myclass() = default;
+Myclass(const Myclass&)
+{
+std::cout<< "copy ctor\n";
+}
+
+Myclass(Myclass&& r)
+{
+std::cout<< "move ctor\n";
+}
+};
+
+void func(const Myclass&)
+{
+std::cout << "const Myclass&\n";
+}
+
+void func(const Myclass&& r) //burası çağrılır
+{
+std::cout << "const Myclass&&\n";
+}
+
+int main()
+{
+Myclass m;
+func(std::move(m)); //hiçbir nesne çağrılmaz çünkü referans nesneye bağlanır
+Myclass &&r = std::move(m);
+}
+
+---------
+class Myclass {
+public:
+};
+
+void func(const Myclass&)
+{
+std::cout << "const Myclass&\n";
+}
+
+void func(const Myclass&&) //burası çağrılır
+{
+std::cout << "const Myclass&&\n";
+}
+
+void foo(Myclass &&r ) 
+{
+
+func(r);
+}
+
+int main()
+{
+Myclass m;
+foo(std::move(m));
+}
+
+-----------------------
+
+class Myclass {
+public:
+Myclass() = default;
+Myclass(const Myclass&)
+{
+std::cout<< "copy ctor\n";
+}
+
+Myclass(Myclass&&)
+{
+std::cout<< "move ctor\n";
+}
+};
+
+void foo(const Myclass &other)
+{
+Myclass m(other); //copy
+}
+
+void foo(Myclass&&)
+{
+Myclass m(other); //copy const
+Myclass m(std::move(other)); //move const
+
+}
+
+int main()
+{
+Myclass m;
+//öyle bir kod yaz ki
+foo(m); //böyle yazılırsa copy ctor yazısı
+foo(std::move(m))); //böyle yazılırsa move
+}
+
+----------
+
+class Myclass {
+public:
+Myclass() = default;
+Myclass(const Myclass&)
+{
+std::cout<< "copy ctor\n";
+}
+
+Myclass(Myclass&&)
+{
+std::cout<< "move ctor\n";
+}
+Myclass& operator=(const &other);
+Myclass& operator=(Myclass&&);
+};
+
+void foo(const Myclass &other)
+{
+Myclass m;
+m = other;
+}
+
+void foo(Myclass&& other)
+{
+Myclass m; //copy const
+m = std::move(other);
+}
+
+int main()
+{
+Myclass m;
+//öyle bir kod yaz ki
+foo(m); //böyle yazılırsa copy ctor yazısı
+foo(std::move(m))); //böyle yazılırsa move
+}
+
+-----------------------------------
+
+!!!! hiçbir şey aklında kalmadıysa buraya bak
+
+Myclass &r =
+Myclass &&rr =
+
+// ister sol taraf referansı olsun ister sağ taraf referansı olsun bir referans var ise 
+o referansın oluşturduğu ismin value kategorisi her zman l value expresiondur
+
+!! data type başka value kategory başka şeylerdir
+
+Myclass &&rr
+
+rr bir tür
+ama bu ifadenin değer kategorisi L value exp.
+
+-------------
+
+derleyicinin yazdığı move constructer
+
+class Nec {
+
+};
+
+void func(const Nec&); //1
+void func(Nec&&); //2
+
+int main()
+{
+Nec nec;
+func(nec); // 1 çağrılır
+func(Nec{}); //2 çağrılır
+}
+
+---------
+
+!! bir sınııfın hem copy constructerı hem move constructarı var ise
+
+class Nec {
+public:
+Nec(const Nec&); //sol taraf değeri içn bu
+Nec(Nec&&); //sağ taraf değeri için bu
+
+!! ama move constructer olmaz ise sağ taraf değeride sol taraf değeride copy constrıuctea gelicek
+
+};
+
+-----------
+
+int main()
+{
+int x = 5; //value kategorisi yok
+x; //l value
+std::move(x); //value kategorisi yok, value kategory değiştiricek bir ifade yazıldı
+}
+
+----------
+
+Derleyicinin yazdığı move constructer:
+---------------------------------------
+
+Myclass(Myclass &&other) :
+ax(std::move(other.ax)), bx(std::move(other.bx)), cx(std::move(other.cx))
+{
+
+}
+
+--------
+
+class Person {
+private:
+std::string name;
+std::string surname;
+std::string adress;
+std::vector<int> grades;
+}
+
+-----------
+
+move ctor kodunun yazılması:
+------------------------------
+
+class Address {
+public:
+  Address(const char *p) : mlen(std::strlen(p)),
+  mp{static_cast<char *>(std::malloc(mlen + 1));
+  {
+    if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+    }
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
+std::strcpy(mp, p);
+}
+
+Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
+{
+  if (!mp) {
+      throw std::runtime_error{"not enough memory"};
+}
+std::strcpy(mp, other.mp);
+}
+~Address()
+{
+std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+std::free(mp);
+}
+void print()const;
+{
+std::cout << mp << '\n';
+}
+std::size_t lenght()const
+{
+return mlen;
+}
+private:
+std::size_t mlen;
+char *mp;
+};
+
+void process_address(Address x)
+{
+std::cout << "process_address fonksiyonu cagrildi\n"
+x.print();
+(void)getchar();
+}
+
+int main()
+{
+using namespace srd;
+
+Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+adx.print();
+cout << "adres uzunlugu" << adx.lenght() << '\n';
+
+process_address(adx);
+std::cout << "main devam ediyo\n";
+
+adx.print(); //ub, dangling pointerdan dolayı,
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
