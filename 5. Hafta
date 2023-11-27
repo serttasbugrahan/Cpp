@@ -1,7 +1,6 @@
 ////////////////////////////////////////////////1. Ders////////////////////////////////////////////////////////
 
-
-  #include <iostream>
+#include <iostream>
 #include <string>
 #include <cstring>
 
@@ -143,8 +142,6 @@ int main()
   adx.print(); // dangling pointer olur
 }
 
-
-
 //diğer öğeleri yine kopyalar pointerlar ve referansları kaynkatan kaynağa kopyalar
 
 ------------
@@ -161,64 +158,73 @@ std::vector<int> m_grades;
 
 ----------------
 
-class Address {
+#include <iostream>
+#include <string>
+#include <cstring>
+
+class Addrees
+{
 public:
-  Address(const char *p) : mlen(std::strlen(p)),
-  mp{static_cast<char *>(std::malloc(mlen + 1));
+  Addrees(const char *p) : mlen(std::strlen(p)), mp{static_cast<char *>(std::malloc(mlen + 1))}
   {
-    if (!mp) {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
     }
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
-std::strcpy(mp, p);
-}
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
+    std::strcpy(mp, p);
+  }
 
-Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
-{
-  if (!mp) {
+  Addrees(const Addrees& other) : mlen(other.mlen), mp{static_cast<char *>(std::malloc(mlen + 1))}
+  {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
-}
-std::strcpy(mp, other.mp);
-}
-~Address()
-{
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
-std::free(mp);
-}
-void print()const;
-{
-std::cout << mp << '\n';
-}
-std::size_t lenght()const
-{
-return mlen;
-}
+    }
+    std::strcpy(mp, other.mp);
+  }
+
+  ~Addrees()
+  {
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu geri verildi\n";
+    std::free(mp);
+  }
+  void print() const
+  {
+    std::cout << mp << '\n';
+  }
+  std::size_t lenght() const
+  {
+    return mlen;
+  }
+
 private:
-std::size_t mlen;
-char *mp;
+  std::size_t mlen;
+  char *mp;
 };
 
-void process_address(Address x)
+void process_address(Addrees x)
 {
-std::cout << "process_address fonksiyonu cagrildi\n"
-x.print();
-(void)getchar();
+  std::cout << "process_address fonsksiyonu cagrildi\n";
+  x.print();
+  (void)getchar();
 }
 
 int main()
 {
-using namespace srd;
+  using namespace std;
 
-Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
-
-if (adx.length() > 10) {
-Address ady {"bahcelievler derin sokak 45 / 7 ankara"}
-ady.print();
-ady = adx;
-ady.print();
-(void)getchar();
-}
-adx.print();
+  Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
+  
+  if (adx.lenght() > 10)
+  {
+    Addrees ady {"bahcelievler derin sokak 45 / 7 ankara"};
+    ady.print();
+    ady = adx;
+    ady.print();
+    (void)getchar();
+  }
+  adx.print();  
 }
 
 //hata olur
@@ -237,6 +243,7 @@ Myclass x, y;
 x = y; //artım durum c'de olduğu gibi değil
 x.copy_assignment(y);  //yukarıdaki atama her zman böyle yapılmalı
 
+------------------
 
 class Myclass {
 public:
@@ -265,76 +272,89 @@ a.operator = (b).foo(); //bu şekilde yapıcağız
 ---------
 //copy assignment yazımı 
 
-class Address {
+#include <iostream>
+#include <string>
+#include <cstring>
+
+class Addrees
+{
 public:
-  Address(const char *p) : mlen(std::strlen(p)),
-  mp{static_cast<char *>(std::malloc(mlen + 1));
+  Addrees(const char *p) : mlen(std::strlen(p)), mp{static_cast<char *>(std::malloc(mlen + 1))}
   {
-    if (!mp) {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
     }
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
-std::strcpy(mp, p);
-}
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
+    std::strcpy(mp, p);
+  }
 
-Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
-{
-  if (!mp) {
+  Addrees(const Addrees &other) : mlen(other.mlen), mp{static_cast<char *>(std::malloc(mlen + 1))}
+  {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
-}
-std::strcpy(mp, other.mp);
-}
+    }
+    std::strcpy(mp, other.mp);
+  }
 
-Address& operator =(const Address& other)
-{
-std::free(mp);
-mlen = other.mlen();
-mp = static_cast<char*>(std::malloc(mlen + 1))
-if (!mp) {
-throw std::runtime_error{"not enough memory"};
-}
-str::strcpy(mp, other.mp);
-return *yhis;
-}
-~Address()
-{
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
-std::free(mp);
-}
-void print()const;
-{
-std::cout << mp << '\n';
-}
-std::size_t lenght()const
-{
-return mlen;
-}
+  Addrees &operator=(const Addrees &other)
+  {
+    // genel herhangi bir sınıf için
+    std::free(mp);
+    mlen = other.mlen;
+
+    mp = static_cast<char *>(std::malloc(mlen + 1));
+    if (!mp)
+    {
+      throw std::runtime_error{"not enough memory"};
+    }
+    std::strcpy(mp, other.mp);
+    return *this;
+  }
+
+  ~Addrees()
+  {
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu geri verildi\n";
+    std::free(mp);
+  }
+  void print() const
+  {
+    std::cout << mp << '\n';
+  }
+  std::size_t lenght() const
+  {
+    return mlen;
+  }
+
 private:
-std::size_t mlen;
-char *mp;
+  std::size_t mlen;
+  char *mp;
 };
 
-void process_address(Address x)
+void process_address(Addrees x)
 {
-std::cout << "process_address fonksiyonu cagrildi\n"
-x.print();
-(void)getchar();
+  std::cout << "process_address fonsksiyonu cagrildi\n";
+  x.print();
+  (void)getchar();
 }
 
 int main()
 {
-using namespace srd;
+  using namespace std;
 
-Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
+  Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
 
-if (adx.length() > 10) {
-Address ady {"bahcelievler derin sokak 45 / 7 ankara"}
-ady.print();
-ady = adx;
-ady.print();
-(void)getchar();
-}
-adx.print();
+  if (adx.lenght() > 10)
+  {
+    Addrees ady{"bahcelievler derin sokak 45 / 7 ankara"};
+    ady.print();
+    std::cout << "uzunluk = " << ady.lenght() << "\n";
+    ady = adx;
+    ady.print();
+    (void)getchar();
+  }
+  adx.print();
 }
 
 ------------------------------
@@ -709,71 +729,94 @@ std::vector<int> grades;
 move ctor kodunun yazılması:
 ------------------------------
 
-class Address {
+#include <iostream>
+#include <string>
+#include <cstring>
+
+#include <iostream>
+#include <string>
+#include <cstring>
+
+class Addrees
+{
 public:
-  Address(const char *p) : mlen(std::strlen(p)),
-  mp{static_cast<char *>(std::malloc(mlen + 1));
+  Addrees(const char *p) : mlen(std::strlen(p)), mp{static_cast<char *>(std::malloc(mlen + 1))}
   {
-    if (!mp) {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
     }
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
-std::strcpy(mp, p);
-}
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
+    std::strcpy(mp, p);
+  }
 
-//move ctor
-Address(Adress&& other) : mlen(other.mlen), mp(other.mp)
-{
-other.mlen = 0;
-other.mp = nullptr;
-}
-
-Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
-{
-  if (!mp) {
+  Addrees(const Addrees &other) : mlen(other.mlen), mp{static_cast<char *>(std::malloc(mlen + 1))}
+  {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
-}
-std::strcpy(mp, other.mp);
-}
+    }
+    std::strcpy(mp, other.mp);
+  }
 
-~Address()
-{
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
-std::free(mp);
-}
-void print()const;
-{
-std::cout << mp << '\n';
-}
-std::size_t lenght()const
-{
-return mlen;
-}
+  Addrees(Addrees&& other) : mlen(other.mlen), mp(other.mp)
+  {
+    other.mlen = 0;
+    other.mp = nullptr;
+  }
+
+  Addrees &operator=(const Addrees &other)
+  {
+    // genel herhangi bir sınıf için
+    std::free(mp);
+    mlen = other.mlen;
+
+    mp = static_cast<char *>(std::malloc(mlen + 1));
+    if (!mp)
+    {
+      throw std::runtime_error{"not enough memory"};
+    }
+    std::strcpy(mp, other.mp);
+    return *this;
+  }
+
+  ~Addrees()
+  {
+    if (mp)
+      std::free(mp);
+    
+  }
+  void print() const
+  {
+    std::cout << mp << '\n';
+  }
+  std::size_t lenght() const
+  {
+    return mlen;
+  }
+
 private:
-std::size_t mlen;
-char *mp;
+  std::size_t mlen;
+  char *mp;
 };
 
-void process_address(Address x)
+void process_address(Addrees x)
 {
-std::cout << "process_address fonksiyonu cagrildi\n"
-x.print();
-(void)getchar();
+  std::cout << "process_address fonsksiyonu cagrildi\n";
+  x.print();
+  (void)getchar();
 }
 
 int main()
 {
-using namespace srd;
+  using namespace std;
 
-Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
-adx.print();
-cout << "adres uzunlugu" << adx.lenght() << '\n';
+  Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
+  Addrees ady{"bahcelievler derin sokak 45 / 7 ankara"};
 
-process_address(adx);
-std::cout << "main devam ediyo\n";
-
-adx.print(); //ub, dangling pointerdan dolayı,
+  adx.operator=(ady).print();
 }
+
 
 
 -------------
