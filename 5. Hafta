@@ -77,63 +77,72 @@ copy constructer yazlması:
 
 hayata gelen nesne kendi kaynağını edinicek
 
-class Address {
+#include <iostream>
+#include <string>
+#include <cstring>
+
+class Addrees
+{
 public:
-  Address(const char *p) : mlen(std::strlen(p)),
-  mp{static_cast<char *>(std::malloc(mlen + 1));
+  Addrees(const char *p) : mlen(std::strlen(p)), mp{static_cast<char *>(std::malloc(mlen + 1))}
   {
-    if (!mp) {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
     }
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
-std::strcpy(mp, p);
-}
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
+    std::strcpy(mp, p);
+  }
 
-Address(const Add& other) : mlen{other.mlen}, mp(static_cast<char*>(std::malloc(mlen + 1))) 
-{
-  if (!mp) {
+  Addrees(const Addrees& other) : mlen(other.mlen), mp{static_cast<char *>(std::malloc(mlen + 1))}
+  {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
-}
-std::strcpy(mp, other.mp);
-}
-~Address()
-{
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
-std::free(mp);
-}
-void print()const;
-{
-std::cout << mp << '\n';
-}
-std::size_t lenght()const
-{
-return mlen;
-}
+    }
+    std::strcpy(mp, other.mp);
+  }
+
+  ~Addrees()
+  {
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu geri verildi\n";
+    std::free(mp);
+  }
+  void print() const
+  {
+    std::cout << mp << '\n';
+  }
+  std::size_t lenght() const
+  {
+    return mlen;
+  }
+
 private:
-std::size_t mlen;
-char *mp;
+  std::size_t mlen;
+  char *mp;
 };
 
-void process_address(Address x)
+void process_address(Addrees x)
 {
-std::cout << "process_address fonksiyonu cagrildi\n"
-x.print();
-(void)getchar();
+  std::cout << "process_address fonsksiyonu cagrildi\n";
+  x.print();
+  (void)getchar();
 }
 
 int main()
 {
-using namespace srd;
+  using namespace std;
 
-Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
-adx.print();
-cout << "adres uzunlugu" << adx.lenght() << '\n';
+  Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
+  adx.print();
+  cout << "adress uzunlugu " << adx.lenght() << '\n';
 
-process_address(adx);
-std::cout << "main devam ediyo\n";
+  process_address(adx);
+  std::cout << "main devam ediyor\n";
 
-adx.print(); //ub, dangling pointerdan dolayı,
+  adx.print(); // dangling pointer olur
 }
+
 
 
 //diğer öğeleri yine kopyalar pointerlar ve referansları kaynkatan kaynağa kopyalar
