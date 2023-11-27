@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////1. Ders////////////////////////////////////////////////////////
 
-#include <iostream>
+
+  #include <iostream>
 #include <string>
 #include <cstring>
 
@@ -16,6 +17,16 @@ public:
     std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
     std::strcpy(mp, p);
   }
+
+  Addrees(const Addrees& other) : mlen(other.mlen), mp{static_cast<char *>(std::malloc(mlen + 1))}
+  {
+    if (!mp)
+    {
+      throw std::runtime_error{"not enough memory"};
+    }
+    std::strcpy(mp, other.mp);
+  }
+
   ~Addrees()
   {
     std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu geri verildi\n";
@@ -37,23 +48,23 @@ private:
 
 void process_address(Addrees x)
 {
-    std::cout << "process_address fonsksiyonu cagrildi\n";
-    x.print();
-    (void)getchar();
+  std::cout << "process_address fonsksiyonu cagrildi\n";
+  x.print();
+  (void)getchar();
 }
 
 int main()
 {
   using namespace std;
-  
+
   Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
   adx.print();
   cout << "adress uzunlugu " << adx.lenght() << '\n';
-  
+
   process_address(adx);
   std::cout << "main devam ediyor\n";
 
-  adx.print(); //dangling pointer olur 
+  adx.print(); // dangling pointer olur
 }
 
 
