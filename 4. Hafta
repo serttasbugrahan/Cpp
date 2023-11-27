@@ -1846,61 +1846,63 @@ bazı durumlarda biizm sınfımızın veri elemanları kaynak ya da kaynkları k
 
 --------------
 
+#include <iostream>
 #include <string>
 #include <cstring>
 
-class Address {
+class Addrees
+{
 public:
-  Address(const char *p) : mlen(std::strlen(p)),
-  mp{static_cast<char *>(std::malloc(mlen + 1));
+  Addrees(const char *p) : mlen(std::strlen(p)), mp{static_cast<char *>(std::malloc(mlen + 1))}
   {
-    if (!mp) {
+    if (!mp)
+    {
       throw std::runtime_error{"not enough memory"};
     }
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu edlindi\n";
-std::strcpy(mp, p);
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu edinildi\n"; // yazının tutulduğu adresi yazdırır
+    std::strcpy(mp, p);
   }
-~Address()
-{
-std::cout << static_cast<void *>(mp) << "adresindeki bellek bloğu geri verildi\n";
+  ~Addrees()
+  {
+    std::cout << static_cast<void *>(mp) << "adresindeki bellek blogu geri verildi\n";
+    std::free(mp);
+  }
+  void print() const
+  {
+    std::cout << mp << '\n';
+  }
+  std::size_t lenght() const
+  {
+    return mlen;
+  }
 
-std::free(mp);
-}
-void print()const;
-{
-std::cout << mp << '\n';
-{
-return mlen;
-}
-}
-  std::size_t lenght()const  
 private:
-std::size_t mlen;
-char *mp;
+  std::size_t mlen;
+  char *mp;
 };
 
-void process_address(Adress x)
+void process_address(Addrees x)
 {
-std::cout << "process_address fonksiyonu cagrildi\n";
-x.print();
-(void)getchar();
+    std::cout << "process_address fonsksiyonu cagrildi\n";
+    x.print();
+    (void)getchar();
 }
 
 int main()
 {
-using namespace srd;
+  using namespace std;
+  
+  Addrees adx{"buyukdere mah. ozan sokak. no 12 istanbul"};
+  adx.print();
+  cout << "adress uzunlugu " << adx.lenght() << '\n';
+  
+  process_address(adx);
+  std::cout << "main devam ediyor\n";
 
-Address adx{"buyukdere mah. ozan sok. no 12 ıstanbul"};
-adx.print();
-cout << "adres uzunlugu" << adx.lenght() << '\n';
-}
-process_address(adx);
-std::cout << "main devam ediyo\n";
-
-adx.print(); //ub, dangling pointerdan dolayı,
-//derleyicinin yazdığı copy constrectır işleri bozdu
-//bu durumu düzeltmek için copy constructerı kendimiz yazarız 
-//her snıf türünden nesneler kopyalamaya açık olmayabilir bu yüzden kendimizi yazmamaız gerekebilir
+  adx.print(); //ub, dangling pointerdan dolayı,
+  //derleyicinin yazdığı copy constrectır işleri bozdu
+  //bu durumu düzeltmek için copy constructerı kendimiz yazarız 
+  //her snıf türünden nesneler kopyalamaya açık olmayabilir bu yüzden kendimizi yazmamaız gerekebilir
 }
 
 ----------
