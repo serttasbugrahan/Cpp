@@ -980,5 +980,40 @@ Myclass&operator=(Myclass&&);
 //NO MOVE ctor
 };
 
+/////////////////////////////////////////////2. Ders////////////////////////////////////
+
+//special member tablosuna göre konuşuyoruz
+
+class Date {
+
+private:
+int md{1}, mm{1}, my{1970}; //default ctor derleyici yazmasını sağlayabilirz
+};
+
+--------
+
+//sınıfın kopyalamaya karşı kapatılması taşımaya açılması
+
+sıfın move memberları olucak ancak copy delete edilcek böyle sınıflara move only-type denir
+
+class Neco {
+public: 
+Neco();
+Neco(const Neco&) = delete;
+Neco& operator=(const Neco&) = delete;
+Neco(Neco&&);
+Neco& operator=(Neco&&);
+private:
+
+};
+
+
+
+
+
+
+
+
+
 
 
