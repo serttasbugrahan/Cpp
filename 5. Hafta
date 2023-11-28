@@ -505,7 +505,7 @@ Myclass(const Myclass&)
 std::cout<< "copy ctor\n";
 }
 
-Myclass(Myclass&& r)
+Myclass(Myclass&&)
 {
 std::cout<< "move ctor\n";
 }
