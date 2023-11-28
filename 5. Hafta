@@ -1007,6 +1007,182 @@ private:
 
 };
 
+-----
+
+class Member {
+public :
+Member(int);
+Member(int,int);
+private:
+
+};
+
+class Nec {
+public :
+
+private:
+Member mx; //hata yok
+}
+
+int main()
+{
+Nec mynec; //burada hata olur
+}
+
+-----
+
+class Member {
+public :
+Member(int);
+Member(int,int);
+private:
+
+};
+
+class Nec {
+public :
+Member(int);
+Member(int, int);
+Member() = delete; //hata olur
+
+private:
+Member mx; //hata yok
+}
+
+int main()
+{
+Nec mynec; //burada hata olur
+}
+
+---------------------------
+
+temporary objects: nesneyi isimlendirmeden kullanmaya denir. runtime'da nesne var ortalıkta nesne yok
+------------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor\n";
+std::cout << "this = " << this << '\n';
+std::cout << "-----------------------------\n";
+}
+
+~Myclass()
+{
+std::cout << "destructor\n";
+std::cout << "this = " << this << '\n';
+std::cout << "-----------------------------\n";
+}
+
+Myclass(int x)
+{
+std::cout << "Myclass(int x) x = " << x << \n";
+std::cout << "this = " << this << '\n';
+std::cout << "-----------------------------\n";
+}
+
+};
+
+int main()
+{
+Myclass m1;
+Myclass m2(35);
+
+Myclass(); //bu geçerlidir
+Myclass{}; //bu da geçerlidir
+Myclass(12); //bu da geçerlidir
+
+//bir çok durumda isimlendirililmiş nesne kullanmak yerine temporary nesne kullanılır
+//bunun bize faydaları vardır
+}
+
+----
+
+int main()
+{
+Myclass m;
+func(m); //böyle kullanmanın dezavantajları vardır
+//okuyan bunun daha sonra da kullanıcağını düşünür scope'undan dolayı
+
+func(Myclass{12}); //madotory copy elision geçici nesne kullanınca kodu okuyan niyetimizi anlar
+
+}
+
+ !!isimlendirilmemiş nesne işimizi görüyorsa isimlendirilmemiş nesne kullan buna temporary object denir
+
+------
+
+int main()
+{
+Myclass{}; //tempory object değer kategorisi pr value
+
+Myclass&r = Myclass{}; //geçersiz
+const Myclass&r = Myclass{}; //geçerli
+Myclass&&r = Myclass{}; //geçerli
+}
+
+------
+
+void foo(Myclass);
+void bar(Myclass &);
+void baz(const Myclass &);
+void func(Myclass &&);
+
+int main()
+{
+foo(Myclass{}); //geçerli
+bar(Myclass{}); //geçersiz
+baz(Myclass{}); //geçerli
+func(Myclass{}); //geçerli
+}
+
+---------
+//life extension kuralı : normalde bir geçici nesne oluştuğğunda hayata gelen
+geçici nesneyi içine alan ifadenin yürütülmesiyle sona erer 
+
+int main()
+{
+cout << "[1]\n";
+{
+//Myclass{}; //geçici nesne alt satıra geçmden hayatı biter
+const Myclass& r = Myclass{}; //geçici nesnyee bağlar isek life extension uygulanır
+std::cout << "[2]\n";
+}
+std::cout << "[3]\n";
+}
+
+------
+
+Myclass foo()
+{
+return Myclass{};
+}
+
+int main()
+{
+//Myclass &r = foo(); //legal olmaz, l value ref. r value ref'e bağlanmak isteniyor
+const Myclass &r = foo(); //bu şekilde hata olmaz
+}
+
+-------
+
+47.20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
