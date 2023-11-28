@@ -733,10 +733,6 @@ move ctor kodunun yazılması:
 #include <string>
 #include <cstring>
 
-#include <iostream>
-#include <string>
-#include <cstring>
-
 class Addrees
 {
 public:
