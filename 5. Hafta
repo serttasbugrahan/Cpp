@@ -1718,6 +1718,369 @@ foo({347, 871});
 
 //////////////////////////////////////////////3. Ders/////////////////////////////////////////
 
+copy elision
+C++17 (mandotory copy eln)
+RVO
+NRVO
+
+dinamik ömürlü ifadeler
+new ifadeleri
+delete ifadeleri
+operator new fonksiyonları
+operator delete fonksiyonları
+
+
+-----------------
+
+copy elision (kopyalamamanın yapılmaması):
+------------------------------------------
+-maaliyetin yüksek olduğu zamanlar için önem taşır
+
+-copy elision kopyalama yerine move demek değildir
+
+-ne copy çağırılıcak ne move çağırılıcak
+ 
+------
+!! move ctor yok ise copy ctor çağrılır
+
+------
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &)
+  {
+    std::cout << "copy ctor\n";
+  }
+  Myclass(Myclass &&)
+  {
+    std::cout << "copy ctor\n";
+  }
+  Myclass &operator=(const Myclass &)
+  {
+    std::cout << "copy assignment\n";
+    return *this;
+  }
+  /*Myclass &operator=(Myclass &&)
+  {
+    std::cout << "move assignment\n";
+    return *this;
+  }*/
+};
+
+void foo(Myclass x)
+{
+std::cout << "foo()\n";
+}
+
+int main()
+{
+foo(Myclass{}); //geçici nesne
+}
+//normalde beklenti aşağıdaki gibi çalışmasıdır ancak o şekilde olmaz
+default ctor, copy ctor, dtor, dtor sırayıyla çıkmasıdır
+//copy ctor çağrılmadı
+
+----------
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &) = delete
+};
+
+void foo(Myclass x)
+{
+std::cout << "foo()\n";
+}
+
+int main()
+{
+foo(Myclass{}); //cpp 17 öncesinde hata verir
+}
+
+---------
+!! bir fonksiyonun paramteresini sınıf türünden yaparsak ve fonksiyonu pr value exp ile çağırırsak
+c++17 öncesinde derleyiciler opt. yaparak önce gecici nesnyei oluşturmak yerine doğrudan paramtere değişkeni yerine oluşturuyolar
+
+
+c++17 öncesinde 'Myclass{}' nesne statüsündeydi
+
+modern c++ pr value exp olan ifadeler doğrudan bir sınıf nesnesi değil, sınıf nesnesi haline glmesi için bazı seneryoların gerçekleşmesi gerekiyor
+bu seneryolara temporary materialization denir.
+
+temporary materialization : geçici nesne oluşturma
+
+---------
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &) = delete
+};
+
+void foo(Myclass x)
+{
+std::cout << "foo()\n";
+}
+
+//temporary materialization 
+
+int main()
+{
+Myclass{};
+}
+
+--------
+temporary materialization hangi durumlarda olabilir :
+
+1)
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &) = delete
+};
+
+void foo(Myclass x)
+{
+std::cout << "foo()\n";
+}
+
+int main()
+{
+//standarta göre copy olmadığı için hata olmaz
+
+Myclass x = Myclass{}; //geçici nesne bir başka değere atanıyor
+const Myclass &x = Myclass{}; //referansa bağlanabilir
+foo(Myclass{Myclass{Myclass{}}}); //bir kere default ctor çağrılır
+}
+
+çıkan sonuçlar :
+-kağıt üstünde bir kopyalama olmaz
+-kopyalama olmadığı için derleyicinin opt. switchleri ile oynasakta kopyalama olmıycak
+-delete edilmesi halinde de sentax hatası olmıycak
+
+
+-------------
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &) = delete
+};
+
+void foo(Myclass x)
+{
+
+}
+
+int main()
+{
+foo(Myclass{46}); //int parametreli ctor çağrılır
+}
+
+---------
+
+!! ÇOK ÖENMLİ
+
+2. seneryo : RVO(return value opt.)
+----------
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass&) = delete;
+};
+
+Myclass foo(int n)
+{
+//code
+
+return Myclass{n};
+}
+
+int main()
+{
+Myclass m = foo(13); //eskiden derleyicinin yaptığı opt. göre 1-2 kere copy çağırıloyordu
+//şimdi mandotory copy söz konusu delete edilmesine rağmen sentax hatası olmaz
+}
+
+// fonksiyonun return ifadesi pr value ifadesi ise mandotory copy elision olucak
+
+//eskiden RVO opt. du şimdi dilin kuralı oldu
+--------
+
+std::string foo() //fonksiyonun geri dönüş değeri sınıf türünden yapılır
+{
+return 
+}
+
+------------
+
+NRVO (named return value optimization)
+-------------------------------------
+
+NRVO : Mondotory değildir
+
+std::string foo()
+{
+std::string str(1000, 'A');
+
+str += "xxxxxx";
+
+return str;
+}
+
+int main()
+{
+std::string s = foo();
+
+//normalde move ctor çağrılıcıak string kütüphanesinin move ctor'u yoksa (var) vopy ctor çağrılıcak
+}
+
+-----------
+
+class Myclass
+{
+public:
+  Myclass() // default ctor
+  {
+    std::cout << "default ctor\n";
+  }
+  ~Myclass() // dtor
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(int)
+  {
+    std::cout << "Myclass(int)\n";
+  }
+  Myclass(const Myclass &)
+  {
+    std::cout << "copy ctor\n";
+  }
+  Myclass(Myclass &&)
+  {
+    std::cout << "copy ctor\n";
+  }
+  Myclass &operator=(const Myclass &)
+  {
+    std::cout << "copy assignment\n";
+    return *this;
+  }
+  Myclass &operator=(Myclass &&)
+  {
+    std::cout << "move assignment\n";
+    return *this;
+  }
+
+  void foo() {}
+  void bar() {}
+  void baz() {}
+};
+
+Myclass func()
+{
+Myclass m(365);
+std::cout << "&m = " << &m << '\n';
+
+m.foo();
+m.baz();
+m.bar();
+
+return m;
+}
+
+int main()
+{
+Myclass nec = func();
+std::cout << "&nec = " << &nec << '\n';
+//aynı adres çıkar
+}
+
+
+//36.44
+
+
+
+
+
+
+
+
+
 
 
 
