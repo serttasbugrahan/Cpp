@@ -1163,17 +1163,69 @@ int main()
 {
 //Myclass &r = foo(); //legal olmaz, l value ref. r value ref'e bağlanmak isteniyor
 const Myclass &r = foo(); //bu şekilde hata olmaz
+Myclass &&R = foo(); //geçerli
 }
 
--------
+---------------------
 
-47.20
+move-from state (taşınmış nesne durumu):
+----------------------------------------
+
+std::string foo();
+
+int main()
+{
+using namespace std;
+string s;
+
+s = foo(); //R value referans olduğu için move assignment çağrıllır, L value olsaydı copy çağrılırdı
+//s için tekrar dinamik bellek alanı edinilmez sadece pointerlar kopyalanır
+//ciddi verim kazanılır
+s = std::string(100'000, 'A'); //move assignment çağrılı
+//taşıma semantiğinin devreye girmesi için özel bir şey yapmamız gerekmiyor
+
+}
+
+-------------
+
+Özel durum :
+
+std::string foo();
+
+int main()
+{
+using namespace std;
+string s;
+
+string str(200'000, 'Z');
+string sx = str; //copy assignment çağrılır     
+string sx = std::move(str); //böyle bir kod ile gel beni çal demek istiyoruz, move ctor oldu
+s = std::move(str); //move assignment 
+//burada str destructor çağrılmamıştır scope sonunda çağrılır
 
 
+}
 
+---
 
+std::string foo();
 
+int main()
+{
+using namespace std;
+string sx;
 
+{
+string str(200'000, 'Z');
+
+sx = std::move(str);
+//burada str hayatta ama kaynağıda çalınmış durumda (str is moved_from state)
+}
+sx
+}
+
+// tipik olarak (böyle bir sorumluluk yok) move member'lar kaynağı çalınmış nesneyi
+kaynağı çalınmış diğer nesneyi default contruct edilmiş şekilde state bırakır 
 
 
 
