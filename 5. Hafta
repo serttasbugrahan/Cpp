@@ -1697,7 +1697,27 @@ func({});
 
 --------
 
+iki parametreli ctor
 
+class Myclass {
+public:
+Myclass(int, int); //legaldir ancak exlicit yaparsak hepsi hata oolur
+};
+
+void foo(Myclass);
+
+Myclass bar()
+{
+return {56, 21};
+}
+
+int main()
+{
+Myclass m = {12, 67};
+foo({347, 871});   
+}
+
+//////////////////////////////////////////////3. Ders/////////////////////////////////////////
 
 
 
