@@ -1077,7 +1077,7 @@ std::cout << "-----------------------------\n";
 
 Myclass(int x)
 {
-std::cout << "Myclass(int x) x = " << x << \n";
+std::cout << "Myclass(int x) x = " << x << '\n';
 std::cout << "this = " << this << '\n';
 std::cout << "-----------------------------\n";
 }
@@ -1143,7 +1143,7 @@ geçici nesneyi içine alan ifadenin yürütülmesiyle sona erer
 
 int main()
 {
-cout << "[1]\n";
+std::cout << "[1]\n";
 {
 //Myclass{}; //geçici nesne alt satıra geçmden hayatı biter
 const Myclass& r = Myclass{}; //geçici nesnyee bağlar isek life extension uygulanır
@@ -1202,7 +1202,6 @@ string sx = str; //copy assignment çağrılır
 string sx = std::move(str); //böyle bir kod ile gel beni çal demek istiyoruz, move ctor oldu
 s = std::move(str); //move assignment 
 //burada str destructor çağrılmamıştır scope sonunda çağrılır
-
 
 }
 
@@ -1284,7 +1283,7 @@ conversion contructor (dönüştüren kurucu işlev): myclass sınıfına dönü
 class Myclass {
 public:
 Myclass() =default;
-myclass(int); //sentax hatası ortadan kalkar
+Myclass(int); //sentax hatası ortadan kalkar
 };
 
 int main()
@@ -1298,7 +1297,7 @@ mx = 5; //sağ taraf int sol taraf myclass (hata)
 class Myclass {
 public:
 Myclass() =default;
-myclass(int x)
+Myclass(int x)
 {
 std::cout << "Myclass(int x) x = " << x << "\n"; 
 std::cout << "this = " << this << '\n';   
