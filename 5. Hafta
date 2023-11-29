@@ -1528,16 +1528,174 @@ String = "Onur Yagar"; //legal
 
 -------
 
-class Vector {
-public:
-Vector();
+int main()
+{
+using namespace std;
+vector<int> ivec(1234); //1234 tane int tutar
+}
 
+------
+
+int main()
+{
+using namespace std;
+int ival = 4343;
+vector<int> ivec;
+
+ivec = ival; //böyle bir senaryo geçerli olsa idi felaket olurdu
+//bunun hata olması aşağıdaki konu ile alakalı
+}
+
+--------------------
+
+explicit ctor: c++ dilinin önemli anahtar sözcüklerinden biridir
+-------------
+
+imlicit conversion : derleyicinin durumdan vazife çıkartarak dilin kuralları gereği yaptığı örtülü dönüşüm
+explicit conversion : tür dönüştüme operatörü ile yapılan dönüşüm
+
+class Myclass {
+
+public:
+Myclass();
+explicit Myclass(int); //bu ctor implict dönüşüm yapmaz sadece explicit dönüşüm yapar demektir
+};
+
+---------
+
+class Myclass {
+public :
+Myclass();
+Myclass(int);
+};
+
+int main()
+{
+Myclass m;
+m = 23; //legal
+}
+
+-----
+
+class Myclass {
+public :
+Myclass();
+emplicit Myclass(int); //kazara implicit coversion yapmasını  enggeliyoruz
+};
+
+int main()
+{
+Myclass m;
+m = 23; //illegal
+m = static_cast<Myclass>(23); //legal
 }
 
 
-//2.5
+------------
 
+!! Bir sınıfın (özellikle) tek paramtereli ctor'larını (aksi yönde karar almanızı gerektiricek makul bir neden olmadıkça)
+explicit yapınız
 
+class Myclass {
+public:
+explicit Myclass(int);
+};
+
+int main()
+{
+Myclass m1(19);
+Myclass m2{35};
+Myclass m3 = 57; //copy init, sentax hatası
+}
+
+-----------
+//kod anlamaya çalışma
+
+int main()
+{
+using namespace std;
+
+unique_ptr<int> p1{new int};
+unique_ptr<int> p2(new int);
+unique_ptr<int> p3 = new int; //sentax hatası
+}
+
+-------
+//Mülakatalarda sorulan bir soru
+
+class Myclass {
+public:
+explicit Myclass(double);
+Myclass(int);
+};
+
+int main()
+{
+Myclass m = 45.98; //hata olmaz, int çağrılır
+}
+
+!! explicit ctor copy init durumunda overload sete hiç girmez
+
+-----------
+
+class Myclass {
+public:
+Myclass();
+};
+
+int main()
+{
+Myclass m{}; //geçerli
+}
+
+----------
+
+class Myclass {
+public:
+Myclass();
+};
+
+void func(Myclass);
+
+Myclass foo()
+{
+return Myclass(); //legal
+return Myclass{};//legal
+return {};//legal
+}
+
+int main()
+{
+func(Myclass());
+func(Myclass{});
+func({});
+}
+
+-------
+
+class Myclass {
+public:
+emplicit Myclass();
+};
+
+void func(Myclass);
+
+Myclass foo()
+{
+//return Myclass();
+//return Myclass{};
+return {};//hata
+}
+
+int main()
+{
+Myclass m = {}; //Hata
+func(Myclass());
+func(Myclass{});
+func({});
+}
+
+--------
 
 
 
