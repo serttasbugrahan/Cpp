@@ -1227,15 +1227,315 @@ sx
 // tipik olarak (böyle bir sorumluluk yok) move member'lar kaynağı çalınmış nesneyi
 kaynağı çalınmış diğer nesneyi default contruct edilmiş şekilde state bırakır 
 
+------
+
+kaynağı çalınmış nesne:
+a) geçerli bir durumda
+in a valid state
+
+b) it's value unkown (değeri bilinmiyor
+
+-----
+
+std::string foo();
+
+int main()
+{
+using namespace std;
+string sx;
+
+{
+string str(200'000, 'Z');
+
+sx = std::move(str);
+
+cout << str << "\n"; //geçerli
+//moved_from state'i sadece ona yeni bir atama yaparak kullanabilirim
+}
+
+}
+
+!! kaynağı çalınmış bir nesneyi atama yoluyla kullanabilinir duurmda bırakmamız gerekir
+
+-------
+//bu kodu şimdilik anlamaya çalışma
+//necati hoca mülakatlarda bunu çok soruyor yorum istiyor
+int main()
+{
+using namespace std;
+
+ifstream ifs {"notlar.txt"};
+
+string sline;
+vector<string> svec;
+
+while (getline(ifs, sline)){
+cout << sline <<'\n';
+svec.push_back(std::move);
+//svec.push_back(std::move(sline)); böyel olmalı
+}
+}
+
+-----------------------
+
+conversion contructor (dönüştüren kurucu işlev): myclass sınıfına dönüüşüm içindir
+------------------------------------------------
+
+class Myclass {
+public:
+Myclass() =default;
+myclass(int); //sentax hatası ortadan kalkar
+};
+
+int main()
+{
+Myclass mx;
+mx = 5; //sağ taraf int sol taraf myclass (hata)
+}
+
+------
+
+class Myclass {
+public:
+Myclass() =default;
+myclass(int x)
+{
+std::cout << "Myclass(int x) x = " << x << "\n"; 
+std::cout << "this = " << this << '\n';   
+}
+};
+
+int main()
+{
+Myclass mx;
+mx = 5;
+//örtülü olarak int türden  bir nesneyi mclass sıfına dönüştürür
+}
+
+------
+
+class Myclass {
+public:
+Myclass() =default;
+
+Myclass(int x)
+{
+std::cout << "Myclass(int x) x = " << x << "\n"; 
+std::cout << "this = " << this << '\n';   
+}
+
+Myclass& operator=(const Myclass& r)
+{
+std::cout << "Myclass copy asssignment this = " << this << "\n";
+std::cout << "&r = " << &r << '\n';
+return *this;
+}
+
+Myclass& operator=(const Myclass&& r)
+{
+std::cout << "Myclass move asssignment this = " << this << "\n";
+std::cout << "&r = " << &r << '\n';
+return *this;
+}
+
+~Myclass()
+{
+std::cout << "Myclass destructor this = " << this << '\n';
+}
+};
+
+int main()
+{
+Myclass mx;
+std::cout << "&mx = " << &mx << '\n';
+std::cout << "main [1]\n";
+//ctor
+mx = 5; //buraya çağrı yapılır ve geciçi nesne oluşturulur
+//dtor
+std::cout << "main [2]\n";
+}
+
+-----------
+
+class Myclass {
+public:
+Myclass(int);
+};
+
+void func(Myclass);
+
+int main()
+{
+func(12);
+}
+//bu kodun geçerli olmasının nedeni user defined gerçekleştii içindir
+
+------
+
+class Myclass {
+public:
+Myclass();
+Myclass(int);
+};
+
+int main()
+{
+Myclass m;
+m = 3.2323; //legal
+
+}
+
+-----
+
+class Myclass {
+public:
+Myclass();
+Myclass(bool);
+};
+
+int main()
+{
+Myclass m;
+int x = 10;
+
+m =&x; //geçerli
+}
+
+-----
+
+class Myclass {
+public:
+Myclass();
+Myclass(int);
+};
+
+int main()
+{
+Myclass m;
+int x = 10;
+int *ptr = nullptr;
+m = ptr;
+}
+
+--------------
+
+type cast operator function:
+----------------------------
+
+eğer bir dönüşüm aşağıdaki dönüşüm sekanslarından biriyle
+gerçekleştiribiliyor ise derleyici bu dönüşümü örtülü olarak yapmak zorunda
+
+user-defined connversion + standart conversioni
+standart conversion + user defined conversion
+
+class Myclass {
+public:
+Myclass();
+Myclass(bool);
+};
+
+int main()
+{
+Myclass m;
+int x = 10;
+int *ptr = nullptr;
+
+m = ptr;
+
+//pointer to int türünden bool'a standart conversion var
+//bool'dan myclass'a user defined conversion var
+//derleyici 'standart conversion + user defined conversion' bu şekilde dönüşümü yapar
+}
+
+------
+
+class Myclass {
+public:
+Myclass();
+Myclass(bool);
+};
+
+int main()
+{
+Myclass m;
+double dval = 32.5;
+m = dval;
+
+'standart conversion + user defined conversion' derleyici bu şekilde dönüşüm yapar
+}
+
+--------
+
+user defined conversion + user defined conversion, bunu örtülü olarak yapamaz
+
+class A {
+
+};
+
+class B {
+public:
+B();
+B(A);
+};
+
+int main()
+{
+A ax;
+B bx;
+
+bx = ax; //conversion constructer
+}
+
+-------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B();
+B(A);
+};
+
+int main()
+{
+A ax;
+B bx;
+
+bx = bx;
+bx = 13; //hata bunu yapması için 2 tane user defined yapması gerekir
+//inr ==> A (user defined)
+A ==> B (user defined)
+!! tür dönüüştürme kullanırsak geçerli olur
+//bx = static_cast<A>(13);
+}
+
+----------
+
+conversion constructer genel olarak bizim için ciddi bir risktir
+
+class String {
+public:
+String(const char *);
+};
+
+int main()
+{
+String = "Onur Yagar"; //legal
+}
+
+-------
+
+class Vector {
+public:
+Vector();
+
+}
 
 
-
-
-
-
-
-
-
+//2.5
 
 
 
