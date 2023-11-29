@@ -2382,4 +2382,244 @@ delete p;
 std::cout << "main [2]\n";
 }
 
+delete etmemek dtor çağrılmaz dtor çağrılmassa kaynaklar geri verilmez
+-----------
+
+!! modern cpp de artık new çok nadi kullanılır buna daha sonra değinniziceğiz
+
+üretime bu şekilde yazılır
+--------------------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+Myclass(int x, int y)
+{
+std::cout << "Myclass(int x, int y) x = " << x << " y = << y << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {
+std::cout << "Myclass::foo() this = " << this << '\n';
+}
+void bar() {
+std::cout << "Myclass::bar() this = " << this << '\n';
+
+}
+};
+
+int main()
+{
+using namespace std;
+
+std::cout << "main [1]\n";
+{
+auto p = make_unique<Myclass>();
+p->bar();
+p->foo();
+}
+
+std::cout << "main [2]\n";
+}
+
+--------------------
+
+raw pointer/naked pointer c'den gelen pointer
+
+smart pointer : gerçekte sınıf nesnesi ancak pointer gibi davranır
+  raw pointer
+  naked pointer
+
+------------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+Myclass(int x, int y)
+{
+std::cout << "Myclass(int x, int y) x = " << x << " y = << y << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {
+std::cout << "Myclass::foo() this = " << this << '\n';
+}
+void bar() {
+std::cout << "Myclass::bar() this = " << this << '\n';
+
+}
+};
+
+void* operator new(std::size_t sz)
+{
+std::cout << "operator new called for the size of : " << sz << "\n";
+
+if (sz == 0)
+++sz;
+if (void* ptr = std::malloc(sz))
+return ptr;
+throw std::bad_alloc{};
+}
+
+void operator delete(void* ptr) noexcept
+{
+std::cout << "operator delete called for the address of : " << ptr << "\n";
+std::free(ptr);  
+}
+
+------
+Derleyicinin new ve delete için yazdığı kod:
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+Myclass(int x, int y)
+{
+std::cout << "Myclass(int x, int y) x = " << x << " y = << y << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {
+std::cout << "Myclass::foo() this = " << this << '\n';
+}
+void bar() {
+std::cout << "Myclass::bar() this = " << this << '\n';
+
+}
+};
+
+
+void* operator new(std::size_t sz)
+{
+std::cout << "operator new called for the size of : " << sz << "\n";
+auto vp = std::malloc(sz);
+if (!vp) {
+throw std::bad_alloc{}
+}
+std::cout << "the address of allocated block is << vp << '\n';
+return vp;
+}
+
+void operator delte(void* vp)
+{
+std::cout << "operator delete called vp = " << vp << '\n';
+std::free(vp);
+}
+
+int main()
+{
+using namespcae std;
+
+cout << "sizeof(Myclass) = " << sizeof(Myclass) << '\n';
+Myclass *p = new Myclass;
+p->foo();
+delete p;
+
+std::cout << "main devam ediyor\n";
+}
+
+-----------
+
+!! operator new fonksiyonu allocated ettiğim new fonksiyonunu free fonksiyonu ile geri veremeyiz
+
+int main()
+{
+Myclass *p = new Myclass;
+free(p); //ub
+}
+
+----------------
+
+array new: aaray oluşturuyor
+---------
+
+new int[expr]; //expr kaç ise o kadar sayı da nesneye sahip bir dinamik dizi oluşturur
+
+
+int main()
+{
+std::cout << "kac tam sayı: ";
+std::size_t n;
+
+std::cin >> n;
+int *p = new int[n];
+for (std::size_t i{} < n; ++i){
+p[i] = i;
+}
+for (std::size_t i{}; i < n; ++i) {
+std::cout << p[i] << '';
+}
+
+delete[] p;
+}
+
+------------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+char buf[256] {};
+};
+
+int main()
+{
+std::cout << "sizeof(Myclass) = " << sizeof(Myclass) << "\n";
+Myclass *p = new Myclass[10];
+delete p; //ub
+delete[] p; //bu şekilde olmalı
+}
+
+!!
+array new ise array delete
+new ise delete kullan
+
+--------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
