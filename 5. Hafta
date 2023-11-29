@@ -2606,20 +2606,87 @@ delete[] p; //bu şekilde olmalı
 array new ise array delete
 new ise delete kullan
 
+----------------------------------------------------
+
+sınıfların static veri elemanları
+sınıfların static üye fonksiyonları
+
+operator overloading
+
+namespace
+
+
+--------------------------------------------------
+
+sınıfların static veri elemanları:
+----------------------------------
+
+class Nec{
+int mx;
+void foo();
+double d1, d2;
+char s[36];
+};
+
+int main()
+{
+std::cout << "sizeof(Nec) = " << sizeof(Nec) << "\n";
+}
+
+//veri lemanı eklnedikçe sizeof artar
+
+----------
+
+class Nec {
+static int mx; //derleyici yer ayrımaz
+};
+
+//sınıfların static veri elemanları static anahtar sözcüğü ile bildiriliyor
+//bu (tanımlama olmayan) (non-defined declaration)
+
 --------
+Aşağıdaki gibi tanımlanmalı
+
+//nec.h
+class Nec {
+static int mx;
+};
+
+//nec.cpp
+
+int Nec::mx;
+
+----------
 
 
+//assembly tarafında global değişkenlerden hiçbir farkı yoktur
+//dil katmanında farklılık vardır
 
+-----------
 
+class Nec{
+public:
+static int mx;
+};
 
+int main()
+{
+Nec::mx; //sınıf dışında kullanırken bu şekilde kullanmalıyoz
+}
 
+-------
 
+class Nec{
+public:
+static int mx;
+};
 
+int main()
+{
+Nec n1, n2;
 
-
-
-
-
-
-
-
+n1.mx = 10;
+n2.mx = 56;
+auto p = &n1;
+p-> mx = 854;
+}
