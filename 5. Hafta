@@ -2070,18 +2070,316 @@ std::cout << "&nec = " << &nec << '\n';
 //aynı adres çıkar
 }
 
+-----------
 
-//36.44
+class Myclass {
+
+public :
+std::string m_str;
+std::vector<int>m_vec;
+};
+
+Myclass foo();
+
+int main()
+{
+Myclass m;
+
+m = foo();
+}
+
+//bu kod move assignment değilde copy assignment olsaydı çok maaliyetli olurdu
+
+-------
+
+class Myclass {
+
+public :
+std::string m_str;
+std::vector<int>m_vec;
+};
+
+Myclass foo();
+
+int main()
+{
+Myclass m = foo();
+}
+
+//ne copy ne move çağırılır mandortory copy elision olucak
+
+----------
+
+-copy ctor
+-move ctor
+-copy elision
+
+en maaliyetliden maaliyetsize
+copy elision > move ctor > copy ctor
+
+----------
+
+class Date {
+int d, m, y;
+};
+
+class Myclass {
+Date mdate;
+int a[1000];
+};
+
+Myclass foo();
+
+int main()
+{
+Myclass m = foo();
+
+m = foo();
+}
+
+//move ctor çağrılıcak ancak faydası yoktur
+copy ile farkı olmaz bu durumda
+
+--------
+
+int main()
+{
+Myclass m; //default ctor
+m = foo(); //move ctor
+
+//c++ dilinde yukarıdaki ve aşağıdaki arasında büyük fark vardır
+
+Myclass m2 = foo(); //gecici bir nesne ise mandortory, otomatik bir nesne ise NRVO olur
+
+}
+
+-------------------
+copy eision
+----------
+1) temporary object passing (mandotory), copy ctor delete edilmiş olsa dahi sentax hatası olmaz
+2) returning a temporary object (mandotory), copy ctor delete edilmiş olsa dahi sentax hatası olmaz
+3) returning an object of automatic storage class (optimizat, on)
+
+----------------
+
+factory function
+---------------
+
+class Point {
+public:
+Point(int, int, int);
+private:
+};
+
+Point MakePoint(int x)
+{
+return Point{x, x, x};
+}
+
+int main()
+{
+auto p = MakePoint(3);
+Point p {3,3,3}; //assembly tarafında aynı anlama gelir
+}
+
+----------
+
+class MoveOnly {
+public:
+  MoveOnly() = default;
+  MoceOnly(const MoveOnly&) = delete; //copy'leri delete etmesekde movelar onları delete edicek
+  MoveOnly& operator(const MoveOnly&) = delete;
+  MoveOnly(MoveOnly&&);
+  MoveOnly&operator=(MoveOnly&&);
+};
+
+MoveOnly foo()
+{
+MoveOnly x;
+return x; //buras l value olduğu için normalde copt ctor çağrılması gerekir 
+//copy ctor çağrıldığı içinde sentax hatası olması gerekir
+//ancak geri dönüş değerini otomatik bir nesneye atadığımız zaman derleyici L value to x value dönüşümü yapar ve hata olmaz
+//return std::move(x); //pessimistic move, bunu yapma bunu yaparsan copy elision devre dışı kalır
+}
+
+int main()
+{
+MoveOnly x;
+x = foo(); 
+}
+
+----------------------------------------------------
+
+Dinamik Ömürlü Nesneler:
+------------------------
+
+1) automatic storage class 
+  a) global nesneler
+  b) static yerel nesneler
+  c) sınıfların static veri elemanlar (static data members)
+2) static storage class
+  a) parameters
+  b) local variabler
+3) dynamic storage class
+  a) new
+  b) delete
+4) thread-local storage class
+
+--------------
+
+new expression/operator
+-----------------------
+
+dinamik ömürlü bir nesne hayata getirmek için new kullanmak gerekir
+
+new mMyclass
+new int
+new double
+
+
+new operatoründe c dilinde farklı olarak c dilinde malloc çağrılırdı
+new operatöründe operator new çağrılır
+
+new Fighter
+void* operator new(std::size_t)
+
+static_cast<Fighter *>(operator new(sizeof(Fighter)))->Fighter()
+//ifadenin türü fighter *
+
+derleyici önce
+-operatör new fonksiyonunu çağırır
+-operatör new fonksiyonuna türün sizeof değerini çağırır
+-operator new başarısız olursa exension trow ediyror başarılı olursa  elde edilen adresi döndürüyor
+
+---------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {}
+void bar() {}
+};
 
 
 
+int main()
+{
+Myclass * p1 = new Myclass;
+auto p1 = new Myclass; //aynı anlamda 3'ü
+auto * p3 = new Myclass;
+
+std::cout << "p = " << p << '\n';
+
+(*p).foo();
+(*p).bar();
+p->foo();
+p->bar();
+
+//ctor ve new çağrılıcıak dtor çağrılmıycak nesnein hayatının bitmesi içn delete kullanmamız gerekicek
+}
+
+----------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+Myclass(int x, int y)
+{
+std::cout << "Myclass(int x, int y) x = " << x << " y = << y << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {}
+void bar() {}
+};
 
 
+int main()
+{
+Myclass *p1 = new Myclass; //default ctor bu şekilde ve aşağıdaki 2 şekilde çağrılır
+Myclass *p2 = new Myclass();
+Myclass *p3 = new Myclass{};
+
+Myclass *p3 = new Myclass(2,6);
+
+}
 
 
+-------
 
+new operator = operatörün ismine denir
+operator new = fonksiyonun ismine denir
 
+--------
 
+nesnenin hayatını bitirmek için delete anahtar kelimesini kullanırız
 
+delete p
+p-> ~Myclass()
+
+-----
+
+void* malloc(size_t n);
+void free(void *);
+
+void* operator new(size_t n);
+void operator delete(void *);
+
+-----
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this = " << this << '\n';
+}
+
+Myclass(int x, int y)
+{
+std::cout << "Myclass(int x, int y) x = " << x << " y = << y << '\n';
+}
+
+~Myclass()
+{
+std::cout << "destructor ctor this = " << this << '\n';
+}
+
+void foo() {
+std::cout << "Myclass::foo() this = " << this << '\n';
+}
+void bar() {
+std::cout << "Myclass::bar() this = " << this << '\n';
+
+}
+};
+
+int main()
+{
+using namespace std;
+
+std::cout << "main [1]\n";
+auto p = new Myclass(3, 7);
+p->bar();
+p->foo();
+delete p;
+std::cout << "main [2]\n";
+}
 
 
