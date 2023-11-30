@@ -2115,7 +2115,7 @@ Myclass m = foo();
 -copy elision
 
 en maaliyetliden maaliyetsize
-copy elision > move ctor > copy ctor
+copy ctor > move ctor > copy elision 
 
 ----------
 
@@ -2154,7 +2154,7 @@ Myclass m2 = foo(); //gecici bir nesne ise mandortory, otomatik bir nesne ise NR
 }
 
 -------------------
-copy eision
+copy elision
 ----------
 1) temporary object passing (mandotory), copy ctor delete edilmiş olsa dahi sentax hatası olmaz
 2) returning a temporary object (mandotory), copy ctor delete edilmiş olsa dahi sentax hatası olmaz
@@ -2187,7 +2187,7 @@ Point p {3,3,3}; //assembly tarafında aynı anlama gelir
 class MoveOnly {
 public:
   MoveOnly() = default;
-  MoceOnly(const MoveOnly&) = delete; //copy'leri delete etmesekde movelar onları delete edicek
+  MoceOnly(const MoveOnly&) = delete; //copy'leri delete etmesekde movelar onları delete edicek, ancak anlaşılır olması nedeni ile böyle yazılrı
   MoveOnly& operator(const MoveOnly&) = delete;
   MoveOnly(MoveOnly&&);
   MoveOnly&operator=(MoveOnly&&);
@@ -2385,7 +2385,7 @@ std::cout << "main [2]\n";
 delete etmemek dtor çağrılmaz dtor çağrılmassa kaynaklar geri verilmez
 -----------
 
-!! modern cpp de artık new çok nadi kullanılır buna daha sonra değinniziceğiz
+!! modern cpp de artık new çok nadir kullanılır buna daha sonra değineceğiz
 
 üretime bu şekilde yazılır
 --------------------------
@@ -2633,7 +2633,7 @@ int main()
 std::cout << "sizeof(Nec) = " << sizeof(Nec) << "\n";
 }
 
-//veri lemanı eklnedikçe sizeof artar
+//veri elemanı eklendikçe sizeof artar
 
 ----------
 
