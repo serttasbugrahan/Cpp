@@ -163,7 +163,7 @@ sizeof(Mert);
 
 -------------
 
-sınıfların static elemlarına dönüyoruz:
+sınıfların static elemlarına dönüyoruz...
 
 class Myclass {
 
@@ -179,7 +179,7 @@ static int x;
 
 int main()
 {
-Myclass::X = 5; //bu şekilde tanımı yapılabilinir
+Myclass::x = 5; //bu şekilde tanımı yapılabilinir
 }
 
 --------
@@ -301,19 +301,20 @@ static constexpr double x = 5.4;
 
 -----
 
-class Nec {
-public:
-static int mx;
-};
-
-int main()
-{
-Nec mynec;
-Nec *p{&mynec};
-
-p->mx
-//mynec.mx
-}
+  class Nec {
+  public:
+  static int mx;
+  };
+  
+  int main()
+  {
+  Nec mynec; //isim aramanın başarılı olabilmesi içib bu şekilde veya aşağdaki şekilde yapılmalı
+  Nec *p{&mynec};
+  Nec::mx;//ya da bu şekilde
+  
+  p->mx
+  //mynec.mx
+  }
 
 ----------
 
@@ -322,7 +323,7 @@ public:
 static int mx;
 };
 
-int Nec::x{};
+int Nec::x{}; //Nec'in x'i 0 değeri ile başlar
 
 int main()
 {
@@ -383,8 +384,7 @@ static int x;
 
 
 --------
-
-class Nec {
+  class Nec {
 public:
 int x;
 static int y;
@@ -421,7 +421,7 @@ a) class scope'dadır
 
 class Nec {
 public:
-static void foo() //global fonksiyon ama class scobe alınmış demek
+static void foo() //global fonksiyon ama class scobe'a alınmış demek
 {
 
 }
@@ -464,7 +464,7 @@ void bar()
 
 class Nec {
 public:
-static void foo() const{} //hata olur, buradaki const gizli parametre değişkenini miteler
+static void foo() const{} //hata olur, buradaki const gizli parametre değişkenini niteler
 
 }
 private:
@@ -639,11 +639,23 @@ int main()
 std::cout << Nec::ival << '\n';
 }
 
+
 --------------------------------
 
 static veri elemanlarının kullanıldığı alanlar:
 ----------------------------------------------
-//mülakatlarda sorulabiliyor
+
+class Person {
+std::vector<int> x; //her personun ayrı bir int dizisi var
+static std::vector<int> x; //bu şekilde personların ortak bir int nesnesi olur
+};
+
+-------------
+mesela student sınıfında öğrencinin sınavlardan aldığı notların ortalamsını veren fonksiyon olsa
+bu fonksiyon non-static olması gerekir her öğrencinin ayrı olabilmesi içn
+öğrencilere toplamda kaç tane sınav yapılmış bunu static yapmamız gerekir
+-------------
+//mülakatlarda sorulabilinen temalar
 
 //named contructor
 
@@ -658,7 +670,6 @@ auto m1 = Myclass::create_object();
 }
 
 -------------
-//burayı tekrar izle
 
 class Complex {
 
@@ -695,8 +706,10 @@ auto c2 = Complex::create_polar(.2352, 4.5767);
 }
 
 ----------
+//dinamikmmürlü nesne zorunluluğu 
+//private ypmaz isek herkes istediği gibi nesne oluşturabilir
 
-class Dynamic0nly {
+class DynamicOnly {
 
 public:
 DynamicOnly(const DynamicOnly&) = delete;
@@ -719,12 +732,11 @@ singleton :tasarım desenidir bir sınıf türünden tek bir nesne olucak ve o n
 
 mesela 1 tane server var, 2 tane olması program domaine aykırı bu durumda sigleton kullanılır, servere singleton ismi verilir
 
-
 class Singleton {
 
 public:
 Singleton(const Singleton&) = delete; //copyalamayı engellemk için yaptık
-static Singleton* instance(); //static olduğu için bu fonksiyonu çağrılması için bir nesneye ihtiyaç olmaz
+static Singleton* get_instance() //static olduğu için bu fonksiyonu çağrılması için bir nesneye ihtiyaç olmaz
 {
 if (!mp)
 mp = new Singleton();
@@ -749,12 +761,12 @@ Singleton::get_instance()->foo();
 
 
 ----------
-
+//başka bir singleten implementasyonu
 Meyer's singleton:
 -----------------
 
-lazy initialization
-thread-safe
+lazy initialization : nesneyi kullanma ihtiyacı olmadan nesneyi oluşturmuyoruz
+thread-safe : singleten nesnesini birden fazla kez oluşturma ihtimali yoktur
 
 class Singleton {
 
@@ -777,6 +789,8 @@ class Myclass {
 public:
 Myclass()
 {
+
+//....
 ++live_object_count
 ++lived_object_count
 }
