@@ -416,9 +416,135 @@ int Nec::y = g.x; //legal
 sınıfların static üye fonksiyonları (static member functions):
 --------------------------------------------------------------
 
+//static üye fonksiyonları
+a) class scope'dadır
+
 class Nec {
 public:
 static void foo() //global fonksiyon ama class scobe alınmış demek
+{
+
+}
+private:
+int mx;
+};
+
+void bar()
+{
+Nec mynec;
+mynec.mx = 5; //erişim hatası
+}
+
+
+int main()
+{
+bar(); //bar bu şekilde çağrılır
+Nec::foo(); //foo bu şekilde çağrılır
+}
+
+--------
+
+class Nec {
+public:
+static void foo() 
+{
+Nec mynec;
+mynec.mx = 5; //sınıfın member fpnksiyonu erişebilir
+}
+private:
+int mx; //hata olmaz
+};
+
+void bar()
+{
+
+}
+
+--------
+
+class Nec {
+public:
+static void foo() const{} //hata olur, buradaki const gizli parametre değişkenini miteler
+
+}
+private:
+int mx;
+};
+
+------
+
+class Nec {
+public:
+static void foo()
+{
+this; //this kullanımı hertürlü sentax hatası olur
+}
+
+private:
+int mx;
+};
+
+--------
+//sınfların static veri elemanları sınıfların non-static veri elemanlrını bu şekilde kullanamaz
+class Nec {
+public:
+static void foo()
+{
+mx = 5; //Hata, this olmadan böyle bir şey yapamayız
+}
+private:
+int mx;
+};
+
+--------
+
+class Nec {
+public:
+static void foo()
+{
+Nec mynec;
+mynec.mx = 5; //bu şekilde legaldir
+}
+private:
+int mx;
+};
+
+---------
+
+class Nec {
+public:
+static void foo()
+{
+mx = 5; //legal
+Nec::mx = 5; //legal
+}
+private:
+static int mx;
+};
+
+-------
+
+class Nec {
+public:
+static void foo()
+{
+
+}
+
+void bar()
+{
+foo(); //legal
+Nec::foo(); //aynı anlamda , Nec'in foo()'su demektir  
+}
+private:
+static int mx;
+};
+
+------
+
+class Nec {
+public:
+static void foo()
 {
 
 }
@@ -426,16 +552,273 @@ static void foo() //global fonksiyon ama class scobe alınmış demek
 
 int main()
 {
+Nec mynec;
+mynec.foo(); //legal
+}
+
+-------
+
+class Nec {
+public:
+static void foo()
+{
+
+}
+void bar()
+{
+this->foo(); //legal
+}
+};
+
+------
+
+class Nec {
+public:
+static void foo()
+{
+
+}
+void bar const()
+{
+foo(); //legal
+}
+};
+
+-------
+
+class Nec {
+public:
+static void foo()
+{
+bar() //illegal
+Nec mynec
+mynec.bar();//legal
+}
+void bar()
+{
+
+}
+};
+
+----------
+
+class Nec {
+public:
+static void foo()
+{
+
+}
+void bar()
+{
+this->foo(); //legal
+}
+};
+
+--------
+//mülakatlarda sorulan tipik bir soru
+
+class Nec {
+public:
+static double foo()
+{
+return 3.9;
+}
+static int ival;
+};
+
+
+int foo()
+{
+return 2;
+}
+
+int Nec::ival = foo(); //isim arama kurallarından dolayı ilk baş class scope'da aranır
+
+int main()
+{
+std::cout << Nec::ival << '\n';
+}
+
+--------------------------------
+
+static veri elemanlarının kullanıldığı alanlar:
+----------------------------------------------
+//mülakatlarda sorulabiliyor
+
+//named contructor
+
+class Myclass {
+public:
+static Myclass create_Object();
+};
+
+int main()
+{
+auto m1 = Myclass::create_object();
+}
+
+-------------
+//burayı tekrar izle
+
+class Complex {
+
+public:
+Complex(double r, double i); //bu şekilde hata olur aynı isimden dolayı
+Complex(double a, double d);
+
+};
+
+------
+
+class Complex {
+public:
+static Complex create_polar(double a, double d)
+{
+return Complex(a, d, 0);
+}
+
+static Complex create_cartesian(double r, double i);
+{
+return Complex(r, i);
+}
+
+private:
+Complex(double, double); //cartesian
+Complex(double, double, int); //polar
+};
+
+
+int main()
+{
+auto c1 = Complex::create_cartesian(3.5, 1.2);   
+auto c2 = Complex::create_polar(.2352, 4.5767);   
+}
+
+----------
+
+class Dynamic0nly {
+
+public:
+DynamicOnly(const DynamicOnly&) = delete;
+DynamicOnly& operator=(const DynamicOnly&) = delete;
+
+Dynamic* create_object()
+{
+return new DynamicOnly{};
+}
+
+private:
+DynamicOnly();
+};
+
+
+
+----------------------------
+
+singleton :tasarım desenidir bir sınıf türünden tek bir nesne olucak ve o nesneye global bir erişim olucak
+
+mesela 1 tane server var, 2 tane olması program domaine aykırı bu durumda sigleton kullanılır, servere singleton ismi verilir
+
+
+class Singleton {
+
+public:
+Singleton(const Singleton&) = delete; //copyalamayı engellemk için yaptık
+static Singleton* instance(); //static olduğu için bu fonksiyonu çağrılması için bir nesneye ihtiyaç olmaz
+{
+if (!mp)
+mp = new Singleton();
+
+return mp;
+}
+
+void foo();
+void bar();
+void baz();
+private:
+inline static Singleton* mp{};
+Singleton();
+};
+
+int main()
+{
+Singleton::get_instance()->baz();
+Singleton::get_instance()->foo();
 
 }
 
 
+----------
 
+Meyer's singleton:
+-----------------
 
+lazy initialization
+thread-safe
 
+class Singleton {
 
+public:
+static Singleton& instance()
+{
+static Singleton object;
+return object;
+}
+private:
+Singleton();
+};
 
+-----------
 
+//hayatta olan nesnelerin sayılması
+
+class Myclass {
+
+public:
+Myclass()
+{
+++live_object_count
+++lived_object_count
+}
+~Myclass()
+{
+--live_object_count;
+}
+
+static int get_live_count() //const olamaz static üye fonksyonlarının const'luğu diye bir şey olamaz
+{
+return live_object_count;
+}
+
+private:
+inline static int live_object_count{};
+inline static int lived_object_count{};
+}
+
+----------
+
+//bir oyun prgramı var her bir fighter nesnesi diğer figter nesnesine erişebilicek
+
+class Fighter {
+public:
+void call_fighter_for_help()
+{
+
+}
+};
+
+int main()
+{
+Fighter f1{"emrecan"};
+Fighter f2{"mehmet"};
+Fighter f3{"damla"};
+Fighter f4{"ali"};
+Fighter f5{"mert"};
+
+f3.call_fighters_for_help(); //düşmanlar etramı sardı mehmet, emrecan, ali, mert yardıma gelin yazısı yazsın
+}
+
+//bir tane veri yapısı (container) olucak hayata gelen her nesnenin adresini o veri yapısına eklememiz gerekir
 
 
 
