@@ -5,7 +5,7 @@ sınıfların statik veri elemanlarına devam
 
 class Nec {
 public:
-static int mx;
+static int mx; //bunu kullanmak için nesne elemanına gerek yok
 };
 
 int main()
@@ -18,7 +18,8 @@ p->mx = 854;
 }
 
 ----------
-
+!!tanımda static anahtarını kullanırsak sentax hatası olur
+!! array ise arrayin boyutunu yazmaya gerek yok
 //nec.h
 
 class Nec {
@@ -28,7 +29,141 @@ static int a[];
 
 ----------
 
-incloplete type : türün varlığından haberdar ise henüz onun tanımını görmemişse denir
+incloplete type : türün varlığından haberdar ancak henüz onun tanımını görmemişse ise
+
+//forward declaration
+class Myclass;
+
+int main()
+{
+//1 incoplete type
+}
+
+----
+class Neco foo(class Ali);
+
+int main()
+{
+
+}
+
+---------------
+
+incomplete type ile neler yapabiliriz?
+
+//fonksiyon bildirimlerinde kullanarabiliriz
+
+class Neco;
+
+Neco foo(Neco);
+Neco& bar(Neco&);
+Neco* baz(Neco *, int);
+
+//type alias declaration yapabiliriz
+
+typedef Neco* NecoPtr;
+typedef Neco& NecRef;
+using NecoPtr = Neco *;
+
+//pointer ya da referans değişkenler tanımlayabiliriz
+
+class Ali;
+
+Ali * foo();
+Ali& bar();
+void baz(Aki &r);
+
+int main()
+{
+Ali *p = foo();
+Ali& r = bar();
+baz(r);
+}
+
+//extern bildirimi yapabiliriz
+
+class Emre;
+
+extern Emre ge;
+extern Emre ga[];
+
+//sınıfların static veri elemanlarında kullanılabilinir
+
+class Nec;
+
+class Myclass {
+
+static Nec snec;
+};
+
+//C dili için
+
+struct Data {
+int mx;
+struct Data sdata; //sentax hatası olur kendi türünden elemanı olamaz
+static Data sdata; //legal
+};
+
+//c++ dili için
+
+class Nec {
+int mx;
+Data sdata; //illegal
+static Data sdata; //legal
+};
+
+!! void is an incomplete type
+
+-------------------
+
+incomplete type ile neler yapılamaz ?
+
+//değişken tanımlayamayız
+
+class Nec;
+
+int main()
+{
+Nec mynec; //hata
+}
+
+//
+
+class Mert;
+
+class Nec {
+
+private:
+Mert mx; //hata
+}
+
+//pointer değişken tanımlayabiliriz ama içerik ve ok operatörü ile kullanamayız
+
+class Mert;
+
+Mert* foo();
+
+int main()
+{
+Mert* p == foo();
+*p //hata
+p-> x = 5; //hata
+}
+
+//sizeof operatörünün operandı yapamam
+
+class Mert;
+
+Mert* foo();
+
+int main()
+{
+sizeof(Mert);
+}
+
+
+
+complete type:
 
 
 
