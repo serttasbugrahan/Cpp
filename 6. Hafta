@@ -161,9 +161,275 @@ int main()
 sizeof(Mert);
 }
 
+-------------
+
+sınıfların static elemlarına dönüyoruz:
+
+class Myclass {
+
+static int x; //bu bir tanımlama değil bunu bir tanım haline getirmek için bazı kurallar var
+};
+
+-------
+
+class Myclass {
+public:
+static int x;
+};
+
+int main()
+{
+Myclass::X = 5; //bu şekilde tanımı yapılabilinir
+}
+
+--------
+
+neco.h
+int x = 0; //odr ihlal edilir
+inline int x = 0;  //odr ihlal edilmez, eskiden bu sadece fonksiyonlar için bir haktı (c++17 öncesi)
+
+-------
+//header-only library
+
+class Myclass {
+static std::vector<int> x{1,2,4,6,8}; //geçersiz
+inline static std::vector<int> x{1,2,4,6,8}; //geçerli
+
+};
+
+-------
+
+class Myclass {
+
+public:
+static std::string version;
+};
+
+int main()
+{
+Myclass::version = "1.02.05"; //linked hatası olur
+}
+
+-----
+
+class Myclass {
+
+public:
+inline static std::string version; //hata kalkar
+};
+
+int main()
+{
+Myclass::version = "1.02.05"; 
+}
+
+-----------------------
+
+inline kısa bir tekrarı:
+
+global değişkenler tanımlandıkları zaman odr uymak zorundalar
+
+bir projede birden fazla kaynak dosyada aynı global değişkeni tanımlayamayız 
+
+eğer bir isim dış bağlantıda ise bütün kaynak dosyalarda aynı varlığa ilişkin olmalı
+
+odr: varlıkların birden fazla bildirimi olabilir ama tek tanımı olmak zorunda
+
+//emre.h
+
+void func(int) //odr ihlal edilir
+
+int x = 10; //odr ihlal edilir, başka dosyalar bu dosyayı include ettiğinde odr çiğnenmiş olur
+
+ama inline kullanırsak bundan bir tane olucak demektir
+
+//ali.h
+inline void func(int x) //odr ihmal edilmiycek
+{
+
+}
+
+//ali.cpp
+inline void func(int x)
+{
+
+}   
+
+//veli.cpp
+inline void func(int x)
+{
+
+}   
+
+//hasan.cpp
+inline void func(int x)
+{
+
+}   
+
+!! birden fazla dosyada kullanılmasına rağmen odr ihmal edilmemiş olur
+
+//myclass.h
+class Myclass {
+
+inline static int sx = 10; //cpp(17) ile geldi
+};
+
+---------------------
+
+//myclass.h
+class Myclass {
+
+static const int sx = 6;
+};
+
+!! sınıfların static, const ve intergral type veri elemanlarına sınıf içinde
+ilk değer verilebilir
+
+class Nec {
+static const double x = 6; //bu şekilde olmaz int olması gerekir
+};
 
 
-complete type:
+-----
+
+class Nec {
+static constexpr double x = 5.4; 
+//constexpr değişkenler
+//tıpkı constexpr fonksiyonlarda olduğu gibi implcitly inline
+};
+
+-----
+
+class Nec {
+public:
+static int mx;
+};
+
+int main()
+{
+Nec mynec;
+Nec *p{&mynec};
+
+p->mx
+//mynec.mx
+}
+
+----------
+
+class Nec {
+public:
+static int mx;
+};
+
+int Nec::x{};
+
+int main()
+{
+Nec n1;
+Nec n2;
+Nec n3;
+Nec n4;
+
+++n1.x;
+++n2.x;
+++n3.x;
+++n4.x;
+
+std::cout << "Nec::x = " << Nec::x << '\n';
+}
+
+-------------
+
+class Nec {
+public:
+void func()
+{
+x = 5; //hepsi legal
+Nec::x = 5;
+this-> = 5;
+}
+private:
+static int x;
+};
+
+-------
+
+class Nec {
+public:
+
+void foo()const
+{
+x = 6; //legal staticden dolayı
+}
+void func()
+{
+x = 5; //hepsi legal
+Nec::x = 5;
+this-> = 5;
+}
+private:
+static int x;
+};
+
+-------
+
+class Nec {
+public:
+Nec(int i) : x(i) {} //illegal
+private:
+static int x;
+};
+
+
+--------
+
+class Nec {
+public:
+int x;
+static int y;
+  
+private:
+
+};
+
+int x = 5;
+int Nec::y = x; //hata
+
+--------
+
+class Nec {
+public:
+int x;
+static int y;
+  
+private:
+
+};
+
+Nec g;
+int x = 5;
+int Nec::y = g.x; //legal
+
+-------------------------------------------------
+
+sınıfların static üye fonksiyonları (static member functions):
+--------------------------------------------------------------
+
+class Nec {
+public:
+static void foo() //global fonksiyon ama class scobe alınmış demek
+{
+
+}
+};
+
+int main()
+{
+
+}
+
+
 
 
 
