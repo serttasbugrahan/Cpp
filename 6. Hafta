@@ -834,7 +834,7 @@ f3.call_fighters_for_help(); //düşmanlar etramı sardı mehmet, emrecan, ali, 
 
 //bir tane veri yapısı (container) olucak hayata gelen her nesnenin adresini o veri yapısına eklememiz gerekir
 
-
+!! static üye fonksiyonlarının this pointerı yoktur
 
 
 
