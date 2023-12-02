@@ -857,6 +857,7 @@ C cx;
 
 hangi durumda derleyici sınıfn hangi özel üye fonskiyonunu yazar
 ------
+!!! BU KISIM İÇİN PC'DE TABLO VAR ONU KULLAN
 1)
 //hiçbir özel üye belirtmessek 6 özel üyeyi'de yazar
 class Myclass{
