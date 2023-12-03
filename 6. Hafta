@@ -839,8 +839,76 @@ f3.call_fighters_for_help(); //düşmanlar etramı sardı mehmet, emrecan, ali, 
 /////////////////////////////////////////////////////2. Ders/////////////////////////////////////////////
 
 
+delegatiing ctor: 
+-----------------
 
+modern c++'dan önce bir ctorun işini başka bir ctor'a havale etme şansı yoktu
 
+çoğu zaman sınıfların ctor'lari overload ediliyor
+ancak overload edilen ctor'ların bazen ortak bir kodu oluyor
+unutmayınız ki kod tekrarı her türlü belayı beraberinde getirir
+eski c++'da ctor'ların ortak kodu bir fonksiyon şeklinde tanımlanıyor
+ve ctor'lar bu fonksiyonu çağırıyordu
+
+class Myclass(int x) 
+{
+public:
+Myclass(int) : Myclass(x, x, x)
+{
+
+}
+
+Myclass(int, int) : Myclass(x, x, 0)
+{
+common_code_init();
+}
+
+Myclass(int x, int y, int z) : mx(x), my(y), mz(z)
+{
+//belki ortak kod
+}
+
+Myclass(const char*p) : Myclass(std::atoi(p))
+{
+
+}
+
+Myclass(double d) : mx(static_cast<int>(d)), my{0} mz{0} //hata
+
+private:
+int mx, my, mz;
+};
+
+-----------------------------------------------------------
+
+friend bildirimleri : bir sınıfın bir koda kendi privated ve protected üyelerini erişme hakkı veriyor
+---------------------
+
+//derleyici normalde erişim engeli koyucaktı ancak ben falanca kod için benin private bölümüme erişim hakkı veriyorum 
+
+//friend bildirimleri hemen her zmaan sınıfın kendi kodlarına veriliyor
+
+//eğer client kodlara friend bildirimi ile erişim veriyor isek orayı tekrar kontrol etmemiz gerekir
+
+sınıfın 
+a) global fonksiyonaları (free functions) private bölüm erişimez
+b) yardımcı türler
+
+--------------
+
+class Myclass {
+
+private:
+int mx{};
+void foo();
+};
+
+void ff(Myclass m)
+{
+m.foo(); //error
+Myclass myc;
+myc.mx = 5; //access error
+}
 
 
 
