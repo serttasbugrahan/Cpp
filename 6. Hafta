@@ -883,6 +883,7 @@ int mx, my, mz;
 
 friend bildirimleri : bir sınıfın bir koda kendi privated ve protected üyelerini erişme hakkı veriyor
 ---------------------
+!! ilerde daha detaylo öğrenilecek
 
 //derleyici normalde erişim engeli koyucaktı ancak ben falanca kod için benin private bölümüme erişim hakkı veriyorum 
 
@@ -910,15 +911,143 @@ Myclass myc;
 myc.mx = 5; //access error
 }
 
+---------
 
+class Myclass {
+public:
+friend void ff(Myclass);
+private:
+int mx{};
+void foo();
+};
 
+void ff(Myclass m)
+{
+m.foo(); 
+Myclass myc;
+myc.mx = 5; 
+}
 
+-----------
 
+!! friend bildirimini public veya friend bildiriminde yapmanın farkı yoktur
 
+-----------
 
+class Myclass {
+public:
+friend int foo(Myclass);
+private:
+int mx{};
+void foo();
+};
 
+int main()
+{
+Myclass m;
+foo(m); //ADL
+}
 
+---------
 
+class Myclass {
+public:
+//hidden firend
+friend int bar(Myclass, int x) //istisnai bir durum
+{
+return x * x;
+}
+private:
+int mx{};
+void foo();
+};
+
+----------
+//Erg::foo
+
+class Nec {
+
+private:
+friend void Erg::foo(int); //bu şekilde olmaz
+};
+
+bu şekilde verebilmesi için complete type olması gerekir
+
+------
+
+class Erg{
+public:
+void foo(int);
+};
+
+class Nec {
+
+private:
+friend void Erg::foo(int); 
+int mx; //private
+};
+
+void Erg::foo(int x)
+{
+Nec necx;
+necx.mx = x; //bu şekilde sentax hatası olmaz
+}
+
+---------
+
+sınıfın ctor'ına friendlik verilebilinir
+
+class Erg {
+public:
+Erg();
+Erg(int);
+};
+
+class Nec {
+
+private:
+friend Erg::Erg(); //legal
+friend Erg::Erg(int); //legal
+int mx; //legal
+};
+
+----------
+
+bir sınıf bir başka sınıfa "friend"'lik verebilir
+bu durumda friend bildirimine konu sınıf incoplete type olabilir
+
+----------
+
+class Nec {
+private:
+friend class Erg; //bu şekilde class anahatar sözcüğü ile kullanıldığı zaman legal
+int mx;
+};
+
+class Erg {
+public:
+void foo(Nec nec)
+{
+nec.mx = 20; //legal
+}
+void bar()
+{
+Nec* p = new Nec;
+auto val = p->mx; //legal
+}
+};
+
+-------------
+
+!! A sınıfı B sınııfına friendlik verirse B sınıfınına A sınıfında friendlik verdiği anlamına gelmiyor  
+
+!! A sınıfı B'nin private bölümüne erişemez
+
+!! 
+A B'ye friend'lik vermiş olsun
+B C'ye friendlik vermiş olsun
+C A'nın private bolumune erişemez
+//friend bildirimleri gecisken degil
 
 
 
