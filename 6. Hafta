@@ -1049,6 +1049,312 @@ B C'ye friendlik vermiş olsun
 C A'nın private bolumune erişemez
 //friend bildirimleri gecisken degil
 
+--------------
+
+Bazen ihtiyaç olsa da bir sınıf kendi seçilmiş private öğeleri için
+bir başka koda "friend" lik veremez
+
+class Myclass {
+private:
+int mx, my, mz;
+void foo();
+void bar();
+void baz();
+}
+
+Böyle durumlarda bazı idioms/tecniques kullanılır
+bunlar arasında en popüleri attorney
+
+
+=======================================================================================
+
+Operator overloading:
+---------------------
+fonksiyon çağırmanın bir başka yoludur.
+
+Operator overloading function çağırmanın bir başka yolu aslında.
+Bir sınıf nesnesi bir operatörün operandı yapıldığında, derleyici operatörün operandı olmuş
+sınıf nesnesini bir fonksiyon çağrısına dönüştürüyor.
+
+a + b //Derleyici bunu bir fonksiyona çağrılan çağrıya dönüştürüyor.
+Burada çağrılan functionlara operator functions deniyor.
+
+class Matrix;
+
+operator function : bir sınıf nesnesinin operatörün operandı olması durumunda derleyici tarafından 
+örtülü olarak çağırılabilmesi demektir
+
+------
+
+operator function:
+  a)free function
+  b)non-static member function
+
+-------
+
+!! runtime maaliyeti yoktur
+
+-------
+
+mydate += 10;
+
+date_x - date_y
+
+------------
+
+karşılaştırma işlemleri en çok ihtiyaç duyulan kısımdır
+
+x > y
+
+a == b
+
+name_x == name_y
+
+name == "Naci Cemal" //burası aslında fonksiyon çağrısını doğurucak
+
+----------
+Neden iyi öğrenmemiz gerekiyor? //bir çok sınıf kütüphanesi operator overloading kullandığı için
+
+int main()
+{
+std::string name{ "Mehmet" };
+
+name += "can";
+if (name == "mehmetcan") {
+
+}
+}
+
+------
+//stl 
+
+int main()
+{
+std::string name{"Mehmet"};
+for (size_t i{}; i < name.size(); ++i) {
+std::cout << name[i] << ' ';
+}
+}
+
+-------------------------------------------
+
+operator overloading genel kuralları:
+-----------------------------------
+
+keyfi isimlendirme yok.
+
+isim operator keyword içerecek keyword'den sonra hangi operatörü overlaod ediyorsa
+o operatörün token'ı yazılır
+
+operator+ //toplama
+operator! //
+operator++ //
+opeartor= //
+opeartor== //
+
+-------------------
+
+olmayan bir operator overload edilemez
+
+a @ b //böyle bir mekanizma yok
+
+-------------------
+
+operandlardan en az birinin user defined type olması gerekiyor
+
+int i1{}, i2{24};
+
+i1 + i2 //böyle bir mekanizma yok
+!i1 //böyle bir mekanizma yok
+
+--------------------
+
+global fonksiyon veya member operator function olamlı(non-static)
+
+global ==> global operator function
+member operator function
+
+-------------------
+
+her operator overload edilemez
+
+dilin kuralları bazı operatörlerin overload edilmesini yasaklıyor
+
+'nokta', '? :' , 'sizeof', '.*', 'typedid' operatörü overload edilemez
+
+-------------------
+
+Bazı operatorler yalnızca member op. functioon olarak kullanılıyorlar
+
+function call operator (fonksiyon çağrı operator)
+subscript operator a[b]
+assignment operators
+tür dönüştürme operatorleri
+-> arrow operator
+
+--------------------
+
+bir istisna hariç operatör fonksiyonları "default argument" alamıyor. (funtion call operator)
+
+---------------------
+
+Bu mekanizmada operatör öncelik seviyesi ve operatör öncelik yönü değiştirlemiyor
+
+a * b + c > 10
+((a * b) + c) > 10
+
+-------------------
+
+Bütün operatör fonksiyonları 
+
+a + b 
+operator+a(a, b) //bu şekilde çağırabiliriz  
+------
+class Myclass {
+
+};
+
+inr main()
+{
+Myclass a, b, c;
+
+a = b; //biz kodu bözyle yazarız
+a.operator=(b); ///derleyici buna dönüştürü
+a = b = c; //biz kodu bözyle yazarız
+a.operator=(b.operator=(c)); //derleyici buna dönüştürü
+}
+
+--------------------
+
+Bu mekanizme ile operatörlerin "arity" sini değiştiremeyiz 
+arity ==> operatörün unary (tek operand alması) ya da binary (2 operand alması) olması    
+
+a > b : binary
+a! : unary
+
+---
+
+a > b
+global operator function
+a > b operator>(a, b)
+
+-----
+
+class Myclas {
+
+};
+//2 tane  parametresi olamak zorunda
+bool operator>(Myclass, Myclass, Myclass); //hata
+bool operator>(Myclass, Myclass); //legal
+bool operator>(Myclass); //hata
+
+-----
+
+!x  operator!(x)
+
+
+class Myclass {
+
+};
+//1 tane parametre değişkeni olmalı
+bool operator!(Myclass, Myclass); //hata
+bool operator!(Myclass); //legal
+
+------------------
+
+member operator functions / non-static member functions
+
+myclass::operator>
+a > b ==> a.operator>(b);
+
+x / y ==> x.operator/(y);
+
+!x  ==> x.operator!(); 
+
+class Myclass {
+public:
+bool operator!()const; //legal
+bool operator!(Myclass)const; //illegal
+};
+
+//global opeartor fonksiyonu ise aşağıdaki şekilde
+a * b ==> operator*(a, b);
+~x ==> operator~(x);
+
+//member ise aşağıdaki şekilde olur
+a * b ==> a.operator*(b)
+~x ==> x.operator~();
+
+
+class Myclass {
+public:
+Myclass operator~()const
+{
+std::cout << "Myclass::operator~()\n";
+std::cout << "this = " << this << '\n';
+return *this;
+}
+};
+
+int main()
+{
+Myclass m;
+std::cout << "&m = " << m << '\n';
+
+//auto x = ~m;
+auto x = m.operator~();
+}
+
+
+-----
+
+//global yaparsak
+
+class Myclass {
+public:
+
+};
+
+class Myclass
+{
+public:
+};
+
+Myclass operator~(const Myclass& r)
+{
+    std::cout << "operator~(Myclass)\n";
+    std::cout << "&r = " << &r << '\n';
+    return r;
+}
+
+int main()
+{
+    Myclass m;
+    std::cout << "&m = " << &m << '\n';
+
+    //auto x = ~m; // aynı anlama gelir
+    auto x = operator~(m);
+}
+
+---------
+Myclass operator*(const Myclass&, const Myclass&);
+Myclass operator/(const Myclass&, const Myclass&);
+Myclass operator+(const Myclass&, const Myclass&);
+bool operator>(const Myclass&, const Myclass&);
+
+int main()
+{
+Myclass m1, m2, m3, m4, m5;
+
+auto b = m1 * m2 + m3 / m4 > m5;
+
+auto b=  operator>(operator+(operator*(m1, m2) opearator/(m3, m4)), m5); 
+}
+---------------------
+
+
+
+
 
 
 
