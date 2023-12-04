@@ -1352,6 +1352,126 @@ auto b=  operator>(operator+(operator*(m1, m2) opearator/(m3, m4)), m5);
 }
 ---------------------
 
+/////////////////////////////////////////////////3. Ders//////////////////////////////////////////////////
+
+class Nec {
+
+};
+
+Nec operator*(const Nec&, const   Nec&);
+Nec operator/(const Nec&, const   Nec&);
+Nec operator+(const Nec&, const   Nec&);
+Nec operator>(const Nec&, const   Nec&);
+
+int main()
+{
+Nec n1, n2, n3, n4, n5;
+
+auto b = n1 * n2 / n4 > n5;
+//auto b = ((n1 * n2) + (n3 / n4)) > n5; 
+
+operator>(operator+(operatot*(n1, n2) operator/(n3,n4), n5);
+
+}
+
+---------------------
+
+non - static şekilde overload edilseydi nasıl olurdu?
+
+class Nec {
+public:
+Nec operator*(const Nec&)const;
+Nec operator/(const Nec&)const;
+Nec operator+(const Nec&)const;
+Nec operator>(const Nec&)const;
+};
+
+int main()
+{
+Nec n1, n2, n3, n4, n5;
+
+auto b = n1 * n2 / n4 > n5;
+
+bool b2 = n1.operator*(n2).operator+(n3.operator/(n4)).operator>(n5)
+}
+
+------------
+unary olarak overload etme ve binaary olarak overload etme
+
++x / x + y
+
+-a / a - b
+
+*a / a * b
+
+&x / a & b 
+
+class Nec {
+public:
+
+};
+
+Nec operator+(const Nec&); //+ operatörü,   global olmasına rağmen derleyici sentax haatsı vermez
+Nec operator+(const Nec&, const Nec&); //toplama operatörü 
+
+-----
+
+üye fonskion olasydı
+
+class Nec {
+public:
+Nec operartor+(const);
+Nec operartor+(const Nec&)const;
+};
+
+---------
+
+class Nec {
+public:
+Nec operator+(const Nec&)const; //const var ise burası
+Nec operator+(int)const; //int var ise burası
+Nec operator+(double)const; //double var ise burası
+Nec operator+(std::string)const; //string var ise burasıı çağırılıcak
+};
+
+----------
+
+Klasik bir mülakat sorusu
+--------------------------
+
+Neden hem üye fonksiyonu hemde gloabl operatör fonksyionu vardır ?
+
+class Nec {
+public:
+Nec operator+(int)const;
+
+};
+
+int main()
+{
+Nec mynec;
+auto x = mynec + 5;
+auto y = 5 + mynec;
+}
+
+-----
+class Matrix {
+
+};
+
+int main()
+{
+using namespace std;
+int ival = 10;
+
+cout << ival;
+cout.operator<<(ival); //cout bu şekilde de yazılabilir buna inserter denir
+
+Matrix m;
+cout << m;
+}
+
+//30.25
 
 
 
