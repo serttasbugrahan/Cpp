@@ -1299,7 +1299,7 @@ return *this;
 int main()
 {
 Myclass m;
-std::cout << "&m = " << m << '\n';
+std::cout << "&m = " << &m << '\n';
 
 //auto x = ~m;
 auto x = m.operator~();
@@ -1309,11 +1309,6 @@ auto x = m.operator~();
 -----
 
 //global yaparsak
-
-class Myclass {
-public:
-
-};
 
 class Myclass
 {
@@ -1447,12 +1442,15 @@ public:
 Nec operator+(int)const;
 
 };
+Nec operator+(int a, const Nec& nec) {   // hatanın kalkması için Gerekli işlemler
 
+}
 int main()
 {
 Nec mynec;
 auto x = mynec + 5;
-auto y = 5 + mynec; //Bu hata verir
+auto y = 5 + mynec; //Bu hata verir nedeni üye fonksyionlar tek parametrelidir bu şekilde yazınca 5 sayısını paramtere olarak alır
+
 }
 
 -----
