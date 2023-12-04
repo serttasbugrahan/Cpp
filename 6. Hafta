@@ -1440,6 +1440,7 @@ Klasik bir mülakat sorusu
 --------------------------
 
 Neden hem üye fonksiyonu hemde gloabl operatör fonksyionu vardır ?
+//1. cevap
 
 class Nec {
 public:
@@ -1451,27 +1452,440 @@ int main()
 {
 Nec mynec;
 auto x = mynec + 5;
-auto y = 5 + mynec;
+auto y = 5 + mynec; //Bu hata verir
 }
 
 -----
-class Matrix {
-
-};
-
+ 
 int main()
 {
 using namespace std;
 int ival = 10;
 
 cout << ival;
-cout.operator<<(ival); //cout bu şekilde de yazılabilir buna inserter denir
-
-Matrix m;
-cout << m;
+cout.operator<<(ival); //cout bu şekilde de yazılabilir böyle fonksyionlara inserter denir
 }
 
-//30.25
+------
+
+class Matrix {
+
+};
+
+std::ostream& operator<<(std::ostream& os, const Matrix&);
+
+int main()
+{
+using namespace std;
+
+int ival = 10;
+
+cout << ival;
+cout.operator<<(ival); //cout bu şekilde de yazılabilir böyle fonksyionlara inserter denir
+Matrix m;
+
+cout << m;   //hata olur bunu düzeltmek için global operator fonksiyonu tanımlanmalıdır
+operator<<(cout, m).operator<<(ival);
+}
+
+--------------------------------------
+
+1. return types of operator functions :
+
+class Complex {
+//
+};
+
+int operator+(const Complex&, const Complex&);
+
+int main()
+{
+Complex c1, c2;
+
+int ival = c1 + c2; //bunu legal kılabiliriz yukarıdi operator yapısını kullanarak ancak bu mantıklı bir hareket değil geri dönüş değeri int olamaz 2 complex toplamının
+}
+
+--------
+
+class Complex {
+//
+};
+
+Complex operator+(const Complex&, const Complex&); //bu şekilde legal yapılır
+
+int main()
+{
+Complex c1, c2;
+
+auto c = c1 + c2; //bu şekilde olmalı
+}
+
+---------
+
+class Date {
+
+};
+
+Date operator+(Date, Date); //bu şekilde legal yapılır
+
+int main()
+{
+Date dx, dy;
+dx + dy; //2 tarihin toplanması 2 pointerın toplanması gibi hiç bir amaca hizmet etmez
+//ancak legal kılınması için yukarıdaki uygulanır
+
+dx - 10; //bu mantıklı bir işlem
+dx - dy; //bu olabilir int çıkışı olur
+
+}
+
+--------
+
+class Myclass {
+public:
+void operator+(Myclass)const;
+};
+
+int main()
+{
+Myclass m1, m2; //hata değil
+}
+
+-------------------
+
+2. const correctness & operator functions
+
+class Matrix {
+
+};
+
+Matrix operator*(Matrix&, Matrix&); //legal yapmakta mantıklı değil
+
+int main()
+{
+Matrix m1, m2;
+m1 * m2; //böyle bir işlem olmaz
+}
+
+--------
+
+class Matrix{
+public:
+Matrix operator*(const Matrix&)const;
+                -------        -------
+};          m2 değişmiyceğini  m1 değişmiyceğni
+ 
+int main()
+{
+Matrix m1, m2;
+
+//m1 * m2
+//m1.operator*(m2)
+}
+
+-----------------------
+
+value category :
+
+x + y
+
+Nec& operator+(const Nec&, const Nec&);
+
+peki geri dömüş değeri hangi nesneye referans olucak
+otomatike dönmesi tanımıs davranış
+
+----------
+
+class Bigint {
+
+};
+
+Bigint& operator+(const Bigint&, const Bigint)
+{
+Bigint result;
+//code gives result avalue
+
+return result; //tanımısz davranış
+}
+
+
+--------
+
+class Bigint {
+
+};
+
+Bigint& operator+(const Bigint&, const Bigint) //bu şekilde olmamalı
+//nesne döndürmeli
+{
+
+}
+
+-------
+
+class Bigint {
+
+};
+
+Bigint operator+(const Bigint&, const Bigint)
+{
+Bigint result;
+
+return result; //maaliyet artmaz, taşıma semantiği devreye girer
+}
+
+--------------------------------------------
+
+operator overloading konusunda akla gelen sorular
+
+class Bigint {
+public:
+Bigint operator+(const Bigint&)const;
+Bigint& operator=(const Bigint&);
+};
+
+int main()
+{
+Bigint x,y;
+x += y; //legal değil
+}
+
+-----------
+
+class Bigint {
+public:
+bool operator==(const Bigint&)const;
+};
+
+int main()
+{
+Bigint b1, b2;
+auto flag = b1 != b2; //legal (c++20 ile geldi)
+}
+
+--------------------
+
+Özel bazı durumlar söz konusu değilse
+
+binary simetrik operatörler global operator fonksiyonu olarak overload edilmesi avantajlar sağlar
+
+simetrik :
+a > b
+b < a
+
+------
+
+class Counter {
+public:
+Counter();
+Counter(int);
+Counter operator+(int)const;
+
+};
+
+int main()
+{
+Counter c;
+c + 5; //tam tersi işlem olmazdı
+}
+
+---- 
+
+class Counter {
+public:
+Counter();
+Counter(int);
+Counter operator+(int)const;
+};
+
+Counter operator+(Counter, int);
+Counter operator+(Counter, Counter); //bu şekilde de olabilirdi
+
+int main()
+{
+
+}
+
+---------
+
+class Counter {
+public:
+Counter(int x = 0) : mx{x} {}
+Counter operator+(const Counter& other) const
+{
+return Counter{ mx + other.mx }; //geçerli ancak global olsaydı private bölümüne erişemeyceği için hatalı olurdu
+}
+private:
+int mx;
+};
+
+int main()
+{
+
+}
+
+
+-------
+
+class Counter {
+public:
+Counter(int x = 0) : mx{x} {}
+private:
+int mx;
+};
+
+Counter operator+(const Counter&lhs, const Counter& rhs)
+{
+return lhs.mx + rhs.mx; //hata olur friend kullanarak hata çzülebilir
+}
+
+-------------------
+
+int main()
+{
+int ival{ 45 };
+double dval{32.45};
+
+std::cout << ival << dval;
+
+std::cout.operator <<(ival).operator << (dval); //aynı anlamda
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+cout << "furkanmert"; //aiağıdaki ile aynı anlamda olmaz
+cout.operator << ("furkanmert"); //void * 
+
+}
+
+---------
+
+int main()
+{
+using namescpace std;
+
+cout << 'A'; //global operator
+cout.operator<< ('A'); //burası parametresi int olan sınfın üye fonksyionu
+cout.operator<< ("bugra"); //neden ekrana bugra yazmıyor, çünkü void* parametreli operator left shift fonksyionu  
+}
+
+---------
+
+class Ostream {
+public:
+Ostream& operator<<(int); //tam sayı değerini yazar
+Ostream& operator<<(double);
+Ostream& operator<<(void *); //adresi yazdıran
+};
+
+Ostream& operator<<(Ostream&, const char *); //yazıyı yazdıran global olan
+Ostream& operator<<(Ostream&, char); //karakteri yazar
+
+--------
+
+int main()
+{
+int x, y;
+
+std::cout << "iki tam sayi girin: ";
+std::cin >> x >> y;
+
+std::cin.operator>>(x).operator>>(y);
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 10;
+
+cout << x << endl;
+//endl aslında fonksyion , ostream manipulatorü
+//endl(cout) //aslında bu şekilde olur, function pointerdan dolau
+}
+
+----
+
+class Ostream {
+public:
+Ostream& operator<<(int);
+Ostream& operator<<(double);
+Ostream& operator<<(void *);
+
+Ostream& operator<<(Ostream&(*)(Ostream&)); //function pointer
+
+};
+
+------------
+
+sembolik olarak endl tanımı :
+
+Ostream& endl(Ostream &os)
+{
+os.put('\n');
+os.flush(); //maliyet
+return os;
+}
+
+-------------------
+
+std::ostream& dashline<<(std::ostream &os)
+{
+os << "\n-------------------------";
+return os;
+}
+int main()
+{
+using namespace std;
+
+int x = 10;
+double d = 1.2;
+long l = 3546L
+
+cout << x << dashlime << d << dashline << l dashline
+//cout.operator <<(x).operator<< (dashline).operator<<(d).operator(dashline).operator<<(l).operator<<(dashline) //yukaridaki kodu derleyici böyle yazar
+
+}
+
+------------------------------------------------
+
+//bir sınıf oluşturuğ operatörleri overload edicez
+
+!!  bu kısmı visiol stdio'da yaptım ek notlar var ise buraya ekledim
+
+!!nint ile int'lere yapılan her şey nint'lere de yapılacak
+
+böyle sınıflar gerçektende var .
+
+mesela sıfıra bölmek normalde tanımssız davranıştır ancak nint'İ sfıra böler isek başka bir cevap yükleyebiliriz
+
+-----------
+//burası ileri cpp'de anlatılacak
+<=> three-way comparision operator
+auto operator<=>(const Nint&)const = default; // 
+
+---------
+terminology
+
+> >= < <= (relational operator)
+== != (equality operators)
+
+!! 
+a > b   b < a
+a >= b  !(a < b)
+a <= b  !(b < a)
+
+
+
+
+
+
 
 
 
