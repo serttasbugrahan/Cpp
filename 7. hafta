@@ -54,7 +54,7 @@ str.operator[](1) = 'a'; //derleyici buna çevirir
 a[3] //l value
 
 ----
-//BURAYI TEKRAR İZLE
+minimal bir array sınıfı yazıyoruz
 
 class String {
 //...
