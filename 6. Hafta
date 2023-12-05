@@ -1881,14 +1881,44 @@ a > b   b < a
 a >= b  !(a < b)
 a <= b  !(b < a)
 
+---
 
+//++x prefix increment
+//x++ postfix incremet
 
+//--x prefix decrement
+//x-- posfix decrement
 
+class Counter {
+public:
+Counter& operator++(); //++prefix overload edilir, L value
+Counter operator++(int); //postfix++ overload edilir, R value, int öylesine yazılır değeri yoktur
+Counter& operator--(); //prefix, L value
+Counter operator--(int); //postfix, Rvalue
+};
 
+-----------
+//otomatik ömürlü nesneye referans dönemeyiz
+//statik ömürlü nesneye referans dönersek hep aynı nesneyi döndürmüş oluruz
+//dinamik ömürlü nesneye referans dönersek delete etme sıkıntısı var
 
+Class Nint {
+Nint& operator+(const Myclass&); //OLMAZ, R value'ya L value bağlanamaz
+}
 
+-----------
+Mülakatlarda sorulur:
 
+++x; //ürettiği değerden faydalanmayacak bunu kullan
 
+------------
+
+Nint operator+()const //yan etkisi yok const gelir, '+' r value & gelmez Nint olur
+{
+  return *this; //çünkü nesnenin kendi değerini döndürür
+}
+
+//burası anlamak için önemli
 
 
 
