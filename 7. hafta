@@ -33,12 +33,311 @@ std::cout << str << '\n';
 //köşeli parantez operatörü overload edilir
 }
 
+------------------
+
+x[y]
+
+x.operator[](y) //derleyici yukarıdaki kodu buna çevirir
+
+----
+
+int main()
+{
+std::string str{ "koray" };
+
+str[1] = 'a';
+str.operator[](1) = 'a'; //derleyici buna çevirir
+}
+
+----
+
+a[3] //l value
+
+----
+//BURAYI TEKRAR İZLE
+
+class String {
+//...
+public:
+String(const char* p) : new char[std::strlen(p) + 1]} //bu kod legal kıldı main altındaki satırı
+{
+std::strcpy(mp, p);
+}
+///...
+
+std::size_t lenght()const
+{
+return std::strlen(mp);
+}
+
+friend std::ostream& operator<<(std::ostream& os, const String& s)
+{
+return os << "'" << s.mp << "'"
+}
+
+char& operator[](std::size_t idx)
+{
+return mp[idx];
+}
+private:
+char* mp;
+};
+
+int main()
+{
+String str("mustafa demirhan");
+
+std::cout << str << '\n';
+std::cout << str[1] << "\n";
+str[0] = '!'; //buranın legal olabilmesi için 'str[0]' l value olmalı
+
+for (size_t i{}; i < str.lenght(); ++i) {
+std::cout << str[i] << ' ';
+}
+}
+
+-----------------
+
+class String {
+//...
+public:
+String(const char* p) : new char[std::strlen(p) + 1]} //bu kod legal kıldı main altındaki satırı
+{
+std::strcpy(mp, p);
+}
+///...
+
+std::size_t lenght()const
+{
+return std::strlen(mp);
+}
+
+friend std::ostream& operator<<(std::ostream& os, const String& s)
+{
+return os << "'" << s.mp << "'"
+}
+
+char& operator[](std::size_t idx)
+{
+return mp[idx];
+}
+private:
+char* mp;
+};
+
+const char& operator[](std::size_t idx)const
+{
+return mp[idx];  
+}
+
+int main()
+{
+const String str("mustafa demirhan");
+auto c = str[4]; //hata, const t* ==> t*, bu durumu aşmak için const overloading yapılır
+//auto c = str.operator[](4); //aynı anlamda
+
+str[3] //bu yazılırsa const olmayan
+const String s = "Bilal";
+str[3] //const olmayan çağrılır, erişim amaçlı kullanılır
 
 
+}
 
+---
 
+class Myclass {
+public:
+void foo();
+};
 
+int main()
+{
+const Myclass m;
+m.foo(); //const t* ==> t*'a dönüşüm yapmaya zorlanır, hata
 
+}
+
+-----
+#include <string.h>
+
+int main()
+{
+const std::string s{ "Tamer" };
+
+std::cout << s << '\n';
+s[0] = 'S';
+s[4] = 't';
+
+std::cout << s << '\n';
+}
+
+------
+
+class Myclass {
+public:
+void operator[](size_t idx)
+{
+std::cout << "Myclass::operator[](size_t idx) idx = " << idx << '\n';
+std::cout << "this = << this << '\n';
+}
+};
+
+int main()
+{
+using namespace std;
+
+Myclass m;
+
+cout << "&m = " << &m << '\n';
+m[4];
+}
+
+------------------------------------------
+
+iki operatörün overload edilmesi:
+---------------------------------
+
+* dereferencing/indirection
+. dot operator
+-> arrow operator
+
+int main()
+{
+int ival{ 764 };
+int* p{ &ival };
+
+}
+
+------
+
+// func işlevinin parametre değişkenin türü int&&
+//219. satirdaki x ifadesinin türü int
+//bir ifadenin türü referans türü olmaz
+
+void func(int&& x) //x'in türü int &&
+{
+x //x'in türü int
+}
+
+------
+
+Mülakat sorusu
+
+void bar(int&)
+{
+std::cout << "1";
+}
+
+void bar(int&&)
+{
+std::cout << "2";
+}
+
+void foo(int && x)
+{
+bar(x); //function overloading var
+
+}
+
+int main()
+{
+foo(5); //1 çağrılır
+}
+
+---------
+
+konuya geri dönüyoruz...
+
+class Myclass {
+public:
+int &operator*()
+{
+std::cout << "operartor* this = " << this << "\n";
+return g;
+}
+};
+
+int main()
+{
+Myclass m;
+
+cout << "&m = " << &m << '\n';
+
+*m = 99; //g nesnesine atama olur
+//m.operator*() = 99; //aynı anlamda
+cout << "g = " << g << '\n';
+}
+
+---------------------
+
+ok operatörünün overload edilmesi
+
+p->x
+
+!! ok operatörü binary bir operatör olmasına rağmen unary operator gibi
+overload edilir yani fonksiyonun parametre değişkeni olmaz
+
+!! global operator fonksiyonu olarak overload edilemez
+
+------
+
+class Nec {};
+
+class SmartPtr {
+
+public:
+Nec* operator->();
+};
+
+-----
+
+p bir sınıf nesnesi olsun bu sınıf için ok operatörü 
+overload edilmiş olsun derleyici
+
+p->x gibi bir ifade için nasıl bir kod üretiyor?
+
+p.operator->()->x //bu şekilde yapıyor
+
+bunun geçerli olabilmesi için ok operatör fonksiyonun geri dönüş değeri pointer olmalıdır
+
+class Myclass {
+public:
+void foo();
+void bar(int);
+};
+
+int main()
+{
+Myclass* p = new Myclass;
+p->foo();
+p->bar(12);
+}
+------
+
+class Myclass {
+public:
+void foo();
+void bar(int);
+};
+
+class PointerLike {
+public:
+PointerLike(Myclass*);
+Myclass& operator->();
+Myclass* operator->();
+};
+
+int main()
+{
+PointerLike p = new Myclass; //bu kodu legal yapma
+
+*p
+
+p->foo();
+p->operator->()->foo(); //buna dönüşür
+p->bar(12);
+p->operator->()->bar(); //buna dönüşür
+}
 
 
 
