@@ -1855,7 +1855,7 @@ cout << x << dashlime << d << dashline << l dashline
 
 //bir sınıf oluşturuğ operatörleri overload edicez
 
-!!  bu kısmı visiol stdio'da yaptım ek notlar var ise buraya ekledim
+!!  bu kısmı visiol stdio'da yaptım, ek notlar var ise buraya ekledim
 
 !!nint ile int'lere yapılan her şey nint'lere de yapılacak
 
@@ -1864,12 +1864,13 @@ böyle sınıflar gerçektende var .
 mesela sıfıra bölmek normalde tanımssız davranıştır ancak nint'İ sfıra böler isek başka bir cevap yükleyebiliriz
 
 -----------
+
 //burası ileri cpp'de anlatılacak
 <=> three-way comparision operator
 auto operator<=>(const Nint&)const = default; // 
 
 ---------
-terminology
+terminology:
 
 > >= < <= (relational operator)
 == != (equality operators)
