@@ -1,3 +1,45 @@
 //////////////////////////////////////////////////////////1. Ders//////////////////////////////////////////
 
+Aşağıdaki operatörlerin overload edilmesinden devam ediyoruz...
+
+operator[]
+dereferencing *
+->
+function call
+type cast
+
+----------------------------
+ufak c tekrarı
+
+p[5]
+*(p + 5) //yukaridaki ile aynı anlamda
+
+int main()
+{
+cout << 2["ELMA"] - 1["ELMA"] << "\n"; //1 çıkar
+cout << "ELMA"[2] - "ELMA"[1] << "\n"; //yukarıdak ile aynı anlam
+}
+
+----------------------------
+
+int main()
+{
+std::string str{ "koray" };
+
+str[1] = 'a';
+str[4] = 'n';
+
+std::cout << str << '\n';
+//köşeli parantez operatörü overload edilir
+}
+
+
+
+
+
+
+
+
+
+
 
