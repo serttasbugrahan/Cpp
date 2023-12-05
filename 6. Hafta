@@ -1833,20 +1833,21 @@ return os;
 
 -------------------
 
-std::ostream& dashline<<(std::ostream &os)
+std::ostream& dashline(std::ostream &os)
 {
-os << "\n-------------------------";
+os << "\n-------------------------\n";
 return os;
 }
+
 int main()
 {
 using namespace std;
 
 int x = 10;
 double d = 1.2;
-long l = 3546L
+long l = 3546L;
 
-cout << x << dashlime << d << dashline << l dashline
+cout << x << dashline << d << dashline << l << dashline;
 //cout.operator <<(x).operator<< (dashline).operator<<(d).operator(dashline).operator<<(l).operator<<(dashline) //yukaridaki kodu derleyici böyle yazar
 
 }
