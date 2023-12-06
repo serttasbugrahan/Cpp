@@ -140,7 +140,8 @@ str[3] //bu yazılırsa const olmayan
 const String s = "Bilal";
 str[3] //const olmayan çağrılır, erişim amaçlı kullanılır
 
-
+//bu durumu aşmak için const overloading yapılır
+//nint dosyası içinde cevabı
 }
 
 ---
@@ -158,6 +159,8 @@ m.foo(); //const t* ==> t*'a dönüşüm yapmaya zorlanır, hata
 }
 
 -----
+//yukarıdaki overlaodingi string kütüphanesi kullanır
+ 
 #include <string.h>
 
 int main()
@@ -165,7 +168,7 @@ int main()
 const std::string s{ "Tamer" };
 
 std::cout << s << '\n';
-s[0] = 'S';
+s[0] = 'S'; //bu atamalar legal
 s[4] = 't';
 
 std::cout << s << '\n';
@@ -190,6 +193,7 @@ Myclass m;
 
 cout << "&m = " << &m << '\n';
 m[4];
+//m.operator[](4);
 }
 
 ------------------------------------------
@@ -286,7 +290,7 @@ class Nec {};
 class SmartPtr {
 
 public:
-Nec* operator->();
+Nec* operator->(); //paramtere değişkeni yazarsak sentax hatası olur
 };
 
 -----
@@ -323,8 +327,8 @@ void bar(int);
 class PointerLike {
 public:
 PointerLike(Myclass*);
-Myclass& operator->();
-Myclass* operator->();
+//Myclass& operator->(); //içerik operatörü overload edilir
+Myclass* operator->(); //bu kod ile lagal olur
 };
 
 int main()
