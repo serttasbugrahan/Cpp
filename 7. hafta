@@ -539,6 +539,10 @@ std::cout << "main devam ediyor\n";
 }
 
 -----------------------
+!!cpp'de 2 çeşit kod vardır:
+1 normal kod 
+2 meta kod (template) derleyiciye yazdırılan 
+------------------------
 
 class Date {
 public:
@@ -581,21 +585,22 @@ private:
 int md{1},mm{1},my{1980};
 };
 
-class DatePtr {
+template <typename T>
+class SmartPtr {
 public:
-DatePtr() = default;
-explicit DatePtr(Date* p) : mp{p} {}
-~DatePtr()
+SmartPtr() = default;
+explicit SmartPtr(T* p) : mp{p} {}
+~SmartPtr()
 {
 if (mp)
 delete mp;
 }
 
 
-DatePtr(const DatePtr&) = delete;
-DatePtr& operator=(const DatePtr&) = delete;
+SmartPtr(const SmartPtr&) = delete;
+SmartPtr& operator=(const SmartPtr&) = delete;
 
-Date& operator*()
+T& operator*()
 {
 return *mp;
 }
@@ -605,17 +610,16 @@ Date* operator->()
 return mp;
 }
 private:
-Date* mp{ nullptr };
+T* mp{ nullptr };
 };
 
 
 int main()
 {
 using namespace std;
-
 std::cout << "main basladi\n";
 if (true) {
-DatePtr p{ new Date{3, 5 , 1987}}; //smartpointer sayesinde delete ifadesi ile sonlandırmayız, buranın legal olması için DatePtr sınıfına parametresi Date* türünden olan ctor vermemiz lazım
+SmartPtr<Date> p{ new Date{3, 5 , 1987}}; //smartpointer sayesinde delete ifadesi ile sonlandırmayız, buranın legal olması için DatePtr sınıfına parametresi Date* türünden olan ctor vermemiz lazım
 cout << *p << "\n"; //burası için içerik operatörünü overload etmemiz gerekiyor
 cout << "ay = " << p->get_month() << '\n';
 cout << "ayin gunu = " << p->get_month_day() << '\n';
@@ -625,4 +629,73 @@ cout << *p << "\n";
 std::cout << "main devam ediyor\n";
 }
 
-//38
+-------
+
+specialization 
+
+--------
+
+class A {
+void foo();
+};
+
+struct B {
+A* operator->();
+};
+
+struct C {
+B operator->
+};
+
+struct D {
+C operator->()
+};
+
+int main()
+{
+D dx;
+dx->foo(); //legal
+//dx.operator->().operator->().operator->()->foo();
+}
+
+-------------------------------------------------
+
+fonksiyon çağrı operatörü:
+--------------------------
+
+func(23)
+fptr(12)
+
+foo(3, 5)
+bir fonksiyon aşağıdaki durumlardan biri olabilir
+
+a) bir fonksiyon ismi (function designator)
+b) bir fonksiyon pointer
+c) function-like macro
+
+callable
+ -function object
+ -closure object
+
+---------
+
+Nec foo;
+foo(3, 5)
+foo.operator()(3, 5)
+
+kuralları:
+---------
+
+fonksiyonun ismi
+  operator() çağrı ismi olmak zorunda
+  üye fonksiyon olmak zorunda(diğer üye fonksiyonları : atama, ok operatörü, köşeli parantex)
+
+
+
+
+
+
+
+
+
+
