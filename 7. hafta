@@ -344,5 +344,139 @@ p->operator->()->bar(); //buna dönüşür
 }
 
 
+///////////////////////////////////////////2. Ders//////////////////////////////////////
+
+Geçen dersin son bölümünün tekrarı
+----------------------------------
+
+derleyici bir sınıf nesnesi ok operatörünün operandı olduğunda
+ok operatörünün operandı olan sınıf nesnesi ifadesini o sınıf nesnesini *this olarak kullanıp
+sınıfın ok operatör fonksiyonuna çsğrıya dönüştüryor ama fonksiyon çağrı ifadesi yine okun sol operandı uapıyor
+
+
+class Myclass {
+public:
+void foo() 
+{
+std::cout << "Myclass::foo()\n";
+}
+void bar(int)
+{
+std::cout << "Myclass::bar(int)\n";
+}
+};
+
+int  main()
+{
+Myclass m;
+Myclass* p{ &m };
+
+p-> foo(); //normalde bu şekilde çağrılabilinir
+p-> bar(12);
+}
+
+-------
+
+class Myclass {
+public:
+void foo() 
+{
+std::cout << "Myclass::foo()\n";
+}
+void bar(int)
+{
+std::cout << "Myclass::bar(int)\n";
+}
+};
+
+class MyPtr {
+public:
+Myclass *operator->()
+
+};
+
+int  main()
+{
+Myclass m;
+Myptr p;
+
+p-> foo(); //legal olur yine
+p.operator->()->foo(); //derleyici bu şekilde yazar
+p-> bar(12);
+p.operator->()->bar(12);
+}
+
+-----------
+
+class Myclass {
+public:
+void foo() 
+{
+std::cout << "this = " << this << '\n';
+std::cout << "Myclass::foo()\n";
+}
+void bar(int)
+{
+std::cout << "Myclass::bar(int)\n";
+}
+};
+
+Myclass g;
+
+class MyPtr {
+public:
+Myclass *operator->()
+{
+return &g;
+}
+};
+
+int  main()
+{
+using namespace std;
+cout << "&g = " << &g << '\n';
+
+Myptr p;
+
+p-> foo(); 
+p-> bar(12);
+}
+
+-------------------------------
+//öyle bir sınıf olucakki bu sınıfın varlık nedeni bu sınıf türünden nesnelerin dinamik ömürlü
+date nesnelerinin hayatını kontrol etme olucak
+
+class Date {
+public:
+Date() = default;
+Date(int d, int m, int y);
+~Date();
+friend std::ostream& operator<<(std::ostream& os, const Date& dt);
+int get_month_day()const;
+int get_month()const;
+int set_year();
+int set_month();
+};
+
+//bir datePtr nesnesi new ifadesi ile oluşturulmuş
+//dinamik ömürlü bir date nesnesini  gösterir (sözde)
+//ancak DatePtr nesnesinin hayatı bittiğinde gösterdiği Date nesnesini dekete eder
+//bunlara smartpointer denir 
+
+class DatePtr {
+
+};
+
+
+int main()
+{
+using namespace std;
+
+std::cout << "main basladi\n";
+if (true) {
+DatePtr p{ new Date{3, 5 , 1987}};
+cout << *p << "\n";
+}
+}
 
 
