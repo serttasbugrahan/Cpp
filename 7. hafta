@@ -662,6 +662,7 @@ dx->foo(); //legal
 
 fonksiyon çağrı operatörü:
 --------------------------
+!! operator overloadingin en öenmli konularından birisi
 
 func(23)
 fptr(12)
@@ -685,13 +686,123 @@ foo.operator()(3, 5)
 
 kuralları:
 ---------
+- fonksiyonun ismi operator() çağrı ismi olmak zorunda
+- üye fonksiyon olmak zorunda(diğer üye fonksiyonları : atama, ok operatörü, köşeli parantex)
+- varsayılan arguman alabilir.
+- ismiyle çağrılabilir
+- overload edilebilir
 
-fonksiyonun ismi
-  operator() çağrı ismi olmak zorunda
-  üye fonksiyon olmak zorunda(diğer üye fonksiyonları : atama, ok operatörü, köşeli parantex)
+class Myclass {
+public:
+void operator()()const; //const olabilir
+{
+std::cout << "Myclass::operator()() this : " << this << '\n';
+}
+};
+
+int main()
+{
+Myclass m;
+std::cout << "&m = " << &m << '\n';
+m(); //nesne ismi
+m.operator()(); //bu şekilde 2 parantez olmalı
+}
 
 
+-----------
 
+class Myclass {
+public:
+void operator()(int x = 5);
+
+};
+
+int main()
+{
+m();
+m.operator()(5); //derleyici buna çevirir
+m(12);
+m.operator()(12); //derleyici buna çevirir
+}
+
+-------------
+
+class Myclass {
+public:
+void operator()(int);
+void operator()(int, int);
+void operator()(double);
+void operator()(const char *);
+};
+
+int main()
+{
+Myclass m;
+
+m(5); //6
+m(5, 7); //7
+m(2.3); //8
+m("m"); //9
+}
+
+----------------
+
+normal bir fonksiyondan farkı
+
+normal fonksiyonların doğrudan bir state bilgisi yok 
+
+// bu işlemler generic programlamada işe yarıycak
+
+class Random {
+public:
+Random(int low, int high) : mlow{low}, mhigh{high} {}
+int operator()()
+{
+return std::rand() % (mhigh - mlow + 1) + mlow;
+}
+private:
+int mlow, mhigh;
+};
+
+
+int main()
+{
+Random rand1{ 45, 72 };
+Random rand1{ 5678, 5792 };
+
+for (int i = 0; i < 10; ++i)
+std::cout << rand1() << ' ';
+
+std::cout << "\n\n";
+
+for (int i = 0; i < 10; ++i)
+std::cout << rand1() << ' ';
+}
+}
+
+--------------
+//kodu anlamaya çalışma
+
+int main()
+{
+using namespace std;
+
+vectır vec{2, 5,7,4,323,2,5,23,12,67};
+
+int n;
+
+std::cout << "kaca bolunenler sayılsın: ";
+std::cin >> n;
+
+cout << count_if(vec.begin(), vec.end(), [n](int x) {return x % n == 0});
+}
+
+--------------------------------------------------
+
+tür dönüştürme operatörleri:
+----------------------------
+
+1.28
 
 
 
