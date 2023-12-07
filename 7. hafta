@@ -446,16 +446,47 @@ p-> bar(12);
 //öyle bir sınıf olucakki bu sınıfın varlık nedeni bu sınıf türünden nesnelerin dinamik ömürlü
 date nesnelerinin hayatını kontrol etme olucak
 
+//datePtr görevi dinamik ömürlü nesnenin hayatını kontrol etmek
+
 class Date {
 public:
 Date() = default;
-Date(int d, int m, int y);
-~Date();
-friend std::ostream& operator<<(std::ostream& os, const Date& dt);
-int get_month_day()const;
-int get_month()const;
-int set_year();
-int set_month();
+Date(int d, int m, int y) : md{d}, mm{m}, mm{y} //ctor
+{
+std::cout << *this << "adresindeki " << this << "adresindeki nesneye hayata geliyor\n";
+}
+
+~Date()
+{
+std::cout << *this << "adresindeki " << this << "adresindeki nesneye hayata veda ediyor\n";
+}
+
+friend std::ostream& operatpr<<(std::ostream& os, const Date& dt);
+{
+return os << "(" <<dt.md << "-" << dt.mm << "-" << dt.my << ")"
+}
+
+int get_month_day()const
+{
+return md;
+}
+
+int get_month()const
+{
+return mm;
+}
+
+void set_year(int y)
+{
+my = y;
+}
+
+void set_month()
+{
+mm = m;
+}
+private:
+int md{1},mm{1},my{1980};
 };
 
 //bir datePtr nesnesi new ifadesi ile oluşturulmuş
@@ -464,7 +495,30 @@ int set_month();
 //bunlara smartpointer denir 
 
 class DatePtr {
+public:
+DatePtr() = default;
+explicit DatePtr(Date* p) : mp{p} {}
+~DatePtr()
+{
+if (mp)
+delete mp;
+}
 
+
+DatePtr(const DatePtr&) = delete;
+DatePtr& operator=(const DatePtr&) = delete;
+
+Date& operator*()
+{
+return *mp;
+}
+
+Date* operator->()
+{
+return mp;
+}
+private:
+Date* mp{ nullptr };
 };
 
 
@@ -474,9 +528,101 @@ using namespace std;
 
 std::cout << "main basladi\n";
 if (true) {
-DatePtr p{ new Date{3, 5 , 1987}};
+DatePtr p{ new Date{3, 5 , 1987}}; //smartpointer sayesinde delete ifadesi ile sonlandırmayız, buranın legal olması için DatePtr sınıfına parametresi Date* türünden olan ctor vermemiz lazım
+cout << *p << "\n"; //burası için içerik operatörünü overload etmemiz gerekiyor
+cout << "ay = " << p->get_month() << '\n';
+cout << "ayin gunu = " << p->get_month_day() << '\n';
+p->set_year(2022);
 cout << *p << "\n";
 }
+std::cout << "main devam ediyor\n";
+}
+
+-----------------------
+
+class Date {
+public:
+Date() = default;
+Date(int d, int m, int y) : md{d}, mm{m}, mm{y} //ctor
+{
+std::cout << *this << "adresindeki " << this << "adresindeki nesneye hayata geliyor\n";
+}
+
+~Date()
+{
+std::cout << *this << "adresindeki " << this << "adresindeki nesneye hayata veda ediyor\n";
+}
+
+friend std::ostream& operatpr<<(std::ostream& os, const Date& dt);
+{
+return os << "(" <<dt.md << "-" << dt.mm << "-" << dt.my << ")"
+}
+
+int get_month_day()const
+{
+return md;
+}
+
+int get_month()const
+{
+return mm;
+}
+
+void set_year(int y)
+{
+my = y;
+}
+
+void set_month()
+{
+mm = m;
+}
+private:
+int md{1},mm{1},my{1980};
+};
+
+class DatePtr {
+public:
+DatePtr() = default;
+explicit DatePtr(Date* p) : mp{p} {}
+~DatePtr()
+{
+if (mp)
+delete mp;
 }
 
 
+DatePtr(const DatePtr&) = delete;
+DatePtr& operator=(const DatePtr&) = delete;
+
+Date& operator*()
+{
+return *mp;
+}
+
+Date* operator->()
+{
+return mp;
+}
+private:
+Date* mp{ nullptr };
+};
+
+
+int main()
+{
+using namespace std;
+
+std::cout << "main basladi\n";
+if (true) {
+DatePtr p{ new Date{3, 5 , 1987}}; //smartpointer sayesinde delete ifadesi ile sonlandırmayız, buranın legal olması için DatePtr sınıfına parametresi Date* türünden olan ctor vermemiz lazım
+cout << *p << "\n"; //burası için içerik operatörünü overload etmemiz gerekiyor
+cout << "ay = " << p->get_month() << '\n';
+cout << "ayin gunu = " << p->get_month_day() << '\n';
+p->set_year(2022);
+cout << *p << "\n";
+}
+std::cout << "main devam ediyor\n";
+}
+
+//38
