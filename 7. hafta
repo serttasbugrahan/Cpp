@@ -165,7 +165,7 @@ m.foo(); //const t* ==> t*'a dönüşüm yapmaya zorlanır, hata
 
 int main()
 {
-const std::string s{ "Tamer" };
+std::string s{ "Tamer" };
 
 std::cout << s << '\n';
 s[0] = 'S'; //bu atamalar legal
