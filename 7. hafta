@@ -799,10 +799,170 @@ cout << count_if(vec.begin(), vec.end(), [n](int x) {return x % n == 0});
 
 --------------------------------------------------
 
-tür dönüştürme operatörleri:
-----------------------------
+tür dönüştürme operatörlerinin overload edilmesi:
+-------------------------------------------------
 
-1.28
+sınıf türünden bir üye başka bir türe dönüşebilecek (class --> int/double vb.)
+
+----------
+
+class Nec {
+
+
+};
+
+int main()
+{
+Nec mynec;
+int ival{ 0 };
+ival = mynec; //legal değil
+}
+
+-----------
+
+class Nec {
+public:
+operator int()const; // !! geri dönüş değeri yazılmaz
+};
+
+int main()
+{
+Nec mynec;
+int ival{ 0 };
+ival = mynec; //legal oldu
+// ival = mynec.operator int(); derleyici bu şekilde anlar
+}
+
+----------
+
+kurallar
+
+class Erg {
+
+};
+   
+class Nec {
+public:
+operator Erg(); //erg türüne, int türüne, double türüne, int* int& vs. hepsine dönüştürebiliriz
+};
+
+int main()
+{
+Nec munec;
+Erg myerg;
+
+myerg = mynec;
+}
+
+---------
+
+kritik nokta: çok önemli de olsa büyük bir risk içerir
+örtülü dönüşümü tetikler
+
+dönüşüm 2 türlü olur
+ -standart dönüşüm
+ -user defined dönüşüm
+
+class Nec {
+public:
+operator int()const;
+};
+
+int main()
+{
+double dval{};
+Nec mynec;
+dval = mynec; //geçerli çünkü standart dönüşüm olur 
+}
+
+
+--------------
+
+class Nec {
+public:
+operator int* ()const; 
+};
+
+int main()
+{
+Nec mynec;
+bool b = mynec;
+}
+
+------------
+
+class Nec {
+public:
+explicit operator int* ()const; 
+};
+
+int main()
+{
+Nec mynec;
+bool b = mynec;
+
+ival = mynec; //derleyici örtülü dönüşüm yapamaz explicitden dolayı
+ival = static_cast<int>(mynec); //geçerli
+ival =(int)mynec; //geçerli
+ival = int(mynec); //geçerli
+}
+
+!! tür dönüştürme operatörünü explicit yapmaya çalış genelde
+
+-----------
+
+class Counter {
+
+public:
+Counter() = default;
+Counter(int val) : mc{val} {}
+
+Counter& operator++()
+{
+++mc;
+return *this;
+}
+
+Counter operator++(int)
+{
+Counter temp(*this);
+++*this;
+return temp;
+}
+
+operator int()const
+{
+return mc;
+}
+private:
+int mc{};
+};
+
+void bar(int)
+{
+
+}
+
+int foo()
+{
+Counter c{ 6786 };
+return c;
+}
+
+int main()
+{
+Counter c{ 4 };
+for (int i = 0; i < 10; ++i) {
+++c;
+}
+int ival = c;
+
+bar(c);
+}
+
+---------------
+
+2.7
 
 
 
