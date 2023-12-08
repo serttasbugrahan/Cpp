@@ -1573,11 +1573,289 @@ C cx;
 
 --------------
 
-1.40
+copy assignment :
+-----------------
+
+class Member {
+public:
+Member& operator=(const Member&)
+{
+std::cout << "Member::operator=(const Member&)\n";
+return *this;
+}
+};
+
+class Owner {
+
+private:
+Member mx;
+};
+
+int main()
+{
+Owner x, y;
+x = y;
+}
+
+------------------
+
+class Member {
+public:
+Member& operator=(const Member&)
+{
+std::cout << "Member::operator=(const Member&)\n";
+return *this;
+}
+};
+
+class Owner {
+public:
+Owner& operator=(const Owner& other)
+{
+return *this;
+}
+
+private:
+Member mx;
+};
+
+int main()
+{
+Owner x, y;
+x = y; //değişiklik olmaz
+}
+
+----------------
+
+derleyicinin yazdığı :
+
+public:
+
+Myclass(const Myclass& other) : ax(other.ax), bx(other.bx)
+{
+
+}
+
+Myclass(Myclass &&other) :: ax(std::move(other.ax)), bx(std::move(bx)), cx(other.cx)
+{
+}
+
+Myclass& operator=(const Myclass &other)
+{
+ax = other.ax;
+bx = other.bx;
+cx = other.cx;
+
+return *this;
+}
+
+Myclass& operator=(Myclass &&other)
+{
+ax = std::move(other.ax);
+bx = std::move(other.bx);
+cx = std::move(other.cx);
+
+return *this;
+}
+
+private:
+A ax;
+B bx;
+C cx;
+}
 
 
+-----------------------------------------------
+
+reference qualifiers (referans niteleyicisi):
+--------------------------------------------
+
+modern c++ ile dile eklendi
+ancak c++17 ve 20 std. ile ilave özellikler kazandı
+
+Bir sınıf nesnesi için sınıf nesnesinin value categorysinin ne olduğuna veya
+sınıf nesnesinin const olup olmadığına bağlı olarak
+
+a) bir üye fonksiyon çağrısının legalitesini belirliyor
+b) function overloading olması durumunda hangi fonksiyonun seçilmesi gerektiğini belirliyor
+
+-----
+
+class Myclass {
+public:
+void set(int);
+};
+
+int main()
+{
+Myclass m;
+m.set(12); //hata yok
+
+}
+
+--------
+
+class Myclass {
+public:
+void set(int);
+};
+
+int main()
+{
+Myclass{}.set(12); //mantıklı değil
+}
+
+----------
+
+class Myclass {
+public:
+void set(int);
+};
+
+int main()
+{
+Myclass m;
+
+Myclass{} = Myclass{}; //legal ama yapmayız
+m = Myclass{}; //
+}
+
+-------------
+
+class Myclass {
+public:
+Myclass set(int);
+void print()const;
+};
+
+int main()
+{
+Myclass{}.set(12).print(); //legal
+}
+
+--------------
+
+Sentax yapısı:
+
+class Myclass {
+public:
+void foo(int)&; //l value referance qualifier (sadece l value ile çağrılır)
+void bar(int)&&; //R value referance qualifier (sadece R value ile çağrılır)
+void baz()const&; //hem sağ hem sol ile çağrılır
+void func()const&&;
+};
+
+int main()
+{
+Myclass m;
+m.foo(12);
+Myclass{}.foo(12); //hata
+
+m.bar(12); // hata
+Myclass{}.bar(12); //legal
+std::move(m).bar(13); //legal
+
+Myclass{}.baz(); //legal
+m.baz(); //legal
+}
+
+-------------
+
+class Myclass {
+
+public:
+Myclass& operator=(const Myclass&)&;
+};
+
+int main()
+{
+Myclass m;
+Myclass{} = m; 
+}
+
+------------
+
+function overloadindde de kullanılır
+
+class Myclass {
+
+public:
+void foo()& //l value ise çağrılır
+{
+std::cout << "foo()&\n";
+}
+
+void foo()&& //r value ise çağrılır
+{
+std::cout << "foo()&&\n";
+}
+};
+
+int main()
+{
+Myclass m;
+Myclass{}.foo(); 
+}
+
+------------
+//aşağıdakilerin hepsi ayrı overload
+
+class Myclass {
+public:
+
+void foo()&
+{
+std::cout << "foo()&\n";
+}
+void foo()&&
+{
+std::cout << "foo()&&\n";
+};
+
+void foo()const &;
+{
+std::cout << "foo()const &\n";
+}
+
+void foo()const&&;
+{
+std::cout << "foo()const &&\n";
+}
 
 
+};
+
+int main()
+{
+Myclass m;
+m.foo(); //1.
+
+const Myclas m;
+m.foo(); //3.
+
+Myclass m;
+std::move(m)foo(); //2.
+
+Myclass m;
+std::move(m)foo(); 
+Myclass{}.foo(); //2.
+
+const Myclass m;
+std::move(m).foo(); //4.
+}
+
+
+------------- 
+
+
+class Myclass {
+public:
+Myclass& operator=(const Myclass&)& = default; //cpp 20'ye kdar yoktu
+// bu şekilde l value şekilde default edilir
+
+};
+
+=================================================================
 
 
 
