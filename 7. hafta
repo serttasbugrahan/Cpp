@@ -1205,6 +1205,92 @@ std::cout << "yanlis\n";
 
 ///////////////////////////////////////////////////3. Ders///////////////////////////////////////////////
 
+C dilinde yazılmış kodlar c++ dilinde de kullanılabiliyor
+ancak c dilinde derlenmiş fonksiyonlar c++ dilinde kullanıldığı zaman
+hata verir bu durumu aşmak için bildirim yapılır
+
+c başlık dosyasında aşağıdaki bildirim ancak c derleyicisi bunu bilmez bu yüzden c derlendikten sonra başlık dosyasına eklenir
+
+extern "C" int foo(int) //bu şekilde yazınca c usulü derleme yapar
+
+---------
+
+extern "C" int foo(int);
+extern "C" int bar(int int);
+extern "C" int baz(double);
+
+//bu şekilde de olur
+extern "C" {
+int foo(int);
+int bar(int, int);
+int baz(double);
+}
+
+---------------
+
+Bu işlemleri hem c hem c++ derleyicisinde çalışırmanın yolu vardır
+
+predefined symbolic constants
+
+__FILE__
+__LINE__
+__DATE__
+__TIME__
+__STDC__
+
+!! makro olduğu için herhangi bir başlık dosyası include etmemize gerek yoktur
+
+__STDC__
+__cplusplus
+
+Aşğıdaki şekilde olur
+---------------------
+
+#ifdef _cplusplus
+extern "C" {
+#endif
+
+int nfunc(int x, int y);
+int foo(int);
+int bar(int, int);
+int baz(double);
+
+#ifdef _cplusplus
+}
+#endif
+
+==========================================================================
+
+composition : 
+ dependency (Bağımlılık) : bir sınıfın başka bir sınıfa bağımlı olduğu durumu ifade eder. Yani, bir sınıfın içinde başka bir sınıfın nesnesini kullanması durumudur
+ association (ilişki) : İki sınıf arasında bir bağlantı olduğunu, ancak bir sınıfın diğerine doğrudan bağımlı olmadığını gösterir 
+ aggregation (Birleştirme) : bir nesnenin diğer bir nesneye ait bir parça olduğu durumu ifade eder. Aggregation, bir bütünün, parçalarından biriyle ilişkili olduğu ancak parça bağımsız bir şekilde var olabilirken, birleştirme ilişkisi kurar
+ composition (Bileşim) : bir nesnenin diğer bir nesneye ait bir parça olduğu durumu ifade eder. Ancak, composition ile birlikte, parça nesnesi, bütün nesnesi olmadan var olamaz. Bütün nesne ömrünü sona erdirdiğinde, parça nesne de sona erer.
+
+
+-----------
+//bir sınıfın elemanının bir sınıf türünden olması
+//has-a relationship 
+//is-a relationship
+
+class Engine {
+///...
+};
+
+class Car {
+private:
+Engine eng;
+};
+
+
+
+
+
+
+
+
+
+
 
 
 
