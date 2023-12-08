@@ -1857,7 +1857,18 @@ Myclass& operator=(const Myclass&)& = default; //cpp 20'ye kdar yoktu
 
 =================================================================
 
+namespaces (isim alanları) : isim çakışmalarını önlemek için yapılır
+---------------------------
 
+
+
+std dosyası
+-----------
+a
+------------
+neclib dosyası
+-------------
+a
 
 
 
