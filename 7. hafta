@@ -1273,26 +1273,307 @@ composition :
 //has-a relationship 
 //is-a relationship
 
+
+//mülakatte ilk sorulacak sorulardan bir tanesş
 class Engine {
-///...
+void start();
+void stop();
 };
 
 class Car {
 private:
-Engine eng;
+Engine eng; //engine'nın sınıfları direk car'ın sınıfı olmayabilir
 };
 
+int main()
+{
+Car MyCar;
+Mycar.start; //hata olur 
+}
+
+----------
+
+//ancak şu şekilde katılabilinir
+
+class Engine {
+void start();
+void stop();
+};
+
+class Car {
+public:
+void start()
+{
+eng.start(); //bu şekilde olur
+}
+private:
+Engine eng; 
+};
+
+int main()
+{
+Car MyCar;
+}
 
 
+-------------
+
+class Engine {
+private:
+void maintain();
+int cyl_volume;
+};
+
+// owner
+//member object - embedded object 
+//friend ile erişebeilir
+
+class Car {
+public:
+void start()
+{
+eng.maintain(); //hata olur, private bölüme erişemez
+}
+private:
+Engine eng; 
+};
+int main()
+{
+Car MyCar;
+}
+
+------------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B() = default;
+A ax;
+};
+
+-----------
 
 
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B()
+{ //hata olur, delete olmaz
+
+}
+A ax;
+};
+
+-----------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+A ax{ 12 };
+};
+
+int main()
+{
+B bx; //legal 
+}
+
+------------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B(int x) : ax{ 10 } //bu şekilde ilk değer verirken narrowing conver. hata olur
+{
+
+}
+A ax;
+};
+
+int main()
+{
+b bx;
+}
+
+------------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B(int x) : ax{ x }
+{
+
+}
+A ax;
+};
+
+int main()
+{
+b bx;
+}
+
+----------
+
+class Person {
+
+public:
+Person(const std::string& name, const std::string &g surname, int age) : m_name{name}, m_surname{surname}, m_age{age}
+{
+m_name = name; //aksi yönde karar alınmadıkça yukarıdaki şekilde ilk değer ver
+}
+private:
+std::string m_name; // BU SIRAYA UY
+std::string m_surname;
+int age;
+};
+
+int main()
+{
+Person per{"cagrihan", "akca", 26};
+}
+
+---------
+
+class Person {
+
+public:
+Person(const char *pname, const char *psurname) : m_name{name}, m_surname{surname} //bu şekilde çok fazla yapılıyor
+{
+
+}
+private:
+std::string m_name;
+std::string m_surname;
+Date m_birth_date;
+};
+
+int main()
+{
+Person per{"cagrihan", "akca", 26};
+}
+
+----------
+
+class Myclass {
+public:
+Myclass(int x, int y, int z) : x(x), y(y), z(z) {}
+int x, y, z;
+};
+
+int main()
+{
+Myclass m(1, 3, 7);
+std::cout << m.x << m.y << m.z << "\n"; //137 yazar
+}
 
 
+------------------------
 
+copy ctor, copy assignment, move assignment, move ctor işlemleri :
 
+class Member {
+public:
+Member()
+{
+std::cout << "Member default ctor\";
+}
 
+Member(const Member&)
+{
+std::cout << "Member copy ctor\";
+}
+};
 
+class Owner {
+public:
+Owner();
+Owner(const Owner& other) : x(other.x) {
+}
+private:
+Member mx;
+int x;
+};
 
+int main()
+{
+Owner x; //default ctor çağrılır
+Owner y(x); //copy çağrılması gerekirken default ctor çağrılır
+}
+
+-----------
+
+class Member {
+public:
+Member()
+{
+std::cout << "Member default ctor\";
+}
+
+Member(const Member&)
+{
+std::cout << "Member copy ctor\";
+}
+};
+
+class Owner {
+public:
+Owner();
+Owner(const Owner& other) : mx(other.mx), x(other.x) { //bu şekilde doğru olur
+//
+}
+private:
+Member mx;
+int x;
+};
+
+int main()
+{
+Owner x; //default ctor çağrılır
+Owner y(x); //copy çağrılması gerekirken default ctor çağrılır
+}
+
+---------
+
+class Myclass {
+public:
+Myclass(const Myclass& other) : ax(other.ax), bx(other.bx) //derleyici bu şekilde yazar
+{
+
+}
+
+Myclass(Myclass &&other) : ax(std::move(other.ax)), bx(std::move(bx)), cx(other.cx) 
+{
+
+}
+
+private:
+A ax;
+B bx;
+C cx;
+}
+
+--------------
+
+1.40
 
 
 
