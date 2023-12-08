@@ -962,11 +962,219 @@ bar(c);
 
 ---------------
 
-2.7
+tür operator fonksiyonunu overload edilecekse
+a) problem domani ile örtüşen bir yapısı olmalı
+b) explicit olmaması çok seyrek bir durumdur
+
+---------------
+
+!! önemli bir tür dönüştürme fonksiyonu
+
+!exp
+exp1 && exp2
+exp1 || exp2
+exp ? op2 : op3
+
+if (expr)
+
+while (expr)
+
+for (;exp; )
+
+do {
+}while (expr);
+
+------
+
+int main()
+{
+Nint x;
+if (x) { //sınıf türleri için böyle bir yaoı yazamayız
+
+}
+}
+
+---------
+
+//nint.h
+class Nint {
+public:
+operator bool()const 
+{
+return mx != 0;
+}
+}
+
+//main.c
+int main()
+{
+Nint x{10};
+if (x.operator bool()) {
+}
+}
+
+--------
+
+int main()
+{
+int x{};
+
+while (std::cin >> x)
+while (std::cin.operator>>(x).operator bool()) //derleyici böyle yazar
+std::cout << x << '\n';
+}
+
+----------
+
+int main()
+{
+using namespace std:
+
+if (cin && cout) {
+
+}
+}
+
+-----------
+
+mülakat sorusu
+
+class Myclass {
+public:
+operator bool()const
+{
+return true;
+}
+};
+
+using namespace std;
+
+int main()
+{
+Myclass m1, m2;
+
+auto x = m1 + m2;
+//auto x = m1.operator bool() + m2.operator bool();
+
+cout << "x = " << x << '\n';
+}
+
+-----------------
+
+class Myclass {
+public:
+operator bool()const
+{
+return true;
+}
+};
+
+int main()
+{
+double x{};
+
+Myclass m;
+
+x = m;
+}
+
+--------------
 
 
 
+class Myclass {
+public:
+operator bool()const
+{
+return true;
+}
+};
 
+int main()
+{
+if (cin && cout) {
 
+}
+bool b = !cin;
+int x = cin; //hata, sınfın operator bool fonksiyonu explicit olduğu için
+}
 
+!! sınıfların operator bool fonksyionları hemen her zaman explicit olarak bildirilir
+
+--------------------
+
+class Myclass {
+public:
+explicit operator bool()const
+{
+return true;
+}
+};
+
+int main()
+{
+double x{};
+
+Myclass m;
+
+bool x(m);
+if (m) {
+
+}
+auto b = m && m;
+}
+
+-------------
+
+class Myclass {
+public:
+explicit operator bool()const
+{
+return true;
+}
+};
+
+int main()
+{
+int x{};
+
+while (cin >> x) {
+
+}
+auto eticin = cin + cin;
+}
+
+-----------------
+
+int main()
+{
+int* ptr{};
+
+if (ptr) {
+std::cout << "evet dogrudur\n";
+}
+else {
+std::cout << "hayir yanlistir\n";
+}
+}
+
+---------------
+
+#include <memmory>
+
+int main()
+{
+using namespace std;
+
+unique_ptr<int> uptr{new int{35} };
+if (uptr) {
+std::cout << "dogru\n";
+}
+else {
+std::cout << "yanlis\n";
+}
+
+}
+
+---------------
 
