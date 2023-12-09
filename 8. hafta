@@ -110,3 +110,699 @@ int main()
 {
 std::chrono::duration //bu şekilde namespace içinde namespace aranabilir
 }
+
+---------
+
+int main()
+{
+std::sort
+std::ranges::sort
+}
+
+----------
+//aşağıdaki sort isimleri farklı varlıklara ilişkili
+namespace Std {
+//sort
+namespace Ranges {
+//sort
+}
+}
+
+---------
+//bunu yapmanın nedeni farklı başlık dosyalarına aynı namespace içinde ancak farklı başlık dosyaları içinde 
+olmasını sağlar
+
+namespace onur {
+int a = 5;
+int b = 67;
+}
+
+namespace onur {
+int c = 343;
+}
+
+
+-----
+//yukarıdaki ile aynı anlamda
+
+namespace onur {
+int a = 5;
+int b = 67;
+
+int c = 343;
+}
+
+----------
+
+namespace eda {
+int a, b, c;
+}
+
+namespace eda {
+double a; //hata
+}
+
+----------
+
+//unnamed namespace
+
+namespace { //legal
+int a, b, c;
+}
+
+--------
+
+namespace ali {
+void foo(int); //function overloading
+
+}
+
+namespace ali {
+void foo(int, int);
+}
+
+--------------------------
+
+!! bir isim alanı içindeki bir ismin nitelenmeden kullanılmasını sağlayan 3 araç vardır
+
+-using declaration
+-using (namespace) directive
+-ADL (argument dependent lookup) (argümana bağlı isim arama)
+
+
+----------
+
+using declaration :
+-----------------
+
+using std::cout;
+
+1) using bildiriminin bir kapsamı vardır ve o kapsam içinde 
+etkin olur
+
+using std::cout;
+
+void foo()
+{
+using std::cin;
+}
+
+2) bildirime konan isim bildirimin yapıldıgu isim alanına enjecte edilir ve sanki o kapsamda tanımlanmış gibi etki gösterir
+
+namespace emre {
+int x = 5;
+}
+
+int main()
+{
+int x = 55;
+using emre::x; //buraya enjecte edilir, hata olur
+}
+
+-----
+
+namespace emre {
+int x = 5;
+}
+
+int main()
+{
+using emre::x; 
+x //emre namespace'inde tanımlanan x olduğunu anlıycak
+}
+
+------
+
+namespace emre {
+int x = 5;
+}
+
+int x = 10;
+using emre::x; //hata olur
+
+int main()
+{
+
+}
+
+------
+
+namespace emre {
+int x = 5;
+}
+
+void foo()
+{
+using emre::x; //x adece burada etkin
+x = 5;
+}
+
+void bar()
+{
+x = 2; //hata 
+}
+
+------
+
+namespace emre {
+int x = 5;
+}
+
+using emre::x; //global alanda yapıldığı için x hata yok
+
+void foo()
+{
+x = 5;
+}
+
+void bar()
+{
+x = 2;
+}
+
+--------
+
+namespace emre {
+int x = 5;
+}
+
+void foo()
+{
+x = 5; //hata 
+}
+
+using emre::x; 
+
+void bar()
+{
+x = 2; //hata yok
+}
+
+---------
+
+namespace ali {
+int x = 10;
+}
+
+int x = 56;
+
+int main()
+{
+using ali::x; //ali'nin x'i
+x = 99;
+std::cout << ali::x << "\";
+}
+
+--------------------------
+
+using (namespace) directive
+---------------------------
+
+using namespace std:ranges;
+using namespace ::boost
+
+-------
+
+namespace ali {
+int a, b, c;
+
+class Neco {
+
+};
+
+void foo();
+}
+
+using namespace ali; //ali namespace içindekiler global alanda görünür olucaklar
+
+int main()
+{
+
+}
+
+
+-------
+using (namespace) direktifi bir bildirimdir
+
+Tüm bildirimlerde olduğu gibi bu bildirimin de bir kapsamı vardır
+ve bu bildirim bildirimin kapsamnında etkindir
+
+-------
+
+namespace Ali {
+int x, y, x;
+}
+
+int main()
+{
+using namespace ali;
+
+x = 5; //hepsi legal
+y = 5;
+z = 456;
+}
+
+--------
+
+namespace ali {
+int x, y, z;
+
+}
+
+using namespace ali;
+
+void foo()
+{
+x = 5;
+y = x;
+z = y;
+}
+
+void bar()
+{
+x = 5;
+y = x;
+z = y;
+}
+
+---------
+
+namespace ali {
+int x = 99, y, z;
+}
+
+int main()
+{
+using namespace ali;
+int x = 10;
+std::cout << x << "\n";
+}
+
+----------
+
+namespace ali {
+int x = 99;
+}
+
+namespace veli {
+int x = 99;
+}
+
+int main()
+{
+using namespace ali;
+using namespace veli;
+x = 4; //ambigiosu hatası
+}
+
+-----------
+
+
+namespace ali {
+int foo(int);
+}
+
+namespace veli {
+int foo(int, int);
+}
+
+int main()
+{
+using namespace ali;
+using namespace veli;
+
+foo(3);
+foo(3, 6); //overloading
+}
+
+----------
+
+int g = 10;
+
+namespace ali {
+using ::g;
+}
+
+namespace veli{
+using ali::g;
+}
+
+int main()
+{
+++g;
+++ali::g;
+++veli::g;
+std::cout << "g = " << g << '\n';
+}
+
+---------------
+namespace Nec {
+void foo();
+void bar(int);
+}
+
+------------------------------
+
+ADL :
+-----
+Bir fonksiyona nitelenmemiş bir isimle çağrı yapıldığında 
+eğer fonksiyona gönderilen argümanlardan biri
+bir namespace içinde tanımlanan türe ilişkin ise
+söz konusu fonksiyon ismi o namespace içinde de aranır!!!
+
+---------
+
+namespace nec {
+
+class Erg {
+
+};
+void foo();
+void bar(int);
+void baz(Erg);
+}
+
+int main()
+{
+nec::Erg e;
+baz(e);
+bar(12); //hata
+}
+
+---------
+
+int main()
+{
+std::cout << "merhaba dunya"; //adl nedeni ile arandı
+}
+
+---------
+
+namespace nec {
+class Erg {
+
+};
+void foo(Erg); //adl ile bulunur
+}
+
+void foo(nec::Erg) {} //Adl ile bulunmaz
+
+int main()
+{
+nec::Erg e;
+foo(e); //ambiguous hata
+}
+
+-----------
+
+namespace nec {
+class Erg {
+
+};
+void foo(std::vector<Erg>);
+}
+
+int main()
+{
+std::vector<nec::Erg> x;
+foo(x);  //leagl
+}
+
+-----------
+
+namespace nec {
+enum Pos {off, on, hold};
+
+void foo(Pos);
+}
+
+int main()
+{
+foo(nec::off); //adl çalışır
+}
+
+--------------
+
+namespace nec {
+class Myclass {
+public:
+struct Data {
+};
+};
+void foo(Myclass::Data);
+}
+
+int main()
+{
+foo(nec::Myclass::Data{}); //nec'in Myclass'ının Data'ının geçici nesnesi ile foo'ya çağrı yapıyorum
+
+}
+
+---------------
+
+//nec.h
+
+namespace neco {
+class Nec {
+public:
+void foo(int);
+};
+
+void func(Nec);
+}
+
+//#include "nec.h"
+
+int main()
+{
+neco::Nec x;
+x.foo(12); //legal 
+func(x); //legal, adr seyasinde bulur
+}
+
+------------
+
+class Myclass {
+public:
+friend void foo(int);
+friend void bar(Myclass);
+};
+
+int main()
+{
+Myclass m;
+bar(m);
+}
+
+------------
+//buradaki friend kullanımı da adl ile alakalıdır 
+class Myclass {
+public:
+friend operator<<(std::operator&, const Myclass&);
+};
+
+int main()
+{
+Myclass m;
+std::cout << m;
+}
+
+------------
+//buradaki nec ismi de çakışabilir bunun için namespace alias vardır
+namespace nec {
+int a;
+class Myclass {
+
+};
+}
+
+------
+namespace alias sentax yapısı aşağıdaki şekildedir
+
+namespace nec_project {
+int a;
+class Myclass {
+};
+}
+
+namespace nec = nec_project;
+
+int main()
+{
+nec::a = 5;
+nec::Myclass m;
+}
+
+--------
+
+namespace eda {
+namespace ali {
+namespace can {
+int x = 57;
+}
+}
+}
+
+namespace can = eda::ali::can;
+
+int main()
+{
+eda::ali::can::x; 
+can::x; //yukarıdaki yerine bu şekilde yazılabilicek
+}
+
+--------
+
+namespace ali::veli::can {
+int x = 5;
+}
+
+namespace ali {
+int a = 9;
+}
+
+namespace ali::veli {
+int v = 34;
+}
+
+int main()
+{
+std::cout << ali::a << "\n";
+std::cout << ali::veli::v << "\n";
+std::cout << ali::veli::can::x << "\n";
+}
+
+-----------
+
+inline namespace
+
+namespace ali {
+inline namespace can {
+int x = 10;
+int y = 45;
+}
+
+int main()
+{
+ali::x = 5; //legal
+ali::y = 10; //legal
+}
+
+-----------
+#define OLDVERSION
+
+namespace ali {
+#ifdef OLDVERSION
+  inline
+#endif
+
+namespace old_version {
+class Myclass {
+
+};
+}
+
+#ifdef NEWVERSION
+  inline
+#endif
+
+namespace new_version {
+class Myclass {
+
+};
+}
+}
+
+int main()
+{
+ali::Myclass
+}
+
+-------------
+
+namespace ali::veli:: inline can { //c++20 ile geldi
+
+}
+
+------------
+
+unnamed namespace :
+-------------------
+internal linkage : farklı kaynak dosyalarda farklı varlıklar ise, static anahtar sözcüğü
+external linkage : bir varlık birden fazla dosyada kullanılıyor ve aynı anlama geliyor ise
+
+-------
+
+static class Myclass { //Böyle bir şey yok
+
+};
+
+-------
+
+namespace { //iç bağlantıda olduğunu söyler
+int x; //iç bağlantıda
+}
+
+--------
+//one defibition rule işlenmez
+
+//mehmet.cpp
+namespace {
+int x = 10;
+class Array{
+
+};
+}
+
+//ali.cpp
+namespace {
+double x{};
+class Array{
+
+};
+
+}
+
+//hasan.cpp
+namespace {
+int x{ 213 };
+class Array{
+
+};
+}
+
+----------
+
+namespace {
+int x = 10;
+class Array {
+
+};
+}
+
+int main()
+{
+x = 90;
+}
+
+---------
+
+
+namespace nec {
+class Myclass {
+public:
+Myclass foo(Myclass);
+};
+}
+
+nec::Myclass nec::Myclass::foo(Myclass m)
+{
+Myclass m;
+return m;
+}
+
+
+
+
+
+
