@@ -1274,7 +1274,7 @@ composition :
 //is-a relationship
 
 
-//mülakatte ilk sorulacak sorulardan bir tanesş
+//mülakatte ilk sorulacak sorulardan bir tanesi
 class Engine {
 void start();
 void stop();
@@ -1436,7 +1436,7 @@ b bx;
 class Person {
 
 public:
-Person(const std::string& name, const std::string &g surname, int age) : m_name{name}, m_surname{surname}, m_age{age}
+Person(const std::string &name, const std::string &surname, int age) : m_name{name}, m_surname{surname}, m_age{age}
 {
 m_name = name; //aksi yönde karar alınmadıkça yukarıdaki şekilde ilk değer ver
 }
@@ -1448,7 +1448,7 @@ int age;
 
 int main()
 {
-Person per{"cagrihan", "akca", 26};
+Person per{"bugrahan", "serttas", 23};
 }
 
 ---------
@@ -1770,7 +1770,7 @@ Myclass& operator=(const Myclass&)&;
 int main()
 {
 Myclass m;
-Myclass{} = m; 
+Myclass{} = m; //hata
 }
 
 ------------
@@ -1857,18 +1857,6 @@ Myclass& operator=(const Myclass&)& = default; //cpp 20'ye kdar yoktu
 
 =================================================================
 
-namespaces (isim alanları) : isim çakışmalarını önlemek için yapılır
----------------------------
-
-
-
-std dosyası
------------
-a
-------------
-neclib dosyası
--------------
-a
 
 
 
