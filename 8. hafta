@@ -1,14 +1,112 @@
 ////////////////////////////////////////////////1. Ders//////////////////////////////////////////
 
-namespaces (isim alanları) : isim çakışmalarını önlemek için yapılır
+namespaces (isim alanları) : isim çakışmalarını önlemek için yapılır, global isim alanları içinde ayrı scopelar oluşturulur
 ---------------------------
 
+//here is as namespace
 
+void x();
 
-std dosyası
+int main()
+{
+::x //bu isim global isim alanında aranır
+}
+
 -----------
-a
-------------
-neclib dosyası
--------------
-a
+
+bir namespace nasıl oluşturulur :
+---------------------------------
+!! bir namespace içinde olmalayız
+!! bir fonksiyon içinde olmaz
+!! bir sınıf tanımı içinde olmaz
+
+namespace nec {
+
+} //burada ';' yok
+
+--------
+
+namespace nec {
+int x = 10; //global değişken
+}
+
+-------
+
+file scope ==> namespace scope
+
+namespace ali {
+int x = 5;
+double x = 5.6; //hata
+}
+
+--------
+
+//bu şekilde sentax hatası olmaz
+namespace bugra{
+void f(int); //function overloading
+void f(double);
+}
+
+--------
+
+namespace emre {
+double x = 5;
+
+class A {
+};
+
+int foo(int)
+{
+
+}
+}
+
+namespace furkan {
+double x = 5.5;
+
+class A {
+};
+
+int foo(int)
+{
+
+}
+}
+}
+
+---------
+
+//ismi namespace içinde aratmak
+
+namespace tamer {
+int x;
+}
+
+int main()
+{
+tamer::x;
+}
+
+---------
+//legal
+namespace a{
+int x;
+}
+
+namespace b{
+int x;
+}
+
+int main()
+{
+a::x = b::x;
+}
+
+---------
+#include <iostream>
+#include <chrono>
+
+int main()
+{
+std::chrono::duration //bu şekilde namespace içinde namespace aranabilir
+}
