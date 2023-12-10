@@ -1233,8 +1233,8 @@ int main()
 {
 Nec mynec;
 
-mynec.foo(12); // access kontrol hatası olur
-mynec.foo(1.2); //hata olmaz
+mynec.foo(12); // hata olmaz
+mynec.foo(1.2); //access kontrol hatası olur
 }
 
 ------------
