@@ -1085,8 +1085,56 @@ public:
 void foo()
 {
 Myclass::mbar(); //legal, modern c++ ile eklendi
+auto sz = sizeof(mx); //legal
 }
 
+-----------------
 
+class Myclass {
 
+class Nested {
 
+};
+};
+
+int main()
+{
+Myclass::Nested x;//hata, private olduğu için
+}
+
+------------
+//burası ilginç biraz
+
+class Myclass {
+
+class Nested {
+public:
+void nf1();
+void nf2();
+};
+public:
+static Nested foo();
+};
+
+int main()
+{
+Myclass::Nested x = Myclass::foo(); //legal değil
+auto x = Myclass::foo(); //legal
+
+x.nf1();
+x.nf2();
+}
+
+--------
+
+class System {
+
+public:
+class Element {
+void foo();
+};
+private:
+std::vector<Element> mvec;
+};
+
+//1.07
