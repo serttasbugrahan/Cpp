@@ -859,6 +859,234 @@ std::cout << wd++ << " " << wd;
 
 }
 
-//22.21
+===================================================================
+
+Nested types/teype member/member types
+
+class Myclass {
+//typedef int value_type; //c dilinde
+using value_type = int; //c++ dilinde nested type
+
+enum color {Blue, Red,Green};
+
+class Nec {
+
+};
+};
+
+
+----------
+
+class Myclass {
+public:
+using value_type = int; //c++ dilinde nested type
+
+enum color {Blue, Red,Green};
+
+class Nec {
+
+};
+};
+
+int main()
+{
+value_type x; //hata olur
+Color mycolor; //hata
+Nec mynec; //hata
+
+Myclass::value_type x;
+Myclass::Color mycolor;
+Myclass::Red;
+}
+
+--------
+
+class Nec {
+public:
+class Erg; { //nec'İn erg türünden bir elemanı yoktur
+
+};
+private:
+Erg ma[10];
+Nec::Erg ma[10]; //böyle yazmaya gerek yok yukarıdaki yeterli
+};
+
+-------
+
+class Nec {
+public:
+class Erg {
+
+};
+private:
+void foo();
+};
+
+//cpp
+void Nec::foo()
+{
+Erg e; //blok içinde arıyor bulamadıysa sınıf içinde arıyor
+Nec::Erg e; //Bu şekild de olur
+}
+
+-------
+
+class Nec {
+public:
+class Erg {
+
+};
+private:
+void foo();
+};
+
+//cpp
+void Nec::foo(Erg e)
+{
+
+}
+
+-------
+
+nested type ile yapılan en tipik hatalar:
+
+1)
+
+class Myclass {
+ValueType mx;
+typedef int ValueType; //Hata
+};
+
+------
+
+2) 
+
+struct ValueType {};
+
+class Myclass { 
+ValueType mx; //ValueType dışındaki
+typedef int ValueType; 
+};
+
+-----
+
+struct ValueType {};
+
+class Myclass { 
+typedef int ValueType; 
+ValueType mx; //myclass value type'ı olur
+};
+
+-------
+
+class Myclass { 
+
+void foo()
+{
+ValueType x = 6; //legal, blok içinde arandıktan sonra class scope içinde aranır
+}
+///
+typedef int ValueType;
+};
+
+//fonkisyonun inline olarak class definition içinde tanımlanmasıyla
+fonksiyonun sınıf dışında normal bildiğimiz bir biçimde tanımlanması arasında isim arama 
+kuralları açısından bir fark yoktur.
+
+-------
+
+class Myclass { 
+
+void foo()
+{
+ValueType x = 6; 
+
+typedef int ValueType;
+}
+};
+
+void Myclass::foo()
+{
+ValueType x = 6;
+}
+
+-----------
+//enclosing class
+class Myclass {
+
+//Nec is a nested type
+//Nec is a inner type
+class Nec{ 
+
+};
+};
+
+----------
+
+class Erg;
+
+//forward declaration
+//erg is an incomplete type
+
+class Myclass {
+class Nec;
+};
+
+----------
+
+class Erg;
+
+class Myclass {
+
+class Nec; //incomplete type
+
+};
+
+class Nec { //Myclass içindeki ile farklılar
+
+};
+//nec is complete type here
+class Myclass::Nec { //bu şekilde tanımı yapılır
+
+};
+
+class Erg {
+
+};
+
+--------------
+
+class Myclass {
+class Erg {
+public:
+void bar()
+{
+
+}
+private:
+void foo()
+}
+};
+
+void func()
+{
+Erg e;
+e.foo();
+}
+//myclass sınıfı erg sınfınnı private bölümüne erişebilir mi?
+  -erişemez friend bildirimi lazım
+
+-------------
+
+class Myclass {
+static void mbar();
+class Erg {
+public:
+void foo()
+{
+Myclass::mbar(); //legal, modern c++ ile eklendi
+}
+
+
 
 
