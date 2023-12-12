@@ -1001,7 +1001,7 @@ void foo()
 {
 ValueType x = 6; 
 
-typedef int ValueType;
+typedef int ValueType; //illegal
 }
 };
 
@@ -1335,7 +1335,7 @@ class Der : public Base {
 
 class Base {};
 
-class Der : protected Base { // public/protected/private
+class Der : protected Base { // public/protected/private olabilir
 
 };
 
@@ -1424,7 +1424,7 @@ c = m; //object slicing (nesne dilimlenmesi) bunu ASLA yapma
 
 -------
 
-class Car()
+class Car
 {
 public:
 void start();
