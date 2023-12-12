@@ -1424,42 +1424,50 @@ c = m; //object slicing (nesne dilimlenmesi) bunu ASLA yapma
 
 -------
 
+#include <iostream>
+
 class Car
 {
 public:
-void start();
-void run();
-void stop();
+    void start();
+    void run();
+    void stop();
 };
 
-class Mercedes : public Car {
+class Mercedes : public Car
+{
 public:
-
 };
 
-class Bmw : public Car {
+class Bmw : public Car
+{
 public:
-
 };
 
-class Audi : public Car {
+class Audi : public Car
+{
 public:
-
 };
 
-void car_game(Car* p);
-void car_race(Car& r1, Car &r2);
+class Skoda : public Car
+{
+public:
+};
+
+void car_game(Car *p);
+void car_race(Car &r1, Car &r2);
 
 int main()
 {
-Mercedes m;
-Bmw bmv;
-Audi a;
-Skoda s;
+    Mercedes m;
+    Bmw b;
+    Audi a;
+    Skoda s;
 
-car_game(&m);
-car_game(&bmv);
+    car_game(&m);
+    car_game(&b);
 
-car_race(bmw, s)
+    car_race(b, s);
 }
+
 
