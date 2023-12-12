@@ -1126,6 +1126,7 @@ x.nf2();
 }
 
 --------
+#include <vector>
 
 class System {
 
@@ -1137,4 +1138,160 @@ private:
 std::vector<Element> mvec;
 };
 
-//1.07
+
+--------
+
+class System {
+
+public:
+class Element {
+void foo();
+};
+
+void Element::foo() //illegal
+{
+
+}
+private:
+
+};
+
+-----------
+//system.h
+class System {
+public:
+class Element {
+void foo();
+};
+
+private:
+
+};
+
+//system.cpp
+void System::Element::foo()
+{
+
+}
+
+--------
+
+//system.h
+class System {
+public:
+Element& operator=(const Element&);
+};
+
+private:
+
+};
+
+System::Element::Element(const Element&) //copy ctoru
+{
+
+}
+
+System::Element& System::Element::operator=(const Element& other)
+{
+return *this;
+}
+
+---------------------------
+
+//çok kullanılan bir idioum ancak daha sonra detaylı görücez
+
+pimple idiom
+pointer to implementation
+handle-body idiom
+cheshire cat
+compiler firewall
+opaque pointer
+
+Bu örüntü sınıfın private bölümünü client kodlardan gizlemeye yönelik
+
+//tamer.h
+class Tamer {
+public:
+
+private:
+A ax;
+B bx;
+C cx;
+int ival;
+}
+
+Neden sınıfımızın private bölümünü gizlemek isteriz?
+  -A ax, B bx, C cx include edilmezdi ve compile time kısalırdır
+
+--------
+
+binary compatibility
+
+A ax, B bx .. sıralarının değiştirilmesi veya yeni öğe eklenmesi yeniden derlenmeyi sağlar
+
+öyle client kodlar var ki bazı değişiklikler yapınca yeniden derlenmesinı sağlıyor 
+ancak gizlenince bunlar problem olmuyor
+
+//pimple idiomu smart pointerlar'da detaylı anlatılacak
+//sınıf nesnesinin içine pointer koyulur bu pointer incomplete bir türden, pointerın neyi gösterdiği konusunda client kodlararın bir bilgisi yok
+sınıfın veri elemanlarını doğrudan sınıfın veri elemanı yapmaktan çıkartıp veri elemanlarını başka bir sınıfın veri elemanı yapıyoruz. böylece doğrudan kullanmak
+yerine pointer ile arka planda kullanıyoruz
+
+//tamer.h
+class Tamer {
+public:
+void foo();
+void bar();
+Tamer();
+private:
+struct pimpl;
+pimpl *mp;
+
+};
+
+//tamer.cpp
+struct Tamer::pimpl{
+A ax;
+D dx;
+C cx;
+int ival;
+bool m_flag;
+}
+
+Tamer::Tamer() : mp{new pimpl{}};
+
+void Tamer::foo()
+{
+mp->ax
+mp->bx
+}
+
+==========================================================================
+
+İnheritance(Kalıtım)
+-----------------------
+
+oop terminology
+
+C++ dilinin kendi kalıtım araçlarına yönelik
+C++ özelinde oluşturulmuş terminology
+
+is-a relationship
+
+Her futbolcu bir sporucudur
+Her mercedes bir arabadır
+Her aslan bir hayvandır
+
+Sporcu, Araba ve hayvana arent class/super class denir
+
+araba'nın özelliklerinii alan fakat ilave özelliklere de sahip olabilecek kalıtım yoluyla oluşturulmus
+sınıfa child class/subclass denir
+
+zebra sınıfını animal sınıfından kalıtım yoluyla elde ettim
+animal sınıfı superclass zebra sınıfı subclass
+
+UML: Yaygun olarak kullanılan modellem dili
+
+//2.00
+
+
