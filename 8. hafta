@@ -1292,6 +1292,174 @@ animal sınıfı superclass zebra sınıfı subclass
 
 UML: Yaygun olarak kullanılan modellem dili
 
-//2.00
+kaynak olarak kullanılan sınıfa base class denir
+kalıtımla elde edilen sınıfa derived class
 
+
+derive ==> türetme
+derivition
+
+base class (taban sınıfa)
+
+derived class (türemiş sınıf)
+
+-----------
+
+3 ayrı kalıtım biçimi (kategorisi) var
+
+public inheritance ==> OOP
+
+a) public inheritance
+b) private inheritance
+c) protected inheritace
+
+multiple inheritance 
+multi-level inheritance 
+
+--------------------
+
+Kalıtım sentaxı:
+----------------
+
+Kalıtım mekanizması ile bir sınıf oluşturmamız için 
+bir complete type'a ihtiyacımız var
+
+class Base; //hata
+class {}; //legal
+
+class Der : public Base {
+
+};
+
+-------
+
+class Base {};
+
+class Der : protected Base { // public/protected/private
+
+};
+
+-------
+
+class Base {};
+
+class Der : Base { };
+//class Der : private Base { }; //aynı anlamda, default olarak private gelir
+
+----------
+class Base {};
+
+struct Der : Base {}; //public kalıtımı
+
+-----------------
+
+class Base {
+public:
+void foo();
+void bar();
+void baz();
+};
+
+class Der : public Base {
+public:
+void f1();
+void f2();
+};
+
+int main()
+{
+Der myder;
+
+myder.bar();
+myder.foo();
+myder.baz();
+myder.f1();
+}
+
+
+---------------
+
+// bir kısmını kendi interfaceime katmak istiyorum bir kısmını istemiyorum diyorsak
+uygulamamız gereken kalıtım değil composition
+
+//ya interface'İn hepsini alırız ya hiçbirini
+
+class Car()
+{
+public:
+void start();
+void run();
+void stop();
+};
+
+class Mercedes : public Car{
+public:
+
+}
+
+----------
+
+class Car()
+{
+public:
+void start();
+void run();
+void stop();
+};
+
+class Mercedes : public Car {
+public:
+
+};
+
+int main()
+{
+Mercedes m;
+Car* p = &m;
+Car& cr = m; //ref. semantiği ile de geçerlidir
+
+Car c;
+c = m; //object slicing (nesne dilimlenmesi) bunu ASLA yapma
+}
+
+-------
+
+class Car()
+{
+public:
+void start();
+void run();
+void stop();
+};
+
+class Mercedes : public Car {
+public:
+
+};
+
+class Bmw : public Car {
+public:
+
+};
+
+class Audi : public Car {
+public:
+
+};
+
+void car_game(Car* p);
+void car_race(Car& r1, Car &r2);
+
+int main()
+{
+Mercedes m;
+Bmw bmv;
+Audi a;
+Skoda s;
+
+car_game(&m);
+car_game(&bmv);
+
+car_race(bmw, s)
+}
 
