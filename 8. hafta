@@ -1795,7 +1795,246 @@ Myclass m;
 m.foo(1); //private olan seçilir ancak erişim kontrolünden dolay hatalı olur
 }
 
+------------
 
-//59
+class Base {
 
+public:
+void foo(int x)
+
+void foo(double);
+};
+
+class Der : public Base {
+public:
+void foo(long);
+void foo(int x)
+{
+Base::foo(x); //bu şekilde olabilir
+}
+void foo(double x)
+{
+Base::foo(x); //bu şekilde olabilir
+}
+};
+
+
+int main()
+{
+Der myder;
+myder.foo(12); //Der'in myder'i çağrılır
+
+//aşağıdaki kodlara dokunmadan nasıl aşağıdakiler çağrılır
+myder.foo(1.2); //Base::foo(double)
+myder.foo(1); //Base::foo(int)
+myder.foo(12L); //Der::foo(long)
+}
+
+----
+
+daha kolay yolu vardır...
+
+class Base {
+
+public:
+void foo(int x)
+void foo(double);
+};
+
+class Der : public Base {
+public:
+using Base::foo; //bu şekilde enjecte edilir
+void foo(long);
+};
+
+int main()
+{
+Der myder;
+
+//aşağıdaki kodlara dokunmadan nasıl aşağıdakiler çağrılır
+myder.foo(1.2); //Base::foo(double)
+myder.foo(1); //Base::foo(int)
+myder.foo(12L); //Der::foo(long)
+}
+
+----------
+
+//multi - level inheritance
+class A {
+
+};
+
+class B : public A {
+
+};
+
+class C : public B {
+
+};
+
+//direct base class (A B'nin taban sınıfı)
+// indirect Base class (B C'nin taban sınıfı)
+
+------------------
+
+Der bir türemiş sınıf olsun
+
+bir der nesnesi hayata geldiğinde önce der içindeki base class object hayata gelecek
+sonra bildirimdeki sırayla member object'ler hayata gelecek
+sonra akış der sınıfın ctor'ının anabloğuna giricek
+
+Bir der nesnesi hayata bittiğinde
+
+
+---------
+
+class Base {
+public:
+Base(int);
+};
+
+class Der : public Base{
+
+};
+
+int main()
+{
+Der myder;//snetax hatası, Der'in defaıult ctoru delete edilmiş
+}
+
+--------
+
+class Base {
+public:
+Base();
+};
+
+class Der : public Base{
+
+};
+
+int main()
+{
+Der myder; //hata yok
+}
+
+-------
+
+class Base {
+public:
+
+};
+
+class Der : public Base{
+
+};
+
+int main()
+{
+Der myder; //hata yok, Base'e default ctor yazar
+}
+
+-------
+
+class Base {
+Base();
+};
+
+class Der : public Base{
+
+};
+
+int main()
+{
+Der myder; //hata var, der'in ctorunu derleyici yazıcak derleyici base default ctoruna çağrı yapacak taban sınıfın default ctoru private olduğu için sentax hatası oluş
+//base'İn default ctoru var ama private
+}
+
+----------
+
+class Base {
+public:
+Base()
+{
+std::cout << "base~def. ctor\n";
+}
+~Base()
+{
+std::cout << "base dtor\n";
+}
+};
+
+class Der : public base {
+
+};
+
+int main()
+{
+Der myder;
+}
+
+-----------
+
+class Base {
+public:
+Base()
+{
+std::cout << "base~def. ctor\n";
+}
+~Base()
+{
+std::cout << "base dtor\n";
+}
+};
+
+class Der : public base {
+public:
+Der()
+{
+std::cout << "der def. ctor\n";
+}
+
+~Der()
+{
+std::cout << "der dtor\n";
+}
+};
+
+int main()
+{
+Der myder;
+}
+
+------------
+
+class Base {
+public:
+Base(int x, int y)
+{
+std::cout << "Base(int x, int y) x = " << x << " y = " << y << '\n';
+}
+};
+
+class Der : public base {
+public:
+Der() //taban sınıfın default ctoru oolmadığı için hata verir
+//Der() : Base(10, 20) //bu şekilde legal olur, Base{10,20} bu şekilde de olur
+{
+std::cout << "der def. ctor\n";
+}
+};
+
+int main()
+{
+Der myder;
+}
+
+---------
+
+!! tanımlanan fonksiyon delete edilemez, derleyici sadece örtülü olarak bildirmsesi gereken fonksiyonu delete edebilri
+ya da fonksiyonu ben delete bildirimi yapabilirim
+
+--------
+
+1.31.05
 
