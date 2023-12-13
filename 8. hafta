@@ -1462,12 +1462,340 @@ int main()
     Mercedes m;
     Bmw b;
     Audi a;
-    Skoda s;
+    Skoda s;e
 
     car_game(&m);
     car_game(&b);
 
     car_race(b, s);
 }
+
+////////////////////////////////////////////////3. Ders////////////////////////////////////////
+
+class Base {
+
+};
+
+class Der : public Base {
+
+};
+
+---------
+//base'in public fonksiyonları Der'in fonksiyonları olarak kullanılabilecek
+
+class Base {
+void foo();
+void bar();
+void baz();
+};
+
+class Der : public Base {
+public:
+Der myder;
+myder.foo();
+};
+
+---------
+//Der'in içinde  Base vardır
+
+class Base {
+int x{};
+int y{};
+};
+
+class Der : public Base { //bu şekilde olursa base class object denir
+int a{};
+int b{};
+Base b; // bu şekilde olursa member object denir
+};
+
+int main()
+{
+std::cout << "sizeof(Base) = " << sizeof(Base) << "\n";
+std::cout << "sizeof(Der) = " << sizeof(Der) << "\n";
+}
+
+------------
+
+bir nesnenin içinde fiziksel olarak bir nesne vardır
+
+containment söz konusu olduğunda member object denir
+kalıtım söz konusu olduğunda base object denir (inheritance)
+
+-----------
+
+sınıfın private bölümü sadece kendisine açıktır
+
+class Baee {
+private:
+int mx;
+void foo();
+protected: //kendisinden kalıtım yoluya elde edilicek sınıflara hitap edicek interface 
+int my;
+int func();
+public: //herkese açık
+
+};
+
+class Der : public Base {
+void bar()
+{
+mx = 5;
+}
+}
+
+
+-----------
+
+public: herkese açık
+private: sadece bana açık ve friend bildiri yapılan kodlara açık
+protected :bana açık, clientlara kapalı ama kalıtım yoluyla benden elde edilecek sınıflara açık
+
+----------
+
+sınıflar tasarlanırken kalıtım yoluyla kullanılacak veya kullanılmayacak şekilde tasalanıyorlar
+
+----------
+//function overloading değildir
+!! taban sınıfın sunduğu isimler ayrı bir scope'da türemiş sınıfların sunduğu isimler ayrı bir scope'da
+aynı isimli fonksiyonlar overload değildir
+
+class Base {
+public:
+void foo(int);
+};
+
+class Der : public Base {
+public:
+void foo(double);
+};
+
+----------
+//bu duruma name hidding denir
+
+int main()
+}
+int x = 10;
+
+if (x > 5) {
+int x = 45;
+x = 99;
+}
+}
+
+---------------------------
+
+kalıtım ve isim arama :
+
+der.a
+ptr->a
+Der::a
+
+sol taraf olan isim yukarıdakilerden biriyse ve sağ operand olan isim önce türemiş sınıfın scope'unda 
+orada bulunamaz ise taban sınıf kapsamında aranır
+
+
+----------
+
+class Base {
+public:
+void foo();
+};
+
+class Der : public Base {
+public:
+void foo(int);
+};
+
+int main()
+{
+Der myder;
+myder.foo(); //illegal, 1607. satırda bulundu ancak parametre gönderilmediği için bulunamadı
+//sol taraf türemiş isim foo türemiş sınıfta aranır
+
+}
+
+
+------------
+
+class Base {
+public:
+void foo();
+};
+
+class Der : public Base {
+public:
+void foo(int);
+};
+
+int main()
+{
+Der myder;
+
+myder.foo(12); //Der::foo
+myder.Base::foo(); //Base::foo
+}
+
+---------
+
+class Nec {
+public:
+void foo();
+
+};
+
+int main()
+{
+Nec mynec;
+mynec.foo();
+mynec.Nec::foo();
+}
+
+----------
+
+class Base {
+public:
+void foo(double);
+
+};
+
+class Der : public Base {
+private:
+void foo(int);
+};
+
+int main()
+{
+Der myder;
+myder.foo(3.4); //illegal access control(private), void foo(int);
+}
+
+!! kontrol sırası ==> name lookup > context control > access control
+
+----------
+
+class Base {
+public:
+void foo(double);
+
+};
+
+class Der : public Base {
+public:
+void bar()
+{
+foo(3.4); //legal
+}
+};
+
+int main()
+{
+
+}
+
+!! türemiş sınıfın bir üye fonskiyonu içinde bir isim nitelenmeden kullanılırsa
+isim önce blokta
+  sonra kapsayan blokta
+    sonra türemiş sınıf tanımında 
+      sonra taban sınıf tanımında 
+        sonra namesapce'de aranır
+
+--------------
+//buradaki x'leri teker teker yorum satırlarına alarak hangix olduğunu öğren
+
+int x;
+class Base {
+public:
+int x;
+};
+
+class Der : public Base {
+public:
+void bar()
+{
+int x = 56;
+{
+int x = 78;
+auto b = x;
+
+auto b1 = Der::x; //1727. satırdaki x
+auto b2 = this->x; //1727. satırdaki x
+auto b1 = Base ::x;
+}
+}
+
+int x;
+};
+
+int main()
+{
+
+}
+
+------------
+//mülakatta sorulabilecek sıfır sefiyesindeki bir soru
+
+class Base {
+public:
+void foo(int);
+
+};
+
+class Der : public Base {
+public:
+void foo(int x)
+{
+  foo(4); //recorsive çağrı, 1746. satır çağrılır
+  Base::foo(x); //recorsive değil
+  foo(); //sentax hatası
+}
+};
+
+int main()
+{
+
+}
+
+----------
+
+class Base {
+public:
+void foo(int);
+
+};
+
+class Der : public Base {
+public:
+void foo(int x)
+{
+int foo = 5;
+foo(10); //hata kendi scobunda aranır
+}
+};
+
+int main()
+{
+
+}
+
+------------
+!!private olduğu için çağrılmama gibi bir durum yoktur
+
+class Myclass {
+public:
+void foo(float x);
+void foo(double x);
+private:
+void foo(int);
+};
+
+int main()
+{
+Myclass m;
+m.foo(1); //private olan seçilir ancak erişim kontrolünden dolay hatalı olur
+}
+
+
+//59
 
 
