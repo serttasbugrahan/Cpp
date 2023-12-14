@@ -2036,5 +2036,485 @@ ya da fonksiyonu ben delete bildirimi yapabilirim
 
 --------
 
-1.31.05
+class Base {
+public:
+Base(double d)
+{
+std::cout << "Base(double d) d = " << d <<'\n';
+}
+
+Base(int x, int y)
+{
+std::cout << "Base(int x, int y) x = " << x << " y = "<< y << '\n';
+}
+
+};
+
+class Der : public base {
+public:
+Der() : Base{10, 20} 
+{
+std::cout << "der def. ctor\n";
+}
+
+Der(double dval) : Base(dval) {
+
+}
+};
+
+int main()
+{
+Der myder { 3. 3};
+}
+
+----------
+
+Eğer taban sınıf nesnemize türemiş sınıfın kodunu yazıyoruz , 
+türemiş sınıf ctor içinde taban snıfın default ctorunu çağırmak istiyorsak bir şey yapmamıza gerek yok
+türemiş sınıf için default ctor default edersek ya da derleyici implicitly declareted edip default ederse derleyici her zman t
+
+--------
+
+class Member {
+public:
+Member(int x)
+{
+std::cout << "Member(int x) x = " << x << '\n';
+}
+};
+
+class Base {
+public:
+Base (double d)
+{
+std::cout << "Base(double d) d = " << d << '\n';
+}
+};
+
+class Der : public Base {
+public:
+Der() : mx(29), Base(3.4) {
+std::cout << "Der default ctor\n";
+}
+
+~Der()
+{
+std::cout << "Der dtor\n";
+}
+private:
+Member mx;
+};
+
+int main()
+{
+Der myder;
+}
+
+//önce base, mx, en son Der hayata gelir
+
+---------------
+
+struct A {
+A(int) {
+std::cout << "A(int)\n";
+}
+};
+
+struct B : A {
+B() : A(10) {
+std::cout << "B(int)\n";
+}
+};
+
+struct C : B {
+C(int x) : A(x) {} //Hata olur dolaylı olarak çağırma yoktur, multi-level inheritance'da
+C(int x) : B(x) { //legal
+std::cout << C(int)\n";
+} 
+};
+
+int main()
+{
+C cx(10);
+}
+
+--------------------
+türemiş sınıftan taban sınıfa olana up sampling
+tabandan türemişe operator kullanarak dönüşümlere down sampling
+--------------------
+
+class Base {
+
+public:
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+Der myder;
+Base *p = &myder; /bu şekilde olabilir
+Base & r = myder; //bu şekilde olabilir
+Base mybase =myder; //object slicing yapma
+}
+
+-----------
+
+class Base {
+
+public:
+void foo(); //void foo(Base*) gizli parametresi vardır
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+Der myder;
+myder.foo();
+}
+
+---------------------------------
+
+kalıtımda özel üye fonksiyonlarının durumu :
+
+-copy ctor
+-move ctor
+-copy assignment
+-move assignment
+
+--------
+
+class Base {
+
+public:
+Base()
+{
+std::cout << Base default ctor\n";
+}
+
+Base(const Base&)
+{
+std::cout << "Base copt ctor\n";
+}
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+Der ader;
+Der bder(ader);
+//Der bder2(std::move(ader));
+}
+
+---------------
+
+class Base {
+public:
+Base()
+{
+std::cout << "Base default ctor\n";
+}
+Base(const Base&)
+{
+std::cout << "Base copy ctor\n";
+}
+};
+
+class Der : public Base {
+public:
+Der()
+{
+std::cout << "Der default ctor\n";
+}
+Der(const Der &)
+{
+std::cout << "Der copy ctor\n";
+}
+};
+
+int main()
+{
+Der ader;
+Der bder(ader);
+}
+
+!! buradaki sıralama çok önemli bir kural
+
+-----------
+
+class Base {
+public:
+Base()
+{
+std::cout << "Base default ctor\n";
+}
+
+Base(const Base&)
+{
+std::cout << "Base copy ctor\n";
+}
+
+Base(Base&&)
+{
+std::cout << Base move ctor\n";
+}
+};
+
+class Der : public Base {
+public:
+Der()
+{
+std::cout << "Der default ctor\n";
+}
+
+Der(const Der &other) : Base(other)
+{
+std::cout << "Der copy ctor\n";
+}
+};
+
+int main()
+{
+Der ader;
+Der bder(ader);
+}
+
+-----------------
+
+class Base {
+public:
+Base()
+{
+std::cout << "Base default ctor\n";
+}
+Base(const Base&)
+{
+std::cout << "Base copy ctor\n";
+}
+Base(Base&&)
+{
+std::cout << Base move ctor\n";
+}
+};
+
+class Der : public Base {
+public:
+Der()
+{
+std::cout << "Der default ctor\n";
+}
+};
+
+int main()
+{
+Der ader;
+Der bder = std::move(ader);
+}
+
+eğer türemiş sınıf nesnesi için türemiş sınıfın move ctorunu derleyici yazarsa 
+derleyicinin yazdığı containent compasitionda olduğu gibi memberlar için nasıl yapıyorsa
+türemiş sınıf içindeki taban sınıf nesnesi içinde move ctor çağrılmasını sağlıycak
+
+-------------
+
+class Base {
+public:
+Base()
+{
+std::cout << "Base default ctor\n";
+}
+Base(const Base&)
+{
+std::cout << "Base copy ctor\n";
+}
+Base(Base&&)
+{
+std::cout << Base move ctor\n";
+}
+};
+
+class Der : public Base {
+public:
+Der()
+{
+std::cout << "Der default ctor\n";
+}
+
+Der(Der&& other) : Base(std::move(other)) 
+{
+std::cout << "der move ctor\n";
+}
+};
+
+int main()
+{
+Der ader;
+Der bder = std::move(ader);
+}
+
+---------------------------
+
+atama operator fonksiyonları :
+
+class Base {
+public:
+Base& operator=(const Base&)
+{
+std::cout << "Base copy assignment\n";
+return *this;
+}
+
+Base& operator=(Base&&)
+{
+std::cout << "Base move assignment\n";
+return *this;
+}
+};
+
+class Der : public Base {
+public:
+Der& operator=(const Der& other)
+{
+//Base::operator=(other);
+*(Base *)this = other; //bu şekilde de olur
+std::cout << Der copy assignment\n";
+return *this;
+}
+
+Der& operator=(Der6& other)
+{
+Base::operator=(std::move(other));
+std::cout << "Der move assignment\n";
+return *this;
+}
+};
+
+int main()
+{
+Der d1, d2;
+d1 = d2;
+d1 = std::move(d2);
+}
+
+------------------------------------------------
+
+class Car {
+public:
+void start()
+{
+std::cout << "Car::start\n";
+}
+};
+
+
+class Volvo : public Car {
+void start()
+{
+std::cout << "Volvo::start\n";
+}
+};
+
+class Audi : public Car {
+void start()
+{
+std::cout << "Audi::start\n";
+}
+};
+
+class Renault : public Car {
+void start()
+{
+std::cout << "Renault::start\n";
+}
+};
+
+void car_game(Car* ptr)
+{
+ptr->start();
+}
+
+int main()
+{
+Audi a;
+Renault r;
+Volvo v;
+
+car_game(&a);
+car_game(&r);
+car_game(&v)
+}
+
+--------------
+//dynamic binding 
+
+class Car {
+public:
+virtual void start()
+{
+std::cout << "Car::start\n";
+}
+};
+
+
+class Volvo : public Car {
+void start()
+{
+std::cout << "Volvo::start\n";
+}
+};
+
+class Audi : public Car {
+void start()
+{
+std::cout << "Audi::start\n";
+}
+};
+
+class Renault : public Car {
+void start()
+{
+std::cout << "Renault::start\n";
+}
+};
+
+void car_game(Car* ptr)
+{
+ptr->start();
+}
+
+int main()
+{
+Audi a;
+Renault r;
+Volvo v;
+
+car_game(&a);
+car_game(&r);
+car_game(&v)
+}
+
+-------------------
+
+dynamic binding / late binding: hangi fonksiyonun çağrıldığı derleme zamanında değil çalışma zamanına bir kodun koşturulması ile anlaşılıyro ise
+
+static binding / early binding : hangi fonksiyonun çağrıldığı  derleme zamanında belli oluyorsa 
+
+-------------------
+
+
+
+
+
+
+
+
+
 
