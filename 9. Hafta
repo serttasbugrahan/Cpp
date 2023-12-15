@@ -393,15 +393,125 @@ virtual void foo(int);
 
 class Der : public Base {
 public:
-void foo(int);
+void foo(int); //bu fonksiyon virtual
 };
 
 class NDer : public Der {
 public:
-void foo(
+void foo(int);
+};
+
+---------
+
+!! BU KISIM car_1.h'da
+
+
+----------
+
+//private, public olma zorunluluğu yoktr sentax hatası yoktur
+
+class Base {
+//private
+virtual void vfunc()
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+class Der : public Base {
+public:
+virtual void vfunc()override
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+----------
+//hata olmaz
+
+class Base {
+public:
+virtual void vfunc()
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+class Der : public Base {
+private:
+virtual void vfunc()override
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+----------
+//hata olmaz
+
+class Base {
+public:
+virtual void vfunc()
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+class Der : public Base {
+private:
+virtual void vfunc()override
+{
+std::cout << "Base::vfunc()\n";
+}
 };
 
 
+void gf(Base* p)
+{
+p->vfunc();
+}
+
+int main()
+{
+Der myder;
+myder.vfunc(); //hata çıkar, erişim hatası
+gf(&myder);
+}
+
+------------------
+
+C++ dilini yeni öğrenenler tipik olarak
+
+statik tür kavramı (static type)
+dinamik tür kavramını (dynamic type)
+birbirine karıştırma eğiliminde
+
+-----------------
+
+mülaktta sorulan tipik soular
+
+class Base {
+public:
+void foo();
+void bar();
+
+};
+
+class Der : public Base {
+public:
+void baz();
+};
+
+void gf(Base& r)
+{
+//r.baz();
+}
+
+int main()
+{
+
+}
+
+1.57.34
 
 
 
