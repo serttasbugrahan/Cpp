@@ -1969,7 +1969,7 @@ std::cout << "base dtor\n";
 }
 };
 
-class Der : public base {
+class Der : public Base {
 
 };
 
@@ -2020,10 +2020,10 @@ std::cout << "Base(int x, int y) x = " << x << " y = " << y << '\n';
 }
 };
 
-class Der : public base {
+class Der : public Base {
 public:
-Der() //taban sınıfın default ctoru oolmadığı için hata verir
-//Der() : Base(10, 20) //bu şekilde legal olur, Base{10,20} bu şekilde de olur
+//Der() //taban sınıfın default ctoru oolmadığı için hata verir
+Der() : Base(10, 20) //bu şekilde legal olur, Base{10,20} bu şekilde de olur
 {
 std::cout << "der def. ctor\n";
 }
@@ -2126,7 +2126,7 @@ std::cout << "A(int)\n";
 };
 
 struct B : A {
-B() : A(10) {
+B(int x) : A(10) {
 std::cout << "B(int)\n";
 }
 };
@@ -2184,6 +2184,8 @@ myder.foo();
 }
 
 ---------------------------------
+fonksiuonların yazımını derleyiciye bırakmaya rule of zero denir
+-----------
 
 kalıtımda özel üye fonksiyonlarının durumu :
 
@@ -2269,7 +2271,7 @@ std::cout << "Base copy ctor\n";
 
 Base(Base&&)
 {
-std::cout << Base move ctor\n";
+std::cout << "Base move ctor\n";
 }
 };
 
@@ -2306,7 +2308,7 @@ std::cout << "Base copy ctor\n";
 }
 Base(Base&&)
 {
-std::cout << Base move ctor\n";
+std::cout << "Base move ctor\n";
 }
 };
 
@@ -2325,7 +2327,7 @@ Der bder = std::move(ader);
 }
 
 eğer türemiş sınıf nesnesi için türemiş sınıfın move ctorunu derleyici yazarsa 
-derleyicinin yazdığı containent compasitionda olduğu gibi memberlar için nasıl yapıyorsa
+derleyicinin yazdığı move ctor tıpkı containent compasitionda olduğu gibi memberlar için nasıl yapıyorsa
 türemiş sınıf içindeki taban sınıf nesnesi içinde move ctor çağrılmasını sağlıycak
 
 -------------
@@ -2342,7 +2344,7 @@ std::cout << "Base copy ctor\n";
 }
 Base(Base&&)
 {
-std::cout << Base move ctor\n";
+std::cout << "Base move ctor\n";
 }
 };
 
@@ -2388,13 +2390,13 @@ class Der : public Base {
 public:
 Der& operator=(const Der& other)
 {
-//Base::operator=(other);
-*(Base *)this = other; //bu şekilde de olur
+Base::operator=(other);
+//*(Base *)this = other; //bu şekilde de olur
 std::cout << Der copy assignment\n";
 return *this;
 }
 
-Der& operator=(Der6& other)
+Der& operator=(Der& other)
 {
 Base::operator=(std::move(other));
 std::cout << "Der move assignment\n";
@@ -2454,10 +2456,12 @@ Volvo v;
 
 car_game(&a);
 car_game(&r);
-car_game(&v)
+car_game(&v);
 }
 
 --------------
+run time polimorfiz
+
 //dynamic binding 
 
 class Car {
@@ -2503,7 +2507,7 @@ Volvo v;
 
 car_game(&a);
 car_game(&r);
-car_game(&v)
+car_game(&v);
 }
 
 -------------------
