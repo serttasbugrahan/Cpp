@@ -46,6 +46,363 @@ car_game(&r);
 car_game(&v);
 }
 
+---------------
+dynamic binding / late binding: hangi fonksiyonun çağrıldığı derleme zamanında değil çalışma zamanına bir kodun koşturulması ile anlaşılıyro ise
+
+static binding / early binding : hangi fonksiyonun çağrıldığı  derleme zamanında belli oluyorsa 
+--------------
+
+
+
+Bir taban sınıfın fonksiyonları 3'e ayrılır :
+
+1) türemiş sınıflara hem bir bir interface (arayüz) hem de bir implementasyon veren fonksiyonlar
+
+Airplane
+  taekoff
+
+2) türemiş sınıflara hem bir bir interface (arayüz) hem de bir default implementasyon veren fonksiyonlar
+
+fly
+
+3) türemiş sınıflara hem bir bir interface (arayüz) veren implementasyon vermeyen fonksiyonlar
+
+land
+
+-------------
+
+override (function overrideing): taban sınfın interface'ini alıp onu istememeye denir
+
+-------------
+
+Bir sınıfın en az 2. katergorisinde bir fonksiyonu varsa böyle sınıflara polymorphic (çok biçimli)
+Bir sınıfın en az 3. katergorisinde en az bir fonksiyonu varsa böyle sınıflara abstract class
+
+-------------
+1)
+
+class Airplane {
+public:
+void takeoff(); //1. kategori
+};
+
+class Airbus : public Airplane{ //override yapmak zorunda değiliz
+
+};
+
+-------
+
+2)
+  
+class Airplane {
+public:
+void takeoff();
+virtual void fly(); //virtual fonksiyon (sanal fonksiyon)
+
+};
+
+class Airbus : public Airplane{ 
+
+};
+
+-------
+
+3)
+
+class Airplane {
+public:
+void takeoff(); //override edilelemz
+virtual void fly(); // override edilebilir ama etmek zorunda değilim
+virtual void land() = 0; //pure virtual function (saf sanal fonksiyon), override edilmeli
+};
+
+class Airbus : public Airplane{ 
+};
+
+
+------
+
+class Airplane {
+public:
+void takeoff();
+virtual void fly();
+//virtual void land() = 0; 
+//airplane abstract (soyut) değil yani concrete(somut)
+//polymorphic'dir
+};
+
+class Airbus : public Airplane{ //override yapmak zorunda değiliz
+
+};
+
+-----
+
+bir sınıfın abstract olmasının çok önemli bir sonucu da var, o sınıf türünden nesne oluşturamayız
+sadece pointer ve referans semantiği ile kullanabiliriz
+
+----
+
+class Airplane {
+public:
+void takeoff();
+virtual void fly();
+virtual void land() = 0; 
+};
+
+class Airbus : public Airplane{};
+
+int main()
+{
+Airplane a; //hata
+//Airbus ab; //hata
+}
+
+---------------
+
+//virtual kullanıldığında aynı imzaya sahip farklı geri dönüş türü
+olan fonksiyon bildirilmesi dilin kurallarına aykır
+
+class Base {
+public:
+virtual int func(int); //türemiş sınıf ister override eder ister etmez
+};
+
+class Der : public Base {
+public:
+double func(int);
+};
+
+----------
+
+//ne overriding ne de overloading olur ve lagal
+class Base {
+public:
+virtual int func(int);
+};
+
+class Der : public Base {
+public:
+double func(double); 
+};
+
+----------
+//bu şekilde taban sınıfı override eder
+//eskiden override etmenin yolu buydu
+
+class Base {
+public:
+virtual int func(int);
+};
+
+class Der : public Base {
+public:
+int func(int); 
+};
+
+---------
+
+override ve final contexual keyword (bağlamasal anahtar sözcük) : 
+belli bir alanda kullanıldğı zaman keyword başka bir yerde kullanıldığı zaman isim anlamına gelir
+
+-------
+
+class Base {
+public:
+virtual int func(int);
+};
+
+class Der : public Base {
+public:
+int func(int); //burada override
+int func(double)override; //hata
+int func(int)override; // burada da override
+};
+
+
+-------
+
+class Base
+{
+public:
+	virtual int func(int)const;
+};
+
+class Der : public Base
+{
+public:
+	int func(int); //override değil const yazmamız lazım
+};
+
+--------
+
+geri dönüş değeri aynı imza aynı override
+imza aynı geri dönüş değeri farklı sentax
+geri dönüş farklı imza farklı override da değil overloadingde değil
+
+----------------
+
+eğer bir fonksiyon çağrısı taban sınıf türünden bir nesne ile değil
+taban sınıf türünden bir pointer değişken ya da 
+taban sınıf türünden bir referans değişken ile 
+yapılıyor ise
+"virtual dispatc" (sanal gönderim devreye giriyor)
+
+airplane_ptr->fly();
+airplane_ref.fly();
+
+ao.fly();
+Airplane ao = myairbus; // olmaz
+
+---------------
+car ile ilgili örnek 
+
+!! BU KISIM VİSİUL STDİODA
+
+---------------
+
+virtual dispatc mekanizmasının devreye girdiği seneryolar
+
+1) Non virtual interface (NVI)
+
+class Base {
+public:
+virtual void foo()
+{
+std::cout << "Base::foo()\n";
+}
+void bar()
+{
+foo();
+}
+};
+
+class Der : public Base {
+public:
+void foo()
+{
+std::cout << "Der::foo()\n";
+}
+};
+
+void gf1(Base* p)
+{
+p->foo();
+}
+
+void gf2(Base& p)
+{
+r.foo();
+}
+
+int main()
+{
+Der myder;
+myder.bar(); //sanal olmaya bir fonksiyona çağrı yapıyoruz
+}
+
+---------------------
+
+bazı tehlikeli hatalar...
+
+1) sanal olmayan bir yapıyı override yaptığını sanması
+
+class Base {
+public:
+void foo()
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+class Der : public Base {
+public:
+void foo()
+{
+}
+};
+
+----------
+
+2) override edeyim derken parametrik yapının yanlış yazılması
+
+class Base {
+public:
+virtual void foo(double)
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+class Der : public Base {
+public:
+void foo(float)
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+----------
+
+class Base {
+public:
+virtual void foo(double)const
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+class Der : public Base {
+public:
+void foo(double) //Yukarıdakinin override'ı değildir const olması gerekir
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+-------------
+
+4) eğer taban sınıfın sanal fonksiyonunu override ederken 
+override contexual keywordünü kullanırsak bunun overirde olduğunu ve derleyiicye kontrol 
+yükümlülüğü veririz
+
+class Base {
+public:
+void foo(long)
+{
+std::cout << "Base::foo()\n";
+}
+};
+
+class Der : public Base {
+public:
+void foo(long)override; //derleyici böyle bir override olmadığını kontrol eder
+//!! override yazmak isek derleyici override olmadığı zmana hata verir
+!! override ediyorsak override yaz
+};
+
+----------------------------
+
+Bir taban sınıfın sanal fonksiyonunu override 
+eden türemiş sınıfın fonksiyonu virtual specifier ile nitelenmemiş olsa da
+yine de sanal (virtual) fonksiyondur
+
+class Base {
+public:
+virtual void foo(int);
+};
+
+class Der : public Base {
+public:
+void foo(int);
+};
+
+class NDer : public Der {
+public:
+void foo(
+};
+
+
+
 
 
 
