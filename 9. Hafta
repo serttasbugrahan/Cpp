@@ -1,5 +1,50 @@
 //////////////////////////////////////////////////1. Ders//////////////////////////////////////////////////////
 
+class Car {
+public:
+virtual void start()
+{
+std::cout << "Car::start\n";
+}
+};
+
+
+class Volvo : public Car {
+void start()
+{
+std::cout << "Volvo::start\n";
+}
+};
+
+class Audi : public Car {
+void start()
+{
+std::cout << "Audi::start\n";
+}
+};
+
+class Renault : public Car {
+void start()
+{
+std::cout << "Renault::start\n";
+}
+};
+
+void car_game(Car* ptr)
+{
+ptr->start();
+}
+
+int main()
+{
+Audi a;
+Renault r;
+Volvo v;
+
+car_game(&a);
+car_game(&r);
+car_game(&v);
+}
 
 
 
