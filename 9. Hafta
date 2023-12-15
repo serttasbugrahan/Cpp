@@ -503,7 +503,7 @@ void baz();
 
 void gf(Base& r)
 {
-//r.baz();
+r.baz(); //hata, taban snıfta arar, isim arama her zaman static türe göre yapılır
 }
 
 int main()
@@ -511,9 +511,191 @@ int main()
 
 }
 
-1.57.34
+-------------
 
+class Base {
+public:
+void foo();
+virtual void bar();
+private:
+virtual void baz();
+};
 
+class Der : public Base {
+public:
+};
+
+void gf(Base& r)
+{
+r.baz(); //hata
+}
+
+------------
+
+tipik mülakat sorusu
+
+class Base {
+public:
+virtual void foo(int x = 7)
+{
+std::cout << "Base::foo(int x) x =" << x << "\n";
+}
+};
+
+class Der : public Base {
+public:
+virtual void foo(int x = 999)override
+{
+std::cout << "Der::foo(int x) x =" << x << "\n"; //iyi bir kullanım değil
+}
+};
+
+void gf(Base& r) 
+{
+r.foo();
+//r.foo(7);//buna dönüştürcek
+}
+
+int main()
+{
+Der myder;
+gf(myder); //7
+
+myder.foo(); //999, der sınıfının foo'nunun varsayılan argümanıyla çağrılır
+}
+
+---------------
+
+yanlış anlaşılmalar...
+
+virtual bir fonksiyon overload edilebilir
+
+class Myclass {
+public:
+virtual void foo(int);
+virtual void foo(double);
+};
+
+class Der : public Base {
+public:
+void foo(int) override;
+void foo(double) override;
+};
+
+-------------
+
+!! virtual anahtar sözcüğünün specifirını global fonksiyonlar için kullanamayız
+
+virtual void gf(Base *);
+
+-------------
+
+class Base {
+public:
+virtual static void foo(); //sınıfın static üye fonksiyonu virtual olamaz
+};
+
+-------------
+
+class Base {
+public:
+virtual Base(int); //ctor virtual olamaz
+
+};
+
+C++ dilinde sınıfların ctor'ları virtual anahtar sözcüğü ile bildirilemez
+ancak virtual ctor özellikle OOP paradigmasında bir ihtiyaç olabilir
+C++ dilinde bu yapıya virtual ctor idioum, clone idiom denir	
+		      -------------------  ------------								
+
+------------
+
+!!BU YAPI car_2.h'da
+//main.cpp
+#include "car.h"
+void car_game(Car* o)
+{
+//buraya (çalışma zamanında)  hangi türden araba gelirse
+//oyunun senaryosu gereği çalışma zamanında aynı türden bir araba oluşturulcak
+
+Car* p = p->clone(); 
+}
+
+---------------
+
+class Base {
+public:
+void foo()
+{
+vfunc();
+}
+
+virtual void vfunc()
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+class Der : public Base {
+public:
+virtual void vfunc()override
+{
+std::cout << "Der::vfunc()\n"; //virtual devreye girer burası ekranda yazar
+}
+};
+
+int main()
+{
+Der myder;
+myder.foo();
+}
+
+-------------
+mülakatlarda sık sorulur
+!!ÖZEL DURUM
+//taban sınıf ctor içinde yapılan sanal fonksiyon çağrıları için
+virtual dispatch uygulanmaz
+
+class Base {
+
+public:
+
+void foo()
+{
+vfunc();
+Base::vfunc();//devreye girmez
+}
+
+/*~Base()
+{
+vfunc(); //yine devreye girmez
+}*/
+
+virtual void vfunc()
+{
+std::cout << "Base::vfunc()\n";
+}
+};
+
+class Der : public Base {
+public:
+virtual void vfunc()override
+{
+std::cout << "Der::vfunc()\n"; 
+};
+
+int main()
+{
+Der myder;
+}
+
+---------
+
+sanal fonksiyon mekanizmasının devreye girmediği yerler...
+
+1) çağrı taban sınıf nesnesi ile yapılıyor ise
+2) çağrı taban sınıf ctor içinde yapılıyorsa
+3) çağrı taban sınıf dtor içinde yapılıyorsa
 
 
 
