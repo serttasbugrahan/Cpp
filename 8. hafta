@@ -1484,6 +1484,7 @@ class Der : public Base {
 //base'in public fonksiyonları Der'in fonksiyonları olarak kullanılabilecek
 
 class Base {
+public:
 void foo();
 void bar();
 void baz();
@@ -1491,10 +1492,14 @@ void baz();
 
 class Der : public Base {
 public:
-Der myder;
-myder.foo();
+
 };
 
+int main()
+{
+Der myder;
+myder.foo();
+}
 ---------
 //Der'in içinde  Base vardır
 
@@ -1526,7 +1531,7 @@ kalıtım söz konusu olduğunda base object denir (inheritance)
 
 sınıfın private bölümü sadece kendisine açıktır
 
-class Baee {
+class Base {
 private:
 int mx;
 void foo();
@@ -1542,7 +1547,7 @@ void bar()
 {
 mx = 5;
 }
-}
+};
 
 
 -----------
@@ -1574,7 +1579,7 @@ void foo(double);
 //bu duruma name hidding denir
 
 int main()
-}
+{
 int x = 10;
 
 if (x > 5) {
@@ -1800,7 +1805,7 @@ m.foo(1); //private olan seçilir ancak erişim kontrolünden dolay hatalı olur
 class Base {
 
 public:
-void foo(int x)
+void foo(int x);
 
 void foo(double);
 };
@@ -1837,7 +1842,7 @@ daha kolay yolu vardır...
 class Base {
 
 public:
-void foo(int x)
+void foo(int x);
 void foo(double);
 };
 
