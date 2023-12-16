@@ -1,51 +1,5 @@
 //////////////////////////////////////////////////1. Ders//////////////////////////////////////////////////////
 
-class Car {
-public:
-virtual void start()
-{
-std::cout << "Car::start\n";
-}
-};
-
-
-class Volvo : public Car {
-void start()
-{
-std::cout << "Volvo::start\n";
-}
-};
-
-class Audi : public Car {
-void start()
-{
-std::cout << "Audi::start\n";
-}
-};
-
-class Renault : public Car {
-void start()
-{
-std::cout << "Renault::start\n";
-}
-};
-
-void car_game(Car* ptr)
-{
-ptr->start();
-}
-
-int main()
-{
-Audi a;
-Renault r;
-Volvo v;
-
-car_game(&a);
-car_game(&r);
-car_game(&v);
-}
-
 ---------------
 dynamic binding / late binding: hangi fonksiyonun çağrıldığı derleme zamanında değil çalışma zamanına bir kodun koşturulması ile anlaşılıyro ise
 
@@ -562,6 +516,7 @@ Der myder;
 gf(myder); //7
 
 myder.foo(); //999, der sınıfının foo'nunun varsayılan argümanıyla çağrılır
+
 }
 
 ---------------
@@ -682,6 +637,7 @@ public:
 virtual void vfunc()override
 {
 std::cout << "Der::vfunc()\n"; 
+}
 };
 
 int main()
