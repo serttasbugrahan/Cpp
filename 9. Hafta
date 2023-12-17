@@ -853,6 +853,284 @@ her sanal fonlsiyon çağrısı için virtual dispatch uygulanmayabilir
 compiler optimization dan dolayı
 devirtualization
 
+--------------------------------------------------
+
+sınıf içinde yapılan using bildirimlerine devam...
+
+using bildiriminin kullanıldığı yerlerden biri de taban sınıftaki bir ismi türemiş sınıfta görünür kılmak
+
+class Base {
+public:
+void func(int);
+void func(long);
+};
+
+class Der : public Base {
+public:
+using Base::func;
+void func(int x) //using sayesinde bu yapıya gerek kalmaz
+{
+Base::func(x);
+}
+void func(double);
+};
+
+int main()
+{
+Der myder;
+myder.func(12);
+}
+
+
+-----------
+protected'ı clientlar çağıramaz, ancak türemiş sınıf çağırabilir
+
+class Base {
+public:
+protected:
+void func(int);
+};
+
+class Der : public Base {
+public:
+using Base::func; //bu şkiled protected içindeki kullanılır
+};
+
+int main()
+{
+Der myder;
+myder.func(12);
+}
+
+-----------
+
+class Base {
+public:
+protected:
+private:
+void func(int);
+};
+
+class Der : public Base {
+public:
+using Base:func; //gecersiz
+};
+
+int main()
+{
+Der myder;
+}
+
+-----------
+
+class Base {
+public:
+void func(int x)
+{
+std::cout <<"Base::func\n";
+}
+private:
+};
+
+class Der : public Base {
+public:
+void func(int x)
+{
+std::cout <<"Der::func\n";
+}
+
+};
+
+int main()
+{
+Der myder;
+myder.func(12); //türemiş sınıf çağrılır
+myder.Base::func(12); //base çağrılır
+}
+
+----------------
+!!kalıtım neden yaparız:
+taban sınıf interface ile aynı interface sahip bir sınıf oluşturmak istiyoruz
+ancak bazı eklemelerde yapmak istiyoruz bunu yapmanın tipik yolu kalıtımdır
+--------------
+
+modern cpp öncesi taban sınıfın ctor için using kullanılmıyordu
+artık kullanılıyır buna inherited ctor denir.
+			--------------
+------
+
+class Base {
+public:
+//protected olsaydı geçerli olmıycaktı
+Base(int);
+Base(int,int);
+
+void f1();
+void f2();
+void f3();
+private:
+};
+
+class Der : Base {
+public:
+Der(int x, int y) : Base(x, y) {}; //eskiden bu şekilde yapılırdı
+using Base:Base; //modern cpp(cpp11) ile bu geldi, //inheritance ctor
+void bar();
+void foo();
+
+};
+
+int main()
+{
+Base mybase(12);
+Base mybase(1, 2);
+Der myder(13); //inheritance ctor
+Der myder(1,3);
+
+
+}
+
+--------------------------------------------
+
+coveriance / variant return type :
+---------------------------------
+
+taban sınıfın sanal fonksiyonunu override edebilmemiz için taban sınıfın sanal fonksiyonu ile
+aynı imzaya sahip aynı geri dönüş değeri türüne sahip olmalıdır
+
+covariance : diyelim ki taban sınıfın sanal fonksiyonunun geri dönüş türü
+
+class B {}
+class D : public B {}
+
+class Base {
+public:
+virtual B* foo();
+virtual B& bar();
+virtual B baz(); //bu şekilde olmaz
+}
+
+class Der : public Base {
+public:
+D *foo()override;
+D& bar()override;
+D baz()override; //hata
+};
+
+int main()
+{
+D* dp = myder.foo();
+auto dp2 = myder.foo();
+}
+//YUKARIDAKİ DURUMUA COVARİANCE DENİR BU İSTİSNADIR
+//pointer ve referans türü ile olmalıdır
+
+---------------------------------
+önümüzde ki konular...
+
+multiple inheritance
+private inheritance
+protected inheritance
+RTTI runtime type information
+
+----------------------
+//aşağıdaki kısmın bize faydaları nedir, araştır
+
+NVI (non-virtual interface)
+
+class Base {
+public:
+void foo(int x)
+{
+vfoo(x);
+}
+private:
+virtual void foo(int);
+};
+
+class Der : public Base {
+public:
+void vfoo(int) override;
+};
+
+------------------------------------
+
+final contexture keyword:
+-------------------------
+
+void final(int final, int override
+{
+
+}
+int main()
+{
+int final = 12;
+int override = 23;
+
+final += override;
+
+::final(final, override);
+}
+
+----------
+
+final 2 ayrı yerde kullanılır
+1) final class
+2) final override
+
+kalıtımın daha fazla yapılmamaıs için yapılan bir yönetdir
+eskiden yorum satırı olarak yapılmaması gerektiği söylenirdi
+
+class Myclass {
+//bu sınıftan kalitim yapmayın
+};
+
+class Der final : public Base { //der sınıfından kalıtım yapılması hata olur
+
+};
+
+class NecDer : public Der {
+
+};
+
+---------
+
+artık türemiş sınıflar tarafından override edilmesin
+
+class Base {
+vitual void func();
+};
+
+class Der : public Base {
+public:
+void func()override final; // yerleri değişik olabilir
+};
+
+class Mer : public Der {
+public:
+void func()override; //hata
+};
+
+
+-------------------------------
+
+int main()
+{
+using namespace std;
+
+std::vector<Car*> carvec;
+
+for (int i = 0; i < 1000; ++i) {
+carvec.push_back(create_random_car());
+}
+//range-based for loop
+for (auto p : carvec) {
+cout << *p << "\n";
+p->start();
+(void)getchar();
+}
+}
+
 
 
 
