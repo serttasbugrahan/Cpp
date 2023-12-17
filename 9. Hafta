@@ -652,6 +652,208 @@ sanal fonksiyon mekanizmasının devreye girmediği yerler...
 1) çağrı taban sınıf nesnesi ile yapılıyor ise
 2) çağrı taban sınıf ctor içinde yapılıyorsa
 3) çağrı taban sınıf dtor içinde yapılıyorsa
+4) çağrı taban sınıf çzünürlük operatörü ile yapılıyorsa
+
+-------
+
+class Base {
+public:
+virtual void func();
+};
+
+class Der : public Base {
+public:
+virtual void func()override
+{
+Base::func();
+}
+
+};
+
+///////////////////////////////////////////////////2. Ders///////////////////////////////////////////////////
+
+class Base {
+public:
+~Base()
+{
+std::cout << "Base dtor\n";
+}
+};
+
+class Der : public Base {
+public:
+~Der()
+{
+std::cout << "Der dtor\n";
+}
+};
+
+int main()
+{
+Base *p = new Der;
+delete p;
+}
+
+//derleyici dtor'un virtual olmaması durumunda p'nin static türüne bakıcak
+ve bunun base* olduğunu gördüğü için base sınıfının dtor'unu çağırıcak
+
+
+//taban sınıf pointerı türemiş sınıf türünden dinamik ömürlü bir nesneyi gösteriyor ise
+taban sınıfın dtoru virtual değil ise tababn sınıfn pointerını bu şekilde delete etmek
+sadece taban sınıfın dtor çağrılmasını sağlıycak dolayısıyla tanımısız davranış olucak
+
+--------------
+//olması gerektiği gibi çalışır
+
+class Base {
+public:
+//virtual dtor
+virtual ~Base()
+{
+std::cout << "Base dtor\n";
+}
+};
+
+class Der : public Base {
+public:
+~Der()
+{
+std::cout << "Der dtor\n";
+}
+};
+
+int main()
+{
+Base *p = new Der;
+delete p;
+}
+
+-----------
+mülakatlarda çıkar
+
+!! polimorfik sınıfların dtor'ları ya public virtual ya da
+protected non-virtual olmalı
+
+//türemiş sınıf taban sınıfın protected bölümüne erişebilir
+
+
+class Base {
+public:
+
+protected:
+~Base()
+{
+std::cout << "Base dtor\n";
+}
+};
+
+class Der : public Base {
+public:
+~Der()
+{
+std::cout << "Der dtor\n";
+}
+};
+
+int main()
+{
+//Der myder; hata olmaz
+
+Base* p = new Der; 
+delete p; //hata
+
+}
+
+
+---------------
+
+//bu kısım car_3.h'da
+
+--------------
+
+!! virtual dispatch heryerde kullanamk mantıklı olmayabilir bunun yerine aşağıdakiler kullanılabilinir
+
+type erasure
+std::variant
+CRTP (curiously recurring template pattern)
+
+-------------
+virtual arka planda nasıl çalışır
+-----------------------------------
+
+//polimorfic olunca 4 byte artar, pointe sizeof'undan dolayı
+
+class Base {
+virtual ~Base
+int x{};
+int y{};
+virtual void f1(){};
+//virtual void f1(){}; normalde fonksiyonlar yer kaplamaz ancak virtualla kaplar
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+std::cout << "sizeof(Base) = " << sizeof(Base) << "\n";
+
+}
+
+----
+
+sanal fonksiyon tablosu
+virtual function table
+it is a data structure
+
+her sınıf için bir sanal fonksiyon tablosu vardır
+index ile fonksiyon adreslerine erişebileceğimiz bir veri yapısı demektir
+
+virtual function table for class Audi
+------------------------------------
+0
+-----------------------------------
+1			&Audi::start
+2			&Audi::run
+3			&Audi::stop
+
+virtual function table for class Mercedes
+------------------------------------
+0
+-----------------------------------
+1			&Mercedes::start
+2			&Mercedes::run
+3			&Mercedes::stop
+
+
+void car_game(Car* p)
+{
+p->run();
+p->vptr[2]() //bu şekilde derleyici yazar
+}
+
+her türemiş sınıf nesnesi oluşturulduğunda vptr init edilecek
+
+sanal fonksiyon tablosu her sınıf için oluşturulcak
+
+-----
+
+görünmeyen maliyet kalemler:
+
+otomotik ömürlü nesneden güzeli yok!
+dinamik ömürlüde ağır işlemler gerçekleşiyor
+
+mülakatların klasik sorusudur
+run time polimorfizim ne şekilde 
+virtual dispatch ne şekilde implemente edilir ve hangi maaliyetlerin söz konusu olduğu
+
+
+her sanal fonlsiyon çağrısı için virtual dispatch uygulanmayabilir
+compiler optimization dan dolayı
+devirtualization
+
+
 
 
 
