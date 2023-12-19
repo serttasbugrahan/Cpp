@@ -1969,10 +1969,229 @@ int main()
 Mder md;
 
 Base* p = &md; //hata
+md.foo(); //hata olur çünkü çağrılması için base pointerı gerekiyor ama md nesnesinin içinde 2 tane base nesnesi var
+md::DerX.foo();
+md::DerY.foo();
 
 }
 
 
+---------
+
+class Base {
+public:
+void foo();
+};
+
+class DerX : public Base {
+
+};
+
+class DerY : public Base {
+
+};
+
+class MDer : public DerX, public DerY {
+
+void func()
+{
+foo(); //hata
+DerX::foo(); //legal
+DerY::foo();
+}
+};
+
+void func(Base&);
+
+int main()
+{
+
+}
+
+---------------
+
+class Edevice {
+public:
+
+void turn_on()
+{
+m_flag = true;
+}
+
+void turn_off()
+{
+m_flag = true;
+}
+
+bool is_open()const
+{
+return m_flag;
+}
+
+private:
+bool m_falg {};
+};
+
+class Printer : public EDevice {
+public:
+void print()
+{
+if (is_on()) {
+std::cout << "printer is printing..."
+}
+else {
+std::cout << "printer connot print device is off...\n";
+}
+}
+};
+
+class Scanner : public EDevice {
+public:
+void scan()
+{
+if (is_on()) {
+std::cout << "scanner is scanning...n";
+}
+else {
+std::cout << "printer connot print device is off...n";
+}
+}
+};
+
+class Combo : public Scanner, public Printer {
+
+};
+
+int main()
+{
+Combo mydevice;
+mydevice.turn_on(); //hata çünkü combo içinde 2 tane edevice var
+
+mydevice.Printer::turnon();
+
+mydevice.print();
+mydevice.scan();
+}
+
+//doğru çalışmıyor, virtual kullanmamız lazım
+
+--------------------
+!! eğer 2 tane taban sınıfın ortak bir taban sınıfı var ise 
+eğer bunları daha sonra çoklu kalıtımda kullanıcak isek her 2 sınıfda virtual inheritance ile elde etmemiz lazım
+
+class Edevice {
+public:
+
+void turn_on()
+{
+m_flag = true;
+}
+
+void turn_off()
+{
+m_flag = true;
+}
+
+bool is_open()const
+{
+return m_flag;
+}
+
+private:
+bool m_falg {};
+};
+
+class Printer : virtual public EDevice {
+public:
+void print()
+{
+if (is_on()) {
+std::cout << "printer is printing..."
+}
+else {
+std::cout << "printer connot print device is off...\n";
+}
+}
+};
+
+class Scanner : virtual public EDevice {
+public:
+void scan()
+{
+if (is_on()) {
+std::cout << "scanner is scanning...n";
+}
+else {
+std::cout << "printer connot print device is off...n";
+}
+}
+};
+
+class Combo : public Scanner, public Printer {
+
+};
+
+int main()
+{
+Combo mydevice;
+
+mydevice.turn_on();
+
+mydevice.print();
+mydevice.scan();
+
+mydevice.turn_off();
+mydevice.print();
+mydevice.scan();
+}
+
+--------------------
+
+mülakatlarda elmas formasyonunu sorarlar, açıklamanızı isterler
+virtual inheritance sorarlar, isim aramaya ilişkin sorarlar
+
+----------------------
+
+class A {
+public:
+A(int);
+};
+
+struct B : A {
+
+};
+
+struct C : B {
+public:
+C() : A(12) {} //NORMALDE BU HATA, ancak virtaul inheritance'da bunu yapmamız gerekicek
+};
+
+---------------
+
+class Base {
+public:
+Base(int x)
+{
+std::cout << "Base(const char *p) p = "<< p << '\n';
+}
+};
+
+class Der1 : virtual public Base {
+public:
+Der1(int) : Base("Der1\n") {};
+};
+
+class Der2 : virtual public Base {
+public:
+Der2(int) : Base("Der2\n") {};
+};
+
+class MulDer : public Der1, public Der2 {
+public:
+Mulder() : 
+};
+
+2.22
 
 
 
