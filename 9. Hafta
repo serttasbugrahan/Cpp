@@ -1081,7 +1081,7 @@ final 2 ayrı yerde kullanılır
 kalıtımın daha fazla yapılmamaıs için yapılan bir yönetdir
 eskiden yorum satırı olarak yapılmaması gerektiği söylenirdi
 
-class Myclass {
+class Base {
 //bu sınıftan kalitim yapmayın
 };
 
@@ -1098,7 +1098,7 @@ class NecDer : public Der {
 artık türemiş sınıflar tarafından override edilmesin
 
 class Base {
-vitual void func();
+virtual void func();
 };
 
 class Der : public Base {
