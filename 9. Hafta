@@ -1133,6 +1133,15 @@ p->start();
 
 //////////////////////////////////////////3. Ders////////////////////////////////////////////
 
+üretimde 
+%80 public 
+% 15 private
+%5 protected kullanılır
+
+
+private kalıtımı:
+----------------
+
 !! türemiş sınıfın implementasyonu taban sınıfın public bölümündeki öğelere erişemez
 
 class Base {
@@ -1148,8 +1157,8 @@ foo();
 };
 
 ----------------
+!! foo bar fonksiyonları der sınıfının private interface'ine eklenir,
 
-!! foo bar fonksiyonları der sınıfının private interface'ine eklenir
 class Base {
 public:
 void foo();
@@ -1166,6 +1175,803 @@ Der myder;
 myder.foo();
 }
 ---------------
+
+!! protected olsa da private'a eklenir
+
+class Base {
+public:
+void foo();
+void bar();
+
+protected:
+void pro_func();
+};
+
+class Der : private Base {
+
+};
+
+class NecDer : public Der {
+void baz()
+{
+pro_func();
+}
+};
+
+
+------------
+!! türemiş sınıf nesnesi taban sınıf türünden kabul edilmiyor
+
+class Base {
+public:
+};
+
+class Der : private Base {
+
+};
+
+int main()
+{
+Der myder;
+Base* p = &myder; //hata olur
+Base&p = myder; //hata olur
+
+}
+
+---------------
+
+class Base {
+public:
+};
+
+class Der : private Base {
+public:
+void gf();
+friend void gf();
+
+void foo()
+{
+Der myder;
+Base* p = &myder; //legal olur
+}
+};
+
+void gf()
+{
+Der myder;
+Base* p = &myder //friendleri içinde legal olur
+}
+
+
+------------------
+
+türemiş sınıf nesnesinin içinde taban sınıf nesnesi var
+private, public veya protected olması burada önemli değil  her zmana vardır
+
+-------------------
+
+class Base {
+public:
+virtual void vfunc();
+};
+
+class Der : private Base {
+public:
+void vfunc()override; //legal
+};
+
+-------------------
+
+private inheritance containement için (composition)
+bir alternatif oluşturur
+
+class X1 {
+public:
+
+};
+
+class Y1 { //Y1 içinde X1 vardır
+private:
+X1 mx; //member object
+};
+
+----------
+
+class X2 {
+
+};
+
+class Y2 : private X2 { //Y2 içinde X2 vardır, base class object
+
+};
+
+
+--------------------
+yukarıdaki 2 yapı arasındaki farkları inceliyoruz...
+
+class X1 {
+protected:
+void foo();
+public:
+};
+
+class Y1 { 
+public:
+void bar()
+{
+mx.foo(); //erişim hatası
+}
+
+private:
+X1 mx;
+};
+
+-----
+
+class X2 {
+public:
+void foo();
+};
+
+class Y2 : private X2 { 
+public:
+using X2::foo();
+void foo() //bu şekilde de yapılır
+{
+X2::foo();
+}
+};
+
+---
+
+class X2 {
+protected:
+void foo();
+};
+
+class Y2 : private X2 { 
+public:
+void bar()
+{
+foo(); //legal
+}
+};
+
+----
+
+class X2 {
+protected:
+virtual void foo();
+};
+
+class Y2 : private X2 { 
+public:
+void foo()override;
+};
+
+-------------------
+
+containment mı yoksa private inheritance mı?
+genel olarak containment seçilir, containment yapamadığımız durumlarda private kullanılır bu durumlar...
+
+1) elemanımın sınıfının sanal fonksiyonunu (doğrudan) override edemem
+ancak private taban sınıfımın sanal fonksiyonlarını override edebilirim
+
+2) elemanımın protected bölümüne erişemem ancak private taban sınıfının
+protected bölümüne erişebilirim
+
+3)bir sınıf nesnesi elemanının türünden değildir
+ancak türemiş sınfın üye fonksiyonları içnde ve türemiş sınfın friendleri için
+is a relationship var
+
+4) eğer sınıfımızın bir elemanı empty class türünden ise 
+bu sınıfın 1 byte olan storage ihtiyacı
+alignment gereği sınıf nesnesinin içinde padding bytes oluşturabilir
+
+ancak empty class'tan private kalıtımı yaparsak 
+derleyiciler EBO denilen opt. yapabilir
+
+
+--------
+
+
+class X {
+
+};
+
+class Y {
+X mx;
+};
+
+int main()
+{
+Y y;
+X *p = &y; //bunu diyemem
+}
+
+--------
+
+class X {
+
+};
+
+class Y : private X{ private
+void foo()
+{
+Y y;
+X *p = &y; //böyle diyebilirim
+}
+};
+
+int main()
+{
+
+}
+
+--------------------
+
+class X {
+
+};
+
+class Y {
+X x1; 
+X x2; //mümkün değil, 
+};
+
+//aynı taban sınıfdan 2 kere kalıtım yapamam
+
+class Base {
+
+};
+
+class Der : Base, Base {
+
+};
+
+--------------------
+
+class Empty {
+void foo();
+void bar();
+};
+
+class Nec {
+
+Empty member;
+int mx;
+};
+
+int main()
+{
+std::cout << "sizeof(Empty) = " << sizeof(Empty) << "\n";
+std::cout << "sizeof(Empty) = " << sizeof(Nec) << "\n"; //hizalamadan dolayı 8 olur 4n katlarından dolay
+}
+
+--------------
+
+EBO
+----
+
+class Empty {
+void foo();
+void bar();
+};
+
+class Nec : private Empty{
+int mx;
+};
+
+int main()
+{
+std::cout << "sizeof(Empty) = " << sizeof(Empty) << "\n";
+std::cout << "sizeof(Empty) = " << sizeof(Nec) << "\n"; //hizalamadan dolayı 8 olur 4n katlarından dolay
+}
+
+-------------
+
+Herb sutter tarafından tanıtılan bir kullanım 
+bu örüntüye restricted polymporphism deniyor, 
+
+//çok kullanılan bir yapı değil ancak mülakatlarda private ile alakalı soru sorulursa araya sıkştır
+
+class Base {
+public:
+virtual void vfunc();
+
+};
+
+void foo(Base& baseref)
+{
+baseref.vfunc();
+}
+
+//f1, f2, f3 fonksiyonlarımız olucak bunların bazılarına haklar vericek
+
+class Der : public Base {
+friend void f1(); //f2, f3 yazarsak onlar kullanılır
+};
+
+void f1()
+{
+Der myder;
+foo(myder);
+}
+
+void f2()
+{
+Der myder;
+foo(myder);
+}
+
+void f3()
+{
+Der myder;
+foo(myder);
+}
+
+
+------------------------------------------------------
+
+protected kalıtımı:
+-------------------
+
+private'dan farkı yoktur,
+multi level inheritancelarda kullanılır
+
+class Base {
+public:
+void foo();
+};
+
+class Der : private Base {
+
+};
+
+class Nec : public Der {
+void necbar()
+{
+foo(); //Hata, protected kalıtımı olsa idi legal olucaktı
+}
+};
+
+
+-----------------------------------------------------------------
+//mülakatlarda bolca sorulur
+
+Multiple inheritance:
+---------------------
+
+Bir sınıfı oluştururken birden fazla taban sınıf oluşturabiliyoruz
+
+bir sınıfın birden fazla taban sınıftan tek bir türetme ile oluşturulması
+
+
+multi -level için geçerli olan çoğu şey bunun için de geçerlidir
+
+sentaxı:
+--------
+
+class Base1 {
+
+};
+
+class Base2 {
+
+};
+
+class Der : public Base1, Base2 { //Base1, public - Base2 private olur
+
+};
+
+--------
+
+class Base1 {
+public:
+void foo();	
+};
+
+class Base2 {
+public:
+void bar();
+};
+
+class Der : public Base1, public Base2 { 
+
+};
+
+int main()
+{
+Der myder;
+
+myder.foo();
+myder.bar();
+Base1* p1 = &myder; //ref içinde geçerli
+Base2* p2 = &myder;
+
+}
+
+------------
+
+class Base1 {
+public:
+int mx;
+};
+
+class Base2 {
+public:
+int my;
+};
+
+class Der : public Base1, public Base2 { 
+
+};
+
+int main()
+{
+std::cout << "sizeof(Der) = " << sizeof(Der) << "\n";
+
+}
+
+-----------
+
+class Base1 {
+public:
+Base1()
+{
+std::cout << "Base1 ctor\n";
+}
+};
+
+class Base2 {
+public:
+Base2()
+{
+std::cout << "Base2 ctor\n";
+}
+};
+
+class Der : public Base1, public Base2 { 
+public:
+Der() : Base2(2), Base1(1) {} //yukarıdaki sıra geçerlidir
+};
+
+int main()
+{
+Der myder; //sırlamayı inheritanceda'ki sıra belirler (Base1, Base2)
+}
+
+------------
+
+class Base1 {
+public:
+Base1()
+{
+std::cout << "Base1 ctor\n";
+}
+};
+
+class Base2 {
+public:
+Base2()
+{
+std::cout << "Base2 ctor\n";
+}
+};
+
+class Der : public Base1, public Base2 { 
+public:
+Der() : Base2(2), Base1(1) {} //yukarıdaki sıra geçerlidir
+};
+
+void foo(Base1&);
+void bar(Base2&);
+
+int main()
+{
+Der myder;
+foo(myder);
+bar(myder);
+
+
+}
+
+-----------
+
+class Base1 {
+public:
+Base1()
+{
+std::cout << "Base1 ctor\n";
+}
+};
+
+class Base2 {
+public:
+Base2()
+{
+std::cout << "Base2 ctor\n";
+}
+};
+
+class Der : public Base1, public Base2 { 
+public:
+Der() : Base2(2), Base1(1) {} //yukarıdaki sıra geçerlidir
+};
+
+void foo(Base1&);
+void foo(Base2&);
+
+int main()
+{
+Der myder;
+foo(myder); //ambigidous
+
+}
+
+-------------
+
+class Base1 {
+public:
+};
+
+class Base2 {
+public:
+};
+
+class Der : public Base1, public Base2 { 
+public:
+};
+
+void foo(Base1&)
+{
+std::cout <<" Base1&\n";
+}
+
+void foo(Base2&)
+{
+std::cout <<" Base2&\n";
+
+}
+
+int main()
+{
+Der myder;
+
+foo(static_cast<Base1&>(myder));
+foo(static_cast<Base2&>(myder));
+
+}
+
+---------------
+
+class Base1 {
+public:
+void foo(double);
+};
+
+class Base2 {
+public:
+void foo(int);
+};
+
+class Der : public Base1, public Base2 { 
+public:
+
+void bar()
+{
+foo(12.3); //her 2 sınıfta da aranır,
+foo(10); //her 2 sınıfta da aranır
+
+}
+};
+
+----------------
+
+class Base1 {
+public:
+int foo(double dval)
+{
+std::cout << "Base1::foo(double) dval = " << dval << '\n';
+}
+};
+
+class Base2 {
+public:
+int foo(double dval)
+{
+std::cout << "Base2::foo(double) dval = " << dval << '\n';
+}
+};
+
+class Der : public Base1, public Base2{
+public:
+void bar()
+{
+Base1::foo(1.2);
+Base2::foo(67);
+}
+};
+
+int main()
+{
+Der myder;
+myder.bar();
+myder.foo(12); //hata
+myder.Base1::foo(12); //legal
+myder.Base2::foo(1.2); //legal
+}
+
+-----------
+
+class Person {
+
+};
+
+class Employee {
+
+};
+
+class Teacher : public Person, public Employee {
+
+};
+
+-----------
+
+class A {
+virtual void bar();
+};
+
+class B {
+virtual void foo();
+};
+
+class C : public A, public B {
+void bar()override;
+void foo()override;
+};
+
+-----------
+
+class InputStream {
+public:
+void read(int&);
+};
+
+class OutputStream {
+void write(int);
+};
+
+class InOutStream : public InputStream, public OutputStream {
+
+};
+
+int main()
+{
+InOutStream stream;
+
+int x{};
+stream.read(x);
+stream.write(12);
+
+}
+
+----------------
+
+//mülakatlarda bunun üstüne giderler
+
+DDD / dreadful diomand of derivation / deatful diomand of derivation
+
+class Stream {
+
+};
+
+class InputStream : public Stream {
+public:
+void read(int&);
+};
+
+class OutputStream : public Stream {
+public:
+void write(int);
+};
+
+class InOutStream : public InputStream, public OutputStream {
+
+};
+
+int main()
+{
+InOutStream stream; //2 tane stream var 
+
+int x{};
+stream.read(x);
+stream.write(12);
+
+}
+
+---------------------
+
+1 tane stream olmasını virtual inheritance (sanal kalıtım) ile sağlarız
+
+class Base {
+int x{ 0 };
+};
+
+class DerX : public Base {
+
+};
+
+class DerY : public Base {
+
+};
+
+class MDer : public DerX, public DerY {}; //2 tane ayrı base nesnesi olucak
+
+int main()
+{
+std::cout << "sizeof(Base) = " << sizeof(Base) << "\n";
+std::cout << "sizeof(Base) = " << sizeof(DerX) << "\n";
+std::cout << "sizeof(Base) = " << sizeof(DerY) << "\n";
+
+}
+
+----------
+// bu yapı compile time da ve run time da problemle oluşturur
+class Base {
+public:
+void func()
+{
+std::cout << "this = " << this << "\n";
+}
+};
+
+class DerX : public Base {
+
+};
+
+class DerY : public Base {
+
+};
+
+class MDer : public DerX, public DerY {
+
+}
+
+int main()
+{
+MDer md;
+md.DerX::func();
+md.DerY::func();
+}
+
+------------
+
+class Base {
+public:
+void foo();
+};
+
+class DerX : public Base {
+
+};
+
+class DerY : public Base {
+
+};
+
+class MDer : public DerX, public DerY {
+
+};
+
+int main()
+{
+Mder md;
+
+Base* p = &md; //hata
+
+}
+
 
 
 
