@@ -1131,6 +1131,42 @@ p->start();
 }
 }
 
+//////////////////////////////////////////3. Ders////////////////////////////////////////////
+
+!! türemiş sınıfın implementasyonu taban sınıfın public bölümündeki öğelere erişemez
+
+class Base {
+private:
+void foo();
+};
+
+class Der : private Base {
+void func()
+{
+foo();
+}
+};
+
+----------------
+
+!! foo bar fonksiyonları der sınıfının private interface'ine eklenir
+class Base {
+public:
+void foo();
+void bar();
+};
+
+class Der : private Base {
+
+};
+
+int main()
+{
+Der myder;
+myder.foo();
+}
+---------------
+
 
 
 
