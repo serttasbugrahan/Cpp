@@ -1472,7 +1472,7 @@ std::cout << "sizeof(Empty) = " << sizeof(Nec) << "\n"; //hizalamadan dolayı 8 
 Herb sutter tarafından tanıtılan bir kullanım 
 bu örüntüye restricted polymporphism deniyor, 
 
-//çok kullanılan bir yapı değil ancak mülakatlarda private ile alakalı soru sorulursa araya sıkştır
+//çok kullanılan bir yapı değil ancak mülakatlarda private ile alakalı soru sorulursa araya sıkıştır diyor necati hoca
 
 class Base {
 public:
@@ -1616,7 +1616,7 @@ std::cout << "sizeof(Der) = " << sizeof(Der) << "\n";
 
 class Base1 {
 public:
-Base1()
+Base1(int)
 {
 std::cout << "Base1 ctor\n";
 }
@@ -1624,7 +1624,7 @@ std::cout << "Base1 ctor\n";
 
 class Base2 {
 public:
-Base2()
+Base2(int)
 {
 std::cout << "Base2 ctor\n";
 }
@@ -1644,7 +1644,7 @@ Der myder; //sırlamayı inheritanceda'ki sıra belirler (Base1, Base2)
 
 class Base1 {
 public:
-Base1()
+Base1(int)
 {
 std::cout << "Base1 ctor\n";
 }
@@ -1652,7 +1652,7 @@ std::cout << "Base1 ctor\n";
 
 class Base2 {
 public:
-Base2()
+Base2(int)
 {
 std::cout << "Base2 ctor\n";
 }
@@ -1679,7 +1679,7 @@ bar(myder);
 
 class Base1 {
 public:
-Base1()
+Base1(int)
 {
 std::cout << "Base1 ctor\n";
 }
@@ -1687,7 +1687,7 @@ std::cout << "Base1 ctor\n";
 
 class Base2 {
 public:
-Base2()
+Base2(int)
 {
 std::cout << "Base2 ctor\n";
 }
