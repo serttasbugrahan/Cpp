@@ -1239,7 +1239,7 @@ Base* p = &myder; //legal olur
 void gf()
 {
 Der myder;
-Base* p = &myder //friendleri içinde legal olur
+Base* p = &myder; //friendleri içinde legal olur
 }
 
 
@@ -1317,7 +1317,7 @@ class Y2 : private X2 {
 public:
 using X2::foo();
 void foo() //bu şekilde de yapılır
-{
+{ 
 X2::foo();
 }
 };
@@ -1373,7 +1373,6 @@ derleyiciler EBO denilen opt. yapabilir
 
 
 --------
-
 
 class X {
 
@@ -1468,7 +1467,7 @@ std::cout << "sizeof(Empty) = " << sizeof(Empty) << "\n";
 std::cout << "sizeof(Empty) = " << sizeof(Nec) << "\n"; //hizalamadan dolayı 8 olur 4n katlarından dolay
 }
 
--------------
+--------------------------------------------
 
 Herb sutter tarafından tanıtılan bir kullanım 
 bu örüntüye restricted polymporphism deniyor, 
