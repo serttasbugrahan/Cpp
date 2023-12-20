@@ -2009,67 +2009,75 @@ int main()
 
 ---------------
 
-class Edevice {
+#include <iostream>
+
+class EDevice
+{
 public:
+    void turn_on()
+    {
+        m_flag = true;
+    }
 
-void turn_on()
-{
-m_flag = true;
-}
+    void turn_off()
+    {
+        m_flag = true;
+    }
 
-void turn_off()
-{
-m_flag = true;
-}
-
-bool is_open()const
-{
-return m_flag;
-}
+    bool is_open() const
+    {
+        return m_flag;
+    }
 
 private:
-bool m_falg {};
+    bool m_flag{};
 };
 
-class Printer : public EDevice {
-public:
-void print()
+class Printer : public EDevice
 {
-if (is_on()) {
-std::cout << "printer is printing..."
-}
-else {
-std::cout << "printer connot print device is off...\n";
-}
-}
-};
-
-class Scanner : public EDevice {
 public:
-void scan()
-{
-if (is_on()) {
-std::cout << "scanner is scanning...n";
-}
-else {
-std::cout << "printer connot print device is off...n";
-}
-}
+    void print()
+    {
+        if (is_open())
+        {
+            std::cout << "printer is printing...\n";
+        }
+        else
+        {
+            std::cout << "printer connot print device is off...\n";
+        }
+    }
 };
 
-class Combo : public Scanner, public Printer {
+class Scanner : public EDevice
+{
+public:
+    void scan()
+    {
+        if (is_open())
+        {
+            std::cout << "scanner is scanning...n";
+        }
+        else
+        {
+            std::cout << "printer connot print device is off...n";
+        }
+    }
+};
 
+class Combo : public Scanner, public Printer
+{
 };
 
 int main()
 {
-Combo mydevice;
-mydevice.turn_on(); //hata çünkü combo içinde 2 tane edevice var
+    Combo mydevice;
+    mydevice.turn_on(); // hata çünkü combo içinde 2 tane edevice var
 
-mydevice.Printer::turnon();
+    mydevice.Printer::turn_on();
 
-mydevice.print();
-mydevice.scan();
+    mydevice.print();
+    mydevice.scan();
 }
 
 //doğru çalışmıyor, virtual kullanmamız lazım
@@ -2078,71 +2086,77 @@ mydevice.scan();
 !! eğer 2 tane taban sınıfın ortak bir taban sınıfı var ise 
 eğer bunları daha sonra çoklu kalıtımda kullanıcak isek her 2 sınıfda virtual inheritance ile elde etmemiz lazım
 
-class Edevice {
+class EDevice
+{
 public:
+    void turn_on()
+    {
+        m_flag = true;
+    }
 
-void turn_on()
-{
-m_flag = true;
-}
+    void turn_off()
+    {
+        m_flag = false;
+    }
 
-void turn_off()
-{
-m_flag = true;
-}
-
-bool is_open()const
-{
-return m_flag;
-}
+    bool is_open() const
+    {
+        return m_flag;
+    }
 
 private:
-bool m_falg {};
+    bool m_flag{};
 };
 
-class Printer : virtual public EDevice {
-public:
-void print()
+class Printer : virtual public EDevice
 {
-if (is_on()) {
-std::cout << "printer is printing..."
-}
-else {
-std::cout << "printer connot print device is off...\n";
-}
-}
-};
-
-class Scanner : virtual public EDevice {
 public:
-void scan()
-{
-if (is_on()) {
-std::cout << "scanner is scanning...n";
-}
-else {
-std::cout << "printer connot print device is off...n";
-}
-}
+    void print()
+    {
+        if (is_open())
+        {
+            std::cout << "printer is printing...\n";
+        }
+        else
+        {
+            std::cout << "printer connot print device is off...\n";
+        }
+    }
 };
 
-class Combo : public Scanner, public Printer {
+class Scanner : virtual public EDevice
+{
+public:
+    void scan()
+    {
+        if (is_open())
+        {
+            std::cout << "scanner is scanning...\n";
+        }
+        else
+        {
+            std::cout << "printer connot print device is off...\n";
+        }
+    }
+};
 
+class Combo : public Scanner, public Printer
+{
 };
 
 int main()
 {
-Combo mydevice;
+    Combo mydevice;
 
-mydevice.turn_on();
+    mydevice.turn_on();
+    mydevice.print();
+    mydevice.scan();
 
-mydevice.print();
-mydevice.scan();
-
-mydevice.turn_off();
-mydevice.print();
-mydevice.scan();
+    mydevice.turn_off();
+    mydevice.print();
+    mydevice.scan();
 }
+
 
 --------------------
 
