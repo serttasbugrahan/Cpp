@@ -2176,22 +2176,57 @@ std::cout << "Base(const char *p) p = "<< p << '\n';
 }
 };
 
-class Der1 : virtual public Base {
+class Der1 : virtual public Base { //der 1 sınıfı base sınıfından kalıtım yoluyla elde edildi
 public:
 Der1(int) : Base("Der1\n") {};
 };
 
-class Der2 : virtual public Base {
+class Der2 : virtual public Base { //der 2 sınfı base sınıfında  kalıtım yoluyla elde edildi
 public:
 Der2(int) : Base("Der2\n") {};
 };
 
-class MulDer : public Der1, public Der2 {
+class MulDer : public Der1, public Der2 { //MulDer sınıfı Der1 ve Der2 sınıfından kalıtım yolula elde edildi
 public:
-Mulder() : 
+Mulder() : Der1(1), Der2(2) {}; //hata
+Mulder() : Base("Mulder"), Der1(1), Der2(2) {}; //legal
+
 };
 
-2.22
+class Nec : public Mulder {
+public:
+Nec() : Base("Nec");
+};
+
+int main()
+{
+//Mulder md;
+//Der1 d2(1);
+Nec e;
+}
+
+----------------------------------------------------------
+
+RTTI (run time time information):
+---------------------------------
+
+run time da türün belirlenmesine yönelik
+cpp ın araç seti var. Bu araç setind 2 tna operator var
+bunlar dinamik ömürlü nesnenin türünün öğrenilmesini sğlar
+
+dynamic_cast
+typeid 
+    type-info
+
+-----------
+taban sınıftan türemiş sınıfa dönüşümlere --> down casting
+türemiş sınıfatan taban sınıfta dönüşümlere --> up casting
+----------
+
+
+
+
+
 
 
 
