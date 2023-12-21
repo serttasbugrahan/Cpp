@@ -1,21 +1,167 @@
 //////////////////////////////////////////////////////////////////////////1. Ders//////////////////////////////////////////////////////7
 
+RTTI:
+-----
+
+polimorfik bir tür söz konusu olduğunda onun gerçek türü ve davranışı çalışma zamanında belli olur
+
+çalışma zamanındaki type başka derleyicinin koda bakarak bulduğu type başka öğle durumlar var ki normalde başvurmıycağımız bir yöntem olsa da
+programın çalışma zamanında bir nesnenin dinamik türünün ne olduğun tespit etmemiz söz konusudur
+cpp bunlar için araç sağlar
+
+-dynamic_cast
+-typeid
+  type_info
 
 
+upcasting : türemiş sınıftan taban sınıfa 
+donw-casting : taban sınıftan türemişe (programın çalışma zamanıyla ilgilidir)
+
+--------------
+
+dynamic cast iki farklı şekilde kullanılabiliyor :
+
+dynamic cast down-casting'in güvenli bir şekilde yapılıp yapılamıycağını sınıyor
+
+dynamic_cast<Mercedes *>(car_ptr) //türü Mercedes *
+dynamic_cast<Mercedes &>(car_ref) //türü Mercedes &
+
+Mercedes *p = dynamic_cast<Mercedes *>(car_ptr);
 
 
+-----------
 
+class Base {
 
+};
 
+class Der : public Base {
 
+};
 
+void foo(Base* baseptr);
 
+int main()
+{
+Der* derptr = dynamic_cast<Der*>(baseptr); //hata, bir sınıfın polimorfik olması için en az bir virtual fonksiyona saship olmalı
+//dynamic_cast geçerli olması için sınıfın polimorfiik olması gerekir
 
+}
 
+int main()
+{
 
+}
 
+-----------
 
+class Base {
+public:
+virtual ~Base() = default;
 
+};
+
+class Der : public Base {
+
+};
+
+void foo(Base* baseptr);
+
+int main()
+{
+Der* derptr = dynamic_cast<Der*>(baseptr);
+}
+
+----------------------
+bu kısım car_4.h içinde
+
+-----------------------
+
+!! dynamic cast operatörünün kullanımında 
+hedef tür referans türü ise
+down-casting güvenli bir şekilde yapılamıyor ise 
+standart kütüphanemiizn
+
+std::bad_cast sınıfı türünden 
+std::bad_cast sınıfı
+  std::expection
+sınıfından kalıtım yoluyla elde edilmiştir
+expection throw edilir
+
+-------------------------------------------
+
+typeid: 
+-------
+typeid kullanıcak isek type_info include etmemiz gerekir, #include<typeinfo>
+
+typeid(*ptr)
+typeid(id)
+typeid(10)
+typeid(++x)
+
+typeid(int)
+typeid(Tesla)
+
+typeid nesnelerinin hepsi sınıf türürnden const bir nesneye referans
+
+-----------------
+
+#include<type_info>
+
+int main()
+{
+std::type_info x; //hata verir çünkü default ctor yok
+//kopyası çıkarılamaz ya da default init yapılarak type_info nesnesini oluşturabiliriz
+}
+
+------
+
+int main()
+{
+int x = 10;
+auto y = typeid(x); //copy ctor delete edildi
+}
+
+her ayrı (distinc) tür için bir type_info nesnesi var
+
+int main()
+{
+int x = 10;
+}
+
+----------
+
+int main()
+{
+int a[10]{};
+
+auto sz = sizeof(a[30)]; //normalde ub ancak işlem kodu üretilmediği için ub değil
+}
+
+----------
+
+!! typeid için işlem kodu üretilmez
+
+int main()
+{
+int x = 12;
+
+const auto& r = typeid(++x);
+std::cout << "x = " << x << '\n';
+}
+
+------------
+
+class Nec {
+
+};
+
+int main()
+{
+Nec mynec;
+
+typeid(mynec); //polymorfic bir tür olması gerekmez
+}
 
 
 
