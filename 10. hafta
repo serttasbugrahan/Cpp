@@ -160,10 +160,235 @@ int main()
 {
 Nec mynec;
 
-typeid(mynec); //polymorfic bir tür olması gerekmez
+typeid(mynec); //legal, polymorfic bir tür olması gerekmez
+typeid(Nec); //static olabilir legal
+}
+
+-----------------------------
+
+type info sınıfını inceliyoruz...
+
+
+class Nec {
+
+};
+
+int main()
+{
+Nec mynec;
+
+std::cout << typeid(mynec).name(); //yazı adresi döndürür, ancak standart değildir, farklı yazılar çıkabilir yani
+
+}
+
+-----------
+
+class Nec {
+
+};
+
+int main()
+{
+Nec mynec;
+int ival{};
+
+typeid(mynec).operator==(typeid(int))
+}
+
+-----
+
+class Nec {
+
+};
+
+int main()
+{
+using namespace std;
+
+int x = 10;
+doyble dval = 5.78;
+cout<<
+(typeid(x) == typeid(int)) << "\n";
+}
+
+------
+
+class Base {
+//public:virtual ~Base(){};
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+Der myder;
+Base* ptr = &myder;
+
+std::cout << (typeid(*ptr) == typeid(Der)) << "\n";
+//type id ifadenin türü polimorfik olan ifadeye göre değişir
+//polimorfic değil ise static türü esas alır
+//polimorfic ise dinamik türü esas alır
+}
+
+-------
+
+class Base {
+public:
+virtual ~Base(){}; //burası olursa dinamik türü esas alır 
+};
+
+class Der : public Base {
+
+};
+
+int main()
+{
+Der myder;
+Base* ptr = &myder;
+
+std::cout << typeid(*ptr).name << "\n";
+}
+
+-----------------
+car_5.h içinde
+-----------------
+mülakatlarda soruluyor...
+
+/// class A class B
+
+a ve b aynı hiyerarşi içierisinde mi onu sorgulaman gerekiyor nasıl yaparsın ?
+-static cast ile
+
+class Base {
+
+};
+
+class Der : public Base {
+
+};
+
+class Nec {
+
+};
+
+int main()
+{
+Nec mynec;
+Der *derptr = static_cast<Der *>(&mynec); //illegal olur 
+
+Base mybase;
+Der* derptr = static_cast<Der*>(&mybase); //legal
 }
 
 
-1.15
+---------------
+
+typeid(*ptr)
+
+polimorfik tür söz konusu olduğunda eğer typeid operatörünün operandı olan ifade  
+dereference edilmiş pointer ifadesi ise pointer değerinin nullptr olması durumunda 
+
+std::bad_typeid
+
+sınıfı türünden exception throw edilir.
+
+------------------------------------------------------
+
+//herb sutter
+
+taban sınıfların dtor'ları ya public virtual ya da
+protected non-virtual olmalı
+
+NVI (non-virtual interface)
+
+------------
+!! template method :taban sınıf türemiş sınıfa customization point vermek istiyorsa virtual function yapıyor
+//oop patentlerinden biridir cp ile alakası yok
+
+class Base {
+
+virtual void attack();
+public:
+void fight()
+{
+attact(); //buna template method denir
+}
+};
+
+======================================================================
+
+std::string:
+------------
+
+c de yazılar char dizilerde tutulur c++ yazıları bir sınıf türünden nesne oluşturarak kullanıyoruz
+
+---
+#include <cstring> //c deki strcmp, strcpy tarzı fonksiyonları çağırmak için kukkanır 
+---
+
+#include <string> 
+
+string STL'in başlık dosyalarından biridir
+STL ==> stnadart Template library
+
+----------
+
+namespace Std olmasaydı sınıfı aşağıdaki şekilde implemente ederdik
+
+int main()
+{
+std::basic_string<char, std::char_traits<char>, std::allocator<char>>
+}
+
+--------
+
+//generic programlama ile alakası vardır, generic programlama olmasaydı
+bütün sınıf fonksitonları çağırılacaktı
+
+int main()
+{
+using  namespace std;
+
+string str("Buğrahan serttas");
+
+cout << str;
+}
+
+----------
+
+-Bu bir sınıf şablonu (class template)
+-container'dır
+
+sequence containers:
+vector
+deque
+list
+forward_list
+string
+array
+
+associative contaniners:
+set
+multiset
+map
+multimap
+
+unordered associative containers:
+unordered_set
+unordered_multiset
+unordered_map
+unordered_multimap
+
+------
+
+std::string bir stl contanier'i
+  sequence container
+
+data structere
+  dynamic_array
+
+-------
 
 
