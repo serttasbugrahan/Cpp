@@ -548,5 +548,441 @@ bazı fonksiyonların parametresi:
 -iterator beg, iterator end ==> (range parametre)
 -std::initializer_list<char> {'B', 'A', 'B', 'A'}
 
-1.03
+------------
+
+initializer_list: bir dizi oluştur ve başladığı ve bittiği yerin adresini tutan elemanlara sahip bir  sınıf nesnesi haline getiriyor 
+böylece bir fonksiyona aşğıdaki şekilde geçtiğimiz aman uzunluğunu da geçmiş oluruz
+
+int main()
+{
+std::initializer_list<int> x{1, 3, 5, 7, 9};
+
+/*
+const int ar[] = {1, 3, 5, 7, 9};
+class initializer_list {
+const int *ps;
+const int *pw;
+}
+*/
+
+}
+
+-------
+
+#include <initializer_list>
+
+void foo(std::initializer_list<int> p)
+{
+std::cout << "&p = " << &p << '\n';
+std::cout << p.begin() << "\n";
+std::cout << p.end() << "\n";
+}
+
+int main()
+{
+std::initializer_list<int> x{1, 3, 5, 7, 9};
+x.end(); //dizinin bittiği yerin adresini döndürür
+
+std::cout << "&x = " << &x << '\n';
+std::cout << x.begin() << "\n";
+std::cout << x.end() << "\n";
+
+foo(x); //adresleri farklı olur ancak begin ve end adresleri ayn olur
+}
+
+---------------
+
+int main()
+{
+auto x = {1, 3, 5, 7}; //init. list
+auto y{1, 3, 5, 7}; //hata
+auto x{ 1 }; //legal, int x, init değil
+auto t = {2, 5, 7. }; //hata olur aynı türden olması gerekir, c++ 14 ile geldi
+ 
+}
+
+-----------------------------------
+
+mülakatlardaki en klasik sorulardan birisi
+
+class Myclass {
+public:
+Myclass(std::initializer_list<int>)
+{
+std::cout << "Myclass(initializer_list)\n";
+}
+
+Myclass(int)
+{
+std::cout << "Myclass(int)\n";
+}
+
+Myclass(int, int)
+{
+std::cout << "Myclass(int, int)\n";
+}
+};
+
+int main()
+{
+Myclass m1{3, 6, 8, 1};
+Myclass m2 = {3, 6, 8, 1};
+
+Myclass m1(10, 20); //int int çağrıır
+Myclass m1{10, 20}; //init_list çağrılır 
+
+}
+
+---------------------
+bu soru mülakkatta gelicek
+
+#include <vector>
+#include <initializer_list>
+
+int main()
+{
+std::cout<int> vec1(100); //100 tane sıfır değeri ile başlatıcak
+std::cout<int> vec2{100}; //init list 1 tane 100 değeri ile başlıycak 
+
+std::cout << "vec1.size() = " << vec1.size() << '\n';
+std::cout << "vec2.size() = " << vec2.size() << '\n';
+
+}
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+string s1(50, 'A');
+std::cout << s1 << '\n';
+string s2{50, 'A'};
+std::cout << s1 << '\n';
+std::cout << s2 << '\n';
+}
+
+
+--------------------------------------
+
+string sınıfın üye fonksiyonları :
+
+1)
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+
+string s1; //default ctor
+ps(s1);
+
+cout << "s1.size() = " << s1.size() << '\n';
+cout << "s1.length() = " << s1.length() << '\n';
+
+}
+
+----
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+
+string s1;
+ps(s1);
+
+s1.empty(); //predicate'dir bool döndüren fonksiyonlara denir
+
+//cout << boolalpha; //bu şekilde yazarız true veya false istersek değeri
+cout << s1.empty() << "\n"; //0, 1 diye yazar
+//çok fazla yerde kullanılır empty
+//s1.size == 0 ile aynı anlamdadır
+}
+
+-------------
+2)
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+string str("ahmet eraslan");
+ps(str);
+cout << "str.size() = " << str.size() <<"\n"; 
+}
+
+------
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+  int main()
+  {
+  using namespace std;
+  
+  char ar[] = { 'A', 'B', 'C'};
+  char ar[] = "murathan";
+  string str(ar + 5); //ub
+  //string str(ar + 3, 2);
+  //string str(ar, 20); //ub
+  char arr[] = "murat";
+  string strrarr, 6); //hata yok
+  cout << "str.lenght() = " << strr.lenght() << '\n'; 
+  
+  ps(str);
+  }
+
+-------
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+size_t n;
+
+cout << "kac tane: ";
+cin >> n;
+cout << string(n, '*');
+
+}
+
+--------
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+
+string str(20, '\0';
+cout << "str.size() = " << str.size() << '\n'
+}
+
+---------
+
+void ps(const std::string& s)
+{
+std::cout << "|" << s << "|\n";
+}
+
+int main()
+{
+using namespace std;
+
+string s1(100, 'A');
+string s2(s1);
+string s3(std::move(s1));
+}
+
+-----------
+
+int main()
+{
+//char parametreli ctor yoktur
+
+using namespace std;
+
+std::string str('A'); //hata
+//eğer tek bir karakterden oluşan yazı tutmasını istiyorsak
+
+string s1("a"); //1
+string s2(1, "A"); //2
+string s3{'A'}; //3
+
+cout << s1.size() = " << s1.size() << '\n';
+cout << s2.size() = " << s2.size() << '\n';
+cout << s3.size() = " << s3.size() << '\n';
+
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+string s1{ "cengizhan" };
+string s2(s1, 3); 
+cout << "s2 = " << s2 << '\n';
+string s2(s1, 1,4); 
+cout << "s2 = " << s2 << '\n';
+string s2(s1, 3,50); 
+cout << "s2 = " << s2 << '\n'; //hata yok
+}
+
+----------------
+
+int main()
+{
+string s1{50, 'A');
+string s2{66, 65, 66, 65};
+
+cout << "s2 = " << s2 << '\n';
+}
+
+-----------------
+son ctor olan range ctor
+
+int main()
+{
+using namespace std;
+char str[] = {"gokhan girgin"};
+
+string s1{str}; //cstr
+string s1{str, 3}; //array
+string s1{str, str + 4}; //range
+
+cout << "s1 = " << s1 << '\n';
+cout << "s2 = " << s2 << '\n';
+cout << "s3 = " << s3 << '\n';
+
+} 
+
+//ctor bitti
+--------------------------------------
+
+size_type capacity()const;
+
+int main()
+{
+using namespcae std;
+
+string str(153, 'A');
+
+cout << "str.size() = " << str.size() << '\n';
+cout << "str.capacity() = " << str.capacity() << '\n';
+
+str += "gokhan";
+cout << str.capacity() = " << str.capacity() << '\n';
+
+str.push_back('.');
+
+str += "gokhan";
+cout << str.capacity() = " << str.capacity() << '\n';
+}
+
+
+!! kapasite stirng sınıfınfa ve vector sınıfında kapasitenin artış katsayısı
+derleyiciye bağlıdır
+
+
+------
+
+int main()
+{
+using namespace std;
+
+string str(40, 'A');
+int cnt{};
+
+//her reallocation olduğunda bu bilgileri yazıdırı
+while (str.size() < 500'000) {
+str.push_bacj('A');
+if (str.capacity() > cap) {
+cout << ++cnt << ". reallocation\n";
+cout << "size = " <<str.size() << \n";
+cout << "capacity = " <<str.capacity() << \n";
+cap = str.capacity();
+(void)getchar();
+}
+}
+}
+
+---------------
+
+yapılan en büyük hatalardan birisi gereksiz yere reallocationa sebep olmak
+
+int main()
+{
+using namespace std;
+
+string str;
+char c = 'S';
+for (int i = 0; i < 1000; ++i) {
+str.push_back(c); //gereksiz reallocation çağrılır bunun yerinereserve fonksiyonunu kullanmak gerekir
+}
+}
+
+--------------
+reserve fonksyionu:
+
+int main()
+{
+using namespace std;
+
+string str(40, 'A');
+str.reserve(600'000); //size arrtırmaz kapasite arttırır
+auto cap = str.capacity();
+int cnt{};
+
+while (str.size() < 500'000) {
+str.push_bacj('A');
+if (str.capacity() > cap) {
+cout << ++cnt << ". reallocation\n";
+cout << "size = " <<str.size() << \n";
+cout << "capacity = " <<str.capacity() << \n";
+cap = str.capacity();
+(void)getchar();
+}
+}
+}
+
+------
+
+int main()
+{
+using namespace std;
+
+string str(40, 'A');
+
+str.reserve(600'000);
+auto cap = str.capacity();
+cout << "size = " << str.size() << '\n';
+cout << "capacity = " << str.capacity() << '\n';
+
+}
+
+-------------------------
+
+mülakkatta mutlaka sorulur
+
+string yazıları her zman heap(free store)'de tutulmaz
+derleyiciler SSO (smalls ignal opt.) yapabilir
+SSO : uzunluğu küçük olan string nesnelerin string nesnesi içinde oluştutulması
+
+
+int main()
+{
+using namespace std;
+
+string str(40, 'A');
+}
+
+------------
+
+
+
+
 
