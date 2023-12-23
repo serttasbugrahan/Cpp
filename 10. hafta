@@ -73,6 +73,34 @@ Der* derptr = dynamic_cast<Der*>(baseptr);
 }
 
 ----------------------
+//dynamic cast örneği (chatgbt)
+
+class Base {
+public:
+    virtual ~Base() {}
+};
+
+class Derived : public Base {
+public:
+    void DerivedMethod() {}
+};
+
+int main() {
+    Base* basePtr = new Derived;
+    Derived* derivedPtr = dynamic_cast<Derived*>(basePtr);
+
+    if (derivedPtr) {
+        // dynamic_cast başarılı oldu, güvenli bir şekilde tür dönüşümü yapıldı
+        derivedPtr->DerivedMethod();
+    } else {
+        // dynamic_cast başarısız oldu, tür dönüşümü güvenli değil
+    }
+
+    delete basePtr;
+    return 0;
+}
+
+----------------------
 bu kısım car_4.h içinde
 
 -----------------------
@@ -105,7 +133,26 @@ typeid(Tesla)
 typeid nesnelerinin hepsi sınıf türürnden const bir nesneye referans
 
 -----------------
+typeid kodu(chatgbt)
+#include <iostream>
+#include <typeinfo>
 
+class MyClass {
+};
+
+int main() {
+    MyClass obj;
+    const std::type_info& typeInfo = typeid(obj);
+
+    std::cout << "Type of obj: " << typeInfo.name() << std::endl;
+
+    if (typeInfo == typeid(MyClass)) {
+        std::cout << "obj is of type MyClass" << std::endl;
+    }
+
+    return 0;
+}
+----------------
 #include<type_info>
 
 int main()
