@@ -438,4 +438,115 @@ data structere
 
 -------
 
+/////////////////////////////////////////2. Ders///////////////////////////
+
+String devam...
+---------------
+
+aslında bir sınıf şablonudur, basic string isimlli sınıf şablonundan bir açılımından bahsediyoruz aslında
+
+!! reallocation' a diikat etmemiz gerekir mümkün olduğunca kaçınmamız lazım
+
+
+-------------------
+
+bir sınıfla ilgili ilk sorulması gerekenler şunlar:
+1-sınıfın genel farlık nedeni ne
+2-bu sınıf kalıtım ile mi kullanılacak yoksa bir ilgisi yok mu
+3-sınıf polimorfic mi değil mi
+4-sınıf generic mi değil mi, yani sınıf şablonu olarak mı oluşturulmuş yok non-temlate'mi
+5-sınıfın bize verdiği hizmetler
+6-operator overloafing var mı funciton overloading var mı, fonksiyonların beklediği invariantlar var mı?
+
+-------------------
+
+operator overloading'den çok fazla faydalanır, bunlar:
+
+<<
+>>
+[ ]
++
++=
+<=> spaceship
+"mehmet"s
+"mehmet"sv
+
+--------------------
+
+sınıf fazla fonksiyon vardır templateler sayesinde sadece çağırdımız fonksiyonun kodu eklenir
+
+---------------------
+generic: türden bağımsız demek
+---------------------
+
+containers (kaplar)
+algorithms (algoritmalar)
+  veri yapıları üstünde koşturulacak algoritma
+  <algorithm>
+  <numeric>
+
+iterators (iterators)
+
+---------------------
+
+kodu anlamaya çalışa
+
+int main()
+{
+using namespace std;
+string name{ "emrecan suster" };
+
+reverse(name.begin(), name.end()); //burada çağırılan global bir fonksiyon
+
+}
+
+-------------------
+
+mülakatlarda algoritma sorularından en çok 
+yazılar üstünde gelir
+
+---------------------
+
+string sınıfının hem üye fonksiyonları var bazı işleri üye fonksiyonlarına
+bazı yazı işlerini global algoritma dediğimiz fonksiyonlara yaptırıyoruz
+
+----------------------
+
+int main()
+{
+std::string::size_type //ideali bu türü kullanmaktır
+
+}
+
+------------------------
+!! diğer sınıflarında (vector...) size_type'ı vardır
+
+hangi veriler std::string::size_type türündendir
+
+1- size değeri / lenght / yazı uzunluğu
+2- kapasite türü
+3- bazı stirng fonksiyonları bir ya da iki parametresine indeks değeri istiyolar
+4- string::size_type npos
+
+-----------------------
+
+en zor kısımlardan biri
+
+bazı parametrik yapılar var bunları iyi öğrenirsek çok daha iyi kavrarız
+
+--------
+!!BURASI ÇOK ÖNEMLİ
+
+bazı fonksiyonların parametresi:
+-const string&  ==> stringin tutuğu ifadenin tamamı üzerinde (whole string) 
+-const string&, size_type idx ==> stringin idx paramteresinde başlarayak sonuna kadar demek (substring)
+-const string&, size_type idx, size_type len ==> idx'den başlarayak len uzunluğunda işlem yapıcak (substring)
+-const char* ==> null karakter ile sonlanan bir adres vermek zorundayız (cstring)
+-const char*, size_type len ==> bu adresten başlarak len tane karakter (data parametre)
+-char ==> sadece 1 tane karakter üzerinde işlem yapıca(
+-size_type, char c ==> n tane c karakteri (fill)
+-iterator beg, iterator end ==> (range parametre)
+-std::initializer_list<char> {'B', 'A', 'B', 'A'}
+
+1.03
 
