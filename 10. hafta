@@ -990,9 +990,375 @@ string str(40, 'A');
 
 //////////////////////////////////////////////////////3. Ders////////////////////////////////////////////
 
+string sınıfının tuttuğu karakterlere ne şekilde erişiriz :
+
+[]
+front back()
+at
+iterator dereferencing
 
 
+-------------
 
+int main()
+{
+using namespace std;
+string str{"burak kose"};
+for (size_t i{}; i < str.lenght(); ++i) {
+cout.put(str[i]); //aynı anlamda
+//cout.put(str.operator[](i)); //aynı anlamda
+}
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+string str{ "mert" };
+str[2] = 's';
+
+cout << str << "\n";
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+const string str{ "mert" };
+
+str[2] = 's'; //hata
+str.operator[](); //hata
+auto c = str[0]; 
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+const string str{ "mert" };
+str[12]; //ub olur
+}
+//expection throw etmez
+-------------
+
+mülakatlarda sorulan tipik sorulardan biridir at ile [] operatörü arasındaki fark
+at ile yazının bir karakterine erişiriz ancak expection twrow devreye girer [] ile devreye girmez
+
+int main()
+{
+using namespace std;
+const string str{ "mert" };
+//burada expection throw'a girer
+try {
+auto c = str.at(345);
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+string str{ "mert" };
+cout << "str = " << str << '\n';
+
+str.front() = 'd';
+str.back() = 'i';
+cout << "str = " << str << '\n';
+}
+
+---------------
+range-based for loop (aralık tabanlı for döngüsü): derleyiciye bir kod yazdırırız bu kodu kendimizde yazabilirdik
+
+int main()
+{
+using namespace std;
+
+string str{ "bugün günlerden pazartesi. kirmizi pazartesi" };
+
+//range : 1. konum ilk öğe konumu, 2. konum son eğeden bir fazlasının konumudur
+//B------------S
+
+vector ivec{2,5, 6,7,9,67};
+
+lis
+}
+
+------
+kodu anlamaya çalışma
+
+int main()
+{
+using namespace std;
+
+vector ivec{2,5, 6,7,9,67};
+list ilist{5,23,2323,12,65,2,55,323};
+string str {"bugrahan serttas };
+
+for (auto iter = ivec.begin(); iter != ivec.end(); ++iter) {
+cout << *iter <<'';
+}
+cout <<'\n';
+
+for (auto iter = ilist.begin(); iter != ilist.end(); ++iter) {
+cout << *iter <<'';
+}
+cout <<'\n';
+
+for (auto iter = str.begin(); iter != str.end(); ++iter) {
+cout << *iter <<'';
+}
+cout <<'\n';
+
+}
+
+-------------
+yukarıadki yerine şu şekilde yazabiliriz, kodu derleyiciye yazdırırız
+//range based scope
+
+int main()
+{
+using namespace std;
+
+vector ivec{2,5, 6,7,9,67};
+list ilist{5,23,2323,12,65,2,55,323};
+string str {"bugrahan serttas };
+
+for (auto i = ivec)
+cout << i << ' ';
+cout << '\n'; 
+
+for (auto i = ilist)
+cout << i << ' ';
+cout << '\n'; 
+
+for (auto i = str)
+cout << i << ' ';
+cout << '\n'; 
+
+}
+
+--------------
+//range based scopeu diziler içinde kullanabiliriz, hatta kendi oluşturduğumuz sınıflar içinde kullanılabilir
+
+auto &i : a //değiştime amaçlı
+const auto &i : a//okuma amaçlı
+
+int main()
+{
+using namespace std;
+
+int a[] = {2,3,432,23,2,32,2,2,1
+for (auto i : a) { //for
+
+}
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+string str { "kirmizi pazartesi" };
+
+for (auto c : str) {
+c = '!'; //yazı değişmez
+}
+cout << str << '\n';
+}
+
+---------------
+
+!! std::string bir STL kabıdır
+iterator arayüzüne sahiptir
+
+!! string sınıfının bazı üye fonksiyonları diğer stl arayüzleriyle ortak arayüze sahip
+yani vector'e nasıl insert ediyorsak stringede o şekilde insert edebiliyoruz
+
+
+-------------------
+
+yazı üstünde yazıyı değiştiren işlemler (modifiers) :
+
+std::string get_name()
+{
+return "kerim denizoglu";
+}
+
+int main()
+{
+using namespace std;
+
+string name = "tayyip erguder";
+
+string str {"mustafa" }; //copy assignment
+
+cout << "|" << str << "|\n";
+
+str = name;  //copy
+
+cout << "|" << str << "|\n";
+
+str = get_name();// move assign.
+
+cout << "|" << str << "|\n";
+
+string str {"alican"}; 
+
+cout << "|" << str << "|\n";
+
+str = 'X'; //char parametreli atama
+
+cout << "|" << str << "|\n";
+
+str = {'a', 'l', 'i'} //init list ataması
+
+cout << "|" << str << "|\n";
+  
+}
+
+-------------------
+
+string değiştirme işlemlerine devam...
+
+std::string get_name()
+{
+return "kerim denizoglu";
+}
+
+int main()
+{
+using namespace std
+
+string name = "tayyip erguder";
+
+cout << "name.size() = " << name.size() << '\n';
+
+name.resize(20);  //size'ı değiştirir, reserve kapasite değiştiriyordu
+//name.resize(20, '!');
+//name.resize(6); //bu şekilde kullarısak silme işlemi yapıcak
+cout << "name.size() = " << name.size() << '\n';
+
+cout << "|" << name << "|\n"; 
+}
+
+----------------------
+mülakatlarda sorulan tipik soru
+
+bir yazıyı tamamen nasıl boşaltırız
+
+std::string get_name()
+{
+return "bugranan serttas";
+}
+
+int main()
+{
+using namespace std;
+
+string name = "tayyip erguder";
+
+cout << "name.lenght() = " << name.lenght() << '\n';
+name.clear();//1. yol
+name.resize(0); //2. yol, argğman sıfır olarak yollandı
+name = ""; //3. yol
+name = {}; //4. yol
+name = string{}; //5. yol
+cout << "name.lenght() = " << name.lenght() << '\n';
+
+}
+
+------------
+yazıyı değiştiren bir başka fonksiyon, bu bütün sequence contanierlarda var
+
+int main()
+{
+using namespace std;
+
+string str {"bjarne stroustrup"};
+
+cout << "str = " << str << '\n';
+
+for (int i = 0; i < 10; ++i){
+str.push_back('.');
+cout << "str = " << str << '\n';
+}
+}
+
+----------
+
+int main()
+{
+using namespace std;
+string s = "han";
+cout << "str = " << str << '\n';
+str += s;
+cout << "str = " << str << '\n';
+str += "oglu";
+cout << "str = " << str << '\n';
+str += m;
+cout << "str = " << str << '\n';
+str += {'x', 'y', 'z'};
+cout << "str = " << str << '\n';
+
+}
+
+-----------
+daha complexler için assign fonksiyonu var
+
+int main()
+{
+using namespace std;
+string s = "han";
+
+string str{"deniz"};
+str.assign("nurhan");
+cout << "str = " << str << '\n';
+str.assign(10, 'T'); //10 tane t karakteri
+cout << "str = " << str << '\n';
+
+string s = "neslihan";
+str.assign(s, 3);
+cout << "str = " << str << '\n';
+str.assign(s, 1, 2); 
+cout << "str = " << str << '\n';
+//geri dönüş değerleri her zaman *this
+
+}
+
+
+---------------------------------------------------------
+
+string sınıfında çok önemli bir öğe ile tanışıyoruz
+
+int main()
+{
+std::cout << "nops = " << std::string::npos; //legal
+std::string::npos = 57687u; //hata, const bir nesneye atama yapamam
+
+//npos hiçbir yazıya geçerli bir index olamaz garantisi verir
+//yazı ne kadar büyük olursa olsun sıfır ile indexleme başladığı için npos o yazıya geçerli bir indeks olamaz
+}
+
+int main()
+{
+//string sınıfının arama fonksiyonları
+//index döndürürler ama arananın bulunamaması durumunda
+//öyle bir index döndürmeliki yazının geçerli bir index olmadığından 
+//emin olacağımız için onu aranan değerin bulunamamasına işaret eden 
+//bir özel değer olmalı bu stringin nposu
+
+}
 
 
 
