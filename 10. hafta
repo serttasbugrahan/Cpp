@@ -404,6 +404,11 @@ cout << str;
 }
 
 ----------
+STL has 4 components:
+-Algorithms
+-Containers
+-Functors
+-Iterators
 
 -Bu bir sınıf şablonu (class template)
 -container'dır
@@ -484,12 +489,11 @@ algorithms (algoritmalar)
   veri yapıları üstünde koşturulacak algoritma
   <algorithm>
   <numeric>
-
 iterators (iterators)
-
+Functors
 ---------------------
 
-kodu anlamaya çalışa
+kodu anlamaya çalışma
 
 int main()
 {
@@ -507,7 +511,7 @@ yazılar üstünde gelir
 
 ---------------------
 
-string sınıfının hem üye fonksiyonları var bazı işleri üye fonksiyonlarına
+string sınıfının hem üye fonksiyonları var hemde yazı işleri bazı işleri üye fonksiyonlarına
 bazı yazı işlerini global algoritma dediğimiz fonksiyonlara yaptırıyoruz
 
 ----------------------
@@ -657,8 +661,7 @@ using namespace std;
 
 string s1(50, 'A');
 std::cout << s1 << '\n';
-string s2{50, 'A'};
-std::cout << s1 << '\n';
+string s2{50, 'A'}; //init listten dolay
 std::cout << s2 << '\n';
 }
 
@@ -688,25 +691,25 @@ cout << "s1.length() = " << s1.length() << '\n';
 
 ----
 
-void ps(const std::string& s)
-{
-std::cout << "|" << s << "|\n";
-}
-
-int main()
-{
-using namespace std;
-
-string s1;
-ps(s1);
-
-s1.empty(); //predicate'dir bool döndüren fonksiyonlara denir
-
-//cout << boolalpha; //bu şekilde yazarız true veya false istersek değeri
-cout << s1.empty() << "\n"; //0, 1 diye yazar
-//çok fazla yerde kullanılır empty
-//s1.size == 0 ile aynı anlamdadır
-}
+  void ps(const std::string& s)
+  {
+  std::cout << "|" << s << "|\n";
+  }
+  
+  int main()
+  {
+  using namespace std;
+  
+  string s1;
+  ps(s1);
+  
+  s1.empty(); //predicate'dir bool döndüren fonksiyonlara denir
+  
+  //cout << boolalpha; //bu şekilde yazarız true veya false istersek değeri
+  cout << s1.empty() << "\n"; //0, 1 diye yazar
+  //çok fazla yerde kullanılır empty
+  //s1.size == 0 ile aynı anlamdadır
+  }
 
 -------------
 2)
@@ -792,9 +795,9 @@ int main()
 using namespace std;
 
 string s1(100, 'A');
-string s2(s1);
-string s3(std::move(s1));
-}
+string s2(s1); //copy
+string s3(std::move(s1)); //move
+ }
 
 -----------
 
@@ -811,9 +814,9 @@ string s1("a"); //1
 string s2(1, "A"); //2
 string s3{'A'}; //3
 
-cout << s1.size() = " << s1.size() << '\n';
-cout << s2.size() = " << s2.size() << '\n';
-cout << s3.size() = " << s3.size() << '\n';
+cout << "s1.size() = " << s1.size() << '\n';
+cout << "s2.size() = " << s2.size() << '\n';
+cout << "s3.size() = " << s3.size() << '\n';
 
 }
 
@@ -836,7 +839,9 @@ cout << "s2 = " << s2 << '\n'; //hata yok
 
 int main()
 {
-string s1{50, 'A');
+using namespace std;
+
+string s1{50, 'A'};
 string s2{66, 65, 66, 65};
 
 cout << "s2 = " << s2 << '\n';
@@ -867,7 +872,7 @@ size_type capacity()const;
 
 int main()
 {
-using namespcae std;
+using namespace std;
 
 string str(153, 'A');
 
@@ -875,13 +880,14 @@ cout << "str.size() = " << str.size() << '\n';
 cout << "str.capacity() = " << str.capacity() << '\n';
 
 str += "gokhan";
-cout << str.capacity() = " << str.capacity() << '\n';
+cout << "str.capacity() = " << str.capacity() << '\n';
 
 str.push_back('.');
 
 str += "gokhan";
-cout << str.capacity() = " << str.capacity() << '\n';
+cout << "str.capacity() = " << str.capacity() << '\n';
 }
+
 
 
 !! kapasite stirng sınıfınfa ve vector sınıfında kapasitenin artış katsayısı
@@ -892,22 +898,24 @@ derleyiciye bağlıdır
 
 int main()
 {
-using namespace std;
+    using namespace std;
 
-string str(40, 'A');
-int cnt{};
+    string str(40, 'A');
+    int cnt{};
 
-//her reallocation olduğunda bu bilgileri yazıdırı
-while (str.size() < 500'000) {
-str.push_bacj('A');
-if (str.capacity() > cap) {
-cout << ++cnt << ". reallocation\n";
-cout << "size = " <<str.size() << \n";
-cout << "capacity = " <<str.capacity() << \n";
-cap = str.capacity();
-(void)getchar();
-}
-}
+    // her reallocation olduğunda bu bilgileri yazıdırı
+    while (str.size() < 500'000)
+    {
+        str.push_back('A');
+        if (str.capacity() > cnt)
+        {
+            cout << ++cnt << ". reallocation\n";
+            cout << "size = " << str.size() << '\n ';
+            cout << "capacity = " << str.capacity() << '\n';
+            cnt = str.capacity();
+            (void)getchar();
+        }
+    }
 }
 
 ---------------
@@ -921,7 +929,7 @@ using namespace std;
 string str;
 char c = 'S';
 for (int i = 0; i < 1000; ++i) {
-str.push_back(c); //gereksiz reallocation çağrılır bunun yerinereserve fonksiyonunu kullanmak gerekir
+str.push_back(c); //gereksiz reallocation çağrılır bunun yerine reserve fonksiyonunu kullanmak gerekir
 }
 }
 
@@ -980,7 +988,11 @@ using namespace std;
 string str(40, 'A');
 }
 
-------------
+//////////////////////////////////////////////////////3. Ders////////////////////////////////////////////
+
+
+
+
 
 
 
