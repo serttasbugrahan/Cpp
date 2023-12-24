@@ -1771,4 +1771,103 @@ str.erase(str.begin(), str.end()); //erase all
 str.erase(0, string::npos);
 }
 
-2.15
+------------------
+karşılaştırma işlemleri
+c++20 spaceship
+
+int main()
+{
+string name{"ayhan"};
+string word{"ekrem"};
+
+if (name == word); //legal
+if (name == "ayhan"); //legal
+if ("ayhan" == word); //legal
+
+if (name < word) //legal
+//geri dönüş değerleri bool
+}
+
+---------------------
+compore fonksiyonları
+
+c deki strcmp'ye benzer
+
+int srcmp(s1, s2)
+
+retval > 0 s1 > s2
+retval < 0 s1 < s2
+retval = 0 s1 == s2
+
+
+if (strcmp(s1, s2) 
+
+-------
+
+int main()
+{
+string name{"ayhan"};
+int result = name.compare();
+//int döndürür 
+result > 0
+
+}
+
+----------
+data
+allocate edilmiş bellek bloğunun adresini döndürür
+
+int main()
+{
+string name{"bugun gunlerden pazartesi" };
+name.data()
+name.c_str()
+const char *p = name.c_str();
+puts(p);
+name += "yarin da gunlerden sali olacak.";
+cout << s << '\n'; 
+cout << p << '\n'; //dangling olduk
+
+}
+
+-----------
+
+int main()
+{
+string s{"bugun gunlerden pazartesi"};
+
+auto p1 = &s[0];
+auto p2 = &*s.begın()
+auto p3 = s.data();
+
+cout << (void*)p1 << '\n';
+cout << (void*)p2 << '\n';
+cout << (void*)p3 << '\n';
+
+}
+
+-----------
+mülakatlarda çok sorulur
+//shring (yüzmek)
+
+int main()
+{
+string s(100'000, 'A');
+
+cout << "str.size() = " << str.size() << '\n';
+cout << "str.capacity() = " << str.capacity() << '\n';
+
+str.erase(10);
+cout << "str.size() = " << str.size() << '\n';
+cout << "str.capacity() = " << str.capacity() << '\n';
+
+//shrink
+str.shrink_to_fit(); //kapasiteyi size'a uygun bir değere çekmeyi sağlar
+cout << "str.capacity() = " << str.capacity() << '\n';
+
+}
+
+
+
+
+
