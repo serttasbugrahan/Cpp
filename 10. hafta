@@ -1674,4 +1674,101 @@ s.erase(s.end() - 1);
 
 ----------------------
 
-1.58.50
+using namespace std;
+
+int main()
+{
+string s{"mehmetbal"};
+
+cout << "|" << s << "|\n";
+
+s.erase(s.begin(), s.begin() + 3);
+cout << "|" << s << "|\n";
+}
+
+-------------
+mülakatlarda sorulur
+//yazının sadece ilk ve son karakterlerini bırakma
+
+using namespace std;
+
+int main()
+{
+string s{"mehmetbal"};
+cout << "|" << s << "|\n";
+
+s.erase(s.begin() + 1, s.end() - 1);
+cout << "|" << s << "|\n";
+}
+
+-------------
+index interface'i
+
+using namespace std;
+
+int main()
+{
+string s{"mehmetbal"};   
+s.insert(0, '!');
+s.insert(0, 20, 'A');
+s.insert(s.size(), "ekrem");
+cout << "s = " << s << '\n';
+}
+
+------------
+
+using namespace std;
+
+int main()
+{
+string s{ "mehmet bal" };
+
+string name{" murathan"};
+
+s.insert(4, name, 2, 3}; //s'İn 4 yerine, 2'den 3 karakterlik kısım 
+cout << "|" << s << "|\n";
+}
+
+------------------------
+
+substr fonksiyonları :
+!! yüksek maaliyetlidir
+
+int main()
+{
+string str{"melike kaptan"};
+//str.substr(idx, n); 1. parametre index, 2. parametresi o indexten başlayarak kaç tane karakerlik substring olduğu 
+str.substr(); //str'nin kendisini elde ederiz ancak adeta onun kopyasını çıkarmış oluruz
+cout << "|" << str.substr() << "|\n";
+cout << "|" << str.substr(7) << "|\n";
+cout << "|" << str.substr(7, 3) << "|\n";
+}
+
+------------------
+erase index interface'i
+
+using namespace std;
+
+int main()
+{
+string str{ "melike kaptan" };
+cout << "|" << str<< "|\n";
+
+str.erase();
+//str.erase(0, 1); //ilk karakteri siler
+//str.erase(3,3); //3. indeksinden başlarayak tüm karakterler
+cout << "|" << str<< "|\n";
+}
+
+-------------------
+erase itarator interface
+
+int main()
+{
+string str{ "melike kaptan" };
+cout << "|" << str<< "|\n";
+str.erase(str.begin(), str.end()); //erase all
+str.erase(0, string::npos);
+}
+
+2.15
