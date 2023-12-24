@@ -1350,17 +1350,328 @@ std::string::npos = 57687u; //hata, const bir nesneye atama yapamam
 //yazı ne kadar büyük olursa olsun sıfır ile indexleme başladığı için npos o yazıya geçerli bir indeks olamaz
 }
 
-int main()
-{
 //string sınıfının arama fonksiyonları
 //index döndürürler ama arananın bulunamaması durumunda
 //öyle bir index döndürmeliki yazının geçerli bir index olmadığından 
 //emin olacağımız için onu aranan değerin bulunamamasına işaret eden 
 //bir özel değer olmalı bu stringin nposu
 
+//bulunursa başladığı yerin indexini döndürür
+bulunamassa string'in size type türünden npos döndürür.
+
+---------------------
+arama fonksiyonları:
+
+std::string::size_type find
+std::string::size_type rfind
+std::string::size_type find_first_of
+std::string::size_type find_last_of
+std::string::size_type find first_not_of
+std::string::size_type find_last_not_of
+
+-hepsiin geri dönüşü indextir yani std::string::size_type
+-aranana bulunursa bulunduğu yerin idexini bulunamassa npos döndürür
+-bütün find fonksiyonları 1 parametreleri aramanın yapılacağı substrucın indexini alıyor
+ve default olarak 0 değerini alır
+
+//bugrahan serttas
+//7, aramam 7 indeksiliden başlar
+//0, aramam bütün substructen başlar
+
+---------------------
+
+int main()
+{
+using namespace std;
+string str;
+
+cout << "bir yazi girin: ";
+cin >> str;
+
+cout << "girdiginiz yazi [" << str << "]\n";
+cout << "aranancak karakter: ";
+char c = 'a';
+
+string::size_type idx = str.find(c);
+//auto idx = str.find(c); //bu şekilde yazabilirdik
+if (idx != string::npos) {
+cout << "bulundu: idx = " << idx << '\n';
+str[idx] = '*';
+cout << "|" << str << "|\n";
+}
+else {
+cout << "bulunamadi\n";
+}
+}
+//str.find(c, 5); //yaparsak 5 indeksinden başlarayak arar
+
+/* //c++17 ile if with initializer geldi bu şekilde kullanmaya çalış
+if (auto idx = str.find(c); idx != string::npos) {
+cout << "bulundu : idx = " << idx << '\n';
+str[idx] = '*';
+cout << "|" << str << "|\n";
+}else{
+cout << "bulunamadi\n";
+}
+*/
+
+--------------------
+
+string'deki overloadingleri anlatıyor ancak çok fazla sayıda var
+hepsini öğrenmek için kitabı incele
+
+int main()
+{
+using namespace std;
+string str;
+
+getline(cin, str,); //boşluk kullanmamızı sağlar,
+cout << "yaziniz : |" << str << "|\n";
+
+if (auto idx = str.find("necati"); idx != string::npos) {
+cout << "bulundu idx = " << idx << "\n";
+str[idx] = '*';
+cout << "[" << str << "]\n";
+}
+else {
+std::cout << "buunamadi\n";
 }
 
+}
 
+--------------
+//bu özellik c++20 ile geldi
 
+yazı aradığım varlıkla mı baslıyor?
+yazı aradığım varlıkla mı bitiyor?
 
+//starts_with kullanılabilir
+//end_withs kullanılabilir
 
+int main()
+{
+using namespace std;
+
+string str;
+
+getline(cin, str);
+cout << "[" << str << "]\n";
+
+if (str.starts_with("necati")) {
+std::cout << "evet var\n";
+}
+else {
+std::cout << "hayir yok\n";
+}
+}
+
+--------------
+//c++23 ile gelen başka bir özellik
+
+int main()
+{
+using namespace std;
+
+string str;
+
+std::cout << "bir yazi girin: ";
+
+getline(cin ,str);
+
+if (str.contains("emrecan")) {
+std::cout << "evet var\n";
+}
+else {
+std::cout << "hayiy yok
+}
+}
+
+---------------
+
+diğer fonksiyonlara bakıyoruz
+
+int main()
+{
+using namespace std;
+
+string str;
+
+std::cout << "bir yazi girin: ";
+
+getline(cin ,str);
+
+str.rfind() //aramayı sondan başlatır  
+}
+
+-----------
+find_first_of //yazının karakterlerinden herhnagi birinin bulunduğu ilk yeri
+
+int main()
+{
+using namespace std;
+
+string str = "serhat istin";
+
+str.find_first_of("patik"); //a'yı bulur aradığım karekterlerden birisi
+str.find_first_not_of("resim"); //resim karakterlerinden biri olmayan ilk karakterin indexini bulur
+//serhat'In h sının bulunduğu indexin yerini döndürür
+
+str.find_last_of //sondan başlar
+str.find_last_not_of //sondan başlar
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+string s1 = "omer faruk";
+string s2 = "selma deniz";
+
+s1.append(s2, 5); //s1 yazısına s2'nin 5. indeksinden başlarayak ekler
+//s1.append(s2, 1,5);
+cout << "s1 = " << s1 << '\n';
+
+}
+
+------------
+
+3, string::npos //npos burada geriye kalanların hepsi anlamında kullanılır
+
+int main()
+{
+using namespace std;
+
+string s1 = "omer faruk";
+string s2 = "selma deniz";
+
+s1.append(s2, 1, string::npos);
+cout << "s1 = " << s1 << '\n';
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+char str[] = "mustafa aksoy";
+
+string s = "omer faruk";
+
+cout << "s = " << s << '\n';
+
+s.append(str, 3);
+//s.append(5, '*'); //fill paraö
+cout << "s = " << s << '\n';
+}
+
+-----------------------
+//burası biraz karmaşık dikkatli çalış
+
+insert fonksiyonları
+arrays fonksiyonları
+
+2 farklı interface vardır
+-STL container interfacer 
+-iterator interface
+
+---------
+
+con.insert(iter, value); //stl genel insert interface'idir
+
+insert fonksiyonları insert edilmiş ilk öğenin konumunu döndürürler
+
+geri dönüş değeri her zaman arrays fonksiyonlarının silinmiş öğeden sonraki konumu olur
+------
+6 7 9 1 8 0 //9 silindi 
+6 7 1 8 0 //haline döndü, silme fonksiyonun geri dönüş değeri 1'in konumu olur
+-------
+
+-------
+6 7 9 1 8 0 //7 8 arası silnir 
+  -     - 
+6 8 0 // bu hale dönüşür geri dönüş değeri silme işleminden sonra silinmyen ilk öğenin konumu yani 8
+-------
+
+iterator inerface ile ekleme yapılanların ismi stl'de inserttür
+silme işlemi yapanında ismi arraysdir
+
+-----------
+vector kütüphanesi için bu şekilde olur
+
+using namespace std;
+int main()
+{
+vector ivec{2, 3, 4, 7, 9,1 };
+
+for (auto i : ivec) cout << i << ' '; 
+cout << '\n';
+ivec.insert(ivec.begin(), 6);
+for (auto i : ivec) cout << i << ' '; 
+cout << '\n';
+}
+
+-----------
+aynı mantığı stringe uygularız
+
+using namespace std;
+
+int main()
+{
+string s {"mehmet bal"};
+
+//iterator interface ile yazonon başına ! işareti ekle
+
+cout << "[" << s << "]\n";
+s.insert(s.begin(), '!');
+//s.insert(s.begin() + 3, '*');
+cout << "[" << s << "]\n";
+}
+
+--------------
+using namespace std;
+
+int main()
+{
+string s {"mehmetbal"};
+//yazının ilk karakterini siler
+while (!s.empty()) { 
+cout << "|" << s << "|\n";
+s.erase(s.begin())
+}
+}
+
+----------------
+using namespace std;
+
+int main()
+{
+string s {"mehmetbal"};
+//yazının ilk karakterini siler
+while (!s.empty()) { 
+cout << "|" << s << "|\n";
+s.pop_back();
+
+}
+}
+
+--------------
+iterator insterface'i
+
+using namespace std;
+
+int main()
+{
+string s {"mehmetbal"};
+//yazının ilk karakterini siler
+while (!s.empty()) { 
+cout << "|" << s << "|\n";
+s.erase(s.end() - 1);
+}
+}
+
+----------------------
+
+1.58.50
