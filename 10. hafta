@@ -555,7 +555,7 @@ bazı fonksiyonların parametresi:
 ------------
 
 initializer_list: bir dizi oluştur ve başladığı ve bittiği yerin adresini tutan elemanlara sahip bir  sınıf nesnesi haline getiriyor 
-böylece bir fonksiyona aşğıdaki şekilde geçtiğimiz aman uzunluğunu da geçmiş oluruz
+böylece bir fonksiyona aşğıdaki şekilde geçtiğimiz zaman uzunluğunu da geçmiş oluruz
 
 int main()
 {
@@ -1102,7 +1102,7 @@ using namespace std;
 
 vector ivec{2,5, 6,7,9,67};
 list ilist{5,23,2323,12,65,2,55,323};
-string str {"bugrahan serttas };
+string str {"bugrahan serttas "};
 
 for (auto iter = ivec.begin(); iter != ivec.end(); ++iter) {
 cout << *iter <<'';
@@ -1131,7 +1131,7 @@ using namespace std;
 
 vector ivec{2,5, 6,7,9,67};
 list ilist{5,23,2323,12,65,2,55,323};
-string str {"bugrahan serttas };
+string str {"bugrahan serttas"};
 
 for (auto i = ivec)
 cout << i << ' ';
@@ -1221,7 +1221,7 @@ str = 'X'; //char parametreli atama
 
 cout << "|" << str << "|\n";
 
-str = {'a', 'l', 'i'} //init list ataması
+str = {'a', 'l', 'i'}; //init list ataması
 
 cout << "|" << str << "|\n";
   
@@ -1238,7 +1238,7 @@ return "kerim denizoglu";
 
 int main()
 {
-using namespace std
+using namespace std;
 
 string name = "tayyip erguder";
 
@@ -1268,13 +1268,13 @@ using namespace std;
 
 string name = "tayyip erguder";
 
-cout << "name.lenght() = " << name.lenght() << '\n';
+cout << "name.lenght() = " << name.length() << '\n';
 name.clear();//1. yol
-name.resize(0); //2. yol, argğman sıfır olarak yollandı
+name.resize(0); //2. yol, argüman sıfır olarak yollandı
 name = ""; //3. yol
 name = {}; //4. yol
 name = string{}; //5. yol
-cout << "name.lenght() = " << name.lenght() << '\n';
+cout << "name.lenght() = " << name.length() << '\n';
 
 }
 
@@ -1482,7 +1482,7 @@ if (str.contains("emrecan")) {
 std::cout << "evet var\n";
 }
 else {
-std::cout << "hayiy yok
+std::cout << "hayiy yok"
 }
 }
 
@@ -1504,7 +1504,7 @@ str.rfind() //aramayı sondan başlatır
 }
 
 -----------
-find_first_of //yazının karakterlerinden herhnagi birinin bulunduğu ilk yeri
+find_first_of //yazının karakterlerinden herhangi birinin bulunduğu ilk yeri
 
 int main()
 {
@@ -1532,7 +1532,6 @@ string s2 = "selma deniz";
 s1.append(s2, 5); //s1 yazısına s2'nin 5. indeksinden başlarayak ekler
 //s1.append(s2, 1,5);
 cout << "s1 = " << s1 << '\n';
-
 }
 
 ------------
@@ -1607,7 +1606,6 @@ int main()
 vector ivec{2, 3, 4, 7, 9,1 };
 
 for (auto i : ivec) cout << i << ' '; 
-cout << '\n';
 ivec.insert(ivec.begin(), 6);
 for (auto i : ivec) cout << i << ' '; 
 cout << '\n';
@@ -1631,10 +1629,10 @@ cout << "[" << s << "]\n";
 }
 
 --------------
-using namespace std;
 
 int main()
 {
+using namespace std;
 string s {"mehmetbal"};
 //yazının ilk karakterini siler
 while (!s.empty()) { 
@@ -1644,10 +1642,10 @@ s.erase(s.begin())
 }
 
 ----------------
-using namespace std;
 
 int main()
 {
+using namespace std;
 string s {"mehmetbal"};
 //yazının ilk karakterini siler
 while (!s.empty()) { 
