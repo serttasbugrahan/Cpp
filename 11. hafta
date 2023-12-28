@@ -160,7 +160,74 @@ cout << "|" << str << "|\n";
 auto n = erase(str, 'e');
 
 cout << "|" << str << "|\n";
+cout << "n = " << n << "|\n";
+
 }
+
+=======================================================================
+
+expection handling
+-------------------
+
+kod yanlış yazılmış ==> programming errors (cpding errors)
+
+kodlama hataları ile başa çıkmanın en temel yolu assertions (doğrulama)
+
+assertions (doğrulama)
+    dynamic assertions (runtime)
+    static assertions (compile time)
+
+---------
+
+c dilinde aşağıda ki şekilde yapıyorduk
+
+#
+assert(x > 0);
+
+void func(int *ptr)
+{
+assert(ptr != NULL);
+assert(b != 0);
+int x = a / b;
+}
+
+-------
+
+c11 ile gelen static assert
+
+static_assert(sizeof(int) > 2);
+
+int main()
+{
+
+}
+
+----------------
+
+eğer fonksyion işini yapamadığını 
+kendisini çağıran koda bir şekilde bildiriyorsa buna geleneksel hata işleme nedir
+
+1. dezavantaj : iş gören kod ile hata işleyen kodun iç içe geçmesi
+kodun anlaşılması vs. her şey zorlaşır
+
+2. dezavantaj : hatanın fonksiyon tarafından kendisini çağıran koda bildirilmesi
+
+f1 ==> f2 ==> f3 ==> f4 ==> f5, bu fonksiyonlar birbirini çağırdığı için hata f1 hatası her yerde gözükebilir
+
+böyle bir durumda f5'te gözüken hata f1' e geçmeli
+
+f1 ==> f2 ==> f3 ==> f4 ==> f5
+<-----------------------------
+
+3.dezavantaj : zorlayıcı bir mekanizmanın olmaması
+
+------------
+
+en büyük risk ctor'lardır çünkü geri dönüş değeri yoktur
+
+
+
+
 
 
 
