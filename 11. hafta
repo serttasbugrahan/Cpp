@@ -1,0 +1,168 @@
+//////////////////////////////////////////////////////////////////////1. Ders//////////////////////////////////////////////////////////////////////////
+
+int main()
+{
+using namespace std;
+
+string name{ "mert" };
+string surname{ "kaptan" };
+
+auto s = name + ' ' + surname + "oglu";
+//operator+(operator+(name, ' '), surname), "oglu");
+}
+
+-------
+
+c++ içindeki c'yi bilmeyenlerin yaptığı bir hata
+
+int main()
+{
+using namespace std;
+string name{ "mert" };
+
+const char* p = "can";
+name + "yasar" + "can"; //
+"yasar" + p + name //hata 2 pointer toplanıyor
+}
+
+--------
+
+int main()
+{
+using namespace std;
+int x{}, y{};
+
+int* p1 = &x;
+int* p2 = &y;
+
+p1 + p2;
+}
+
+---------------------------------
+
+string sınıfı yazılardan sayılara
+sayılardan yazılara dönüşüm olanapı verir
+
+int main()
+{
+using namespace std;
+
+to_string()
+int ival{};
+cout << "bir tam sayi giriniz: ";
+cin >> ival;
+
+auto str = to_string(ival);
+cout << '|' << str << '|';
+
+}
+
+-------
+
+int main()
+{
+using namespace std;
+
+int ival{};
+cout << "bir tam sayi giriniz: ";
+cin >> ival;
+
+string str;
+int x = 56;
+str = x; //operator=(char)
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+string s{ "ali23874furkan" };
+cout << "|" << s << "|\n";
+try
+{
+auto ival = stoi(s)
+auto ival = stoi(s)
+  cout << "ival = " << ival << "|\n";
+}
+catch(const std::exception& ex)
+{
+	std::cout << "expection caught: " << ex.what() << '\n';
+}
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+string s{"23874furkan" };
+
+size_t idx{};
+auto ival = stoi(s, &idx);
+
+cout << "ival = " << ival << '\n';
+cout << "idx = " << idx << '\n';
+}
+
+------------
+//aşaüıdaki örnekler sadece string sınıfına özel değildir 
+containerlara özeldir
+
+#include <algorithm>
+
+int main()
+{
+using namespace std;
+
+string str;
+
+std::cout << "bir yazi girin: ";
+getline(cin, str);
+char c = 'e';
+auto n = count(str.begin(), str.end(), c)
+
+cout << "n = " << n << '\n'; 
+}
+
+--------
+
+#include <algorithm>
+
+int main()
+{
+using namespace std;
+
+string str;
+
+std::cout << "bir yazi girin: ";
+getline(cin, str);
+
+cout << "|" << str << "|\n";
+reverse(str.begin(), str.end());
+cout << "|" << str << "|\n";
+}
+
+---------
+
+int main()
+{
+using namespace std;
+string str;
+
+std::cout << "bir yazi girin: ";
+getline(cin, str);
+
+cout << "|" << str << "|\n";
+
+auto n = erase(str, 'e');
+
+cout << "|" << str << "|\n";
+}
+
+
+
+
+
