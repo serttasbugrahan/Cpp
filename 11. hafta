@@ -203,6 +203,8 @@ int main()
 }
 
 ----------------
+geleneksel hata işleme:
+-----------------------
 
 eğer fonksyion işini yapamadığını 
 kendisini çağıran koda bir şekilde bildiriyorsa buna geleneksel hata işleme nedir
@@ -225,11 +227,404 @@ f1 ==> f2 ==> f3 ==> f4 ==> f5
 
 en büyük risk ctor'lardır çünkü geri dönüş değeri yoktur
 
+----------------------------------
+
+expection handling araçları : çalışma zamanı hatalarının ele alınması
+-----------------------------
+
+throw 
+try 
+catch
+
+--------
+
+throw : işimi yapamamakla ilgili bilgiyi size ieticek bir nesne oluşturdum ve bu nesneyi size göderiyorum
+   throw statement	
+
+try block : bir hata göderilirse ben bu hatayı yakalamakla görevliyim demektir
+try {
+
+}
+
+catch block : hataya müdahale eden kodu temsil ediyor (exception handler)
+
+---------
+
+try {
+f1();
+}
+catch(int) { //birden fazla catch olabilir
+
+}
+catch(long) { //long türünden ise buraya
+
+}
+catch(double) { //double türünden ise buraya
+
+}
+
+--------
+to catch an exception
+uncaught exception
+--------
+
+bit hata nesnesi gönderildi
+ve bu hata nesnesi yakalanamadi
+bu durumda ne olur?
+
+uncaught exception olur bu durumda
+std::terminate çağrılır, std::terminate'de 
+abort çağırır
+
+---------
+
+using terminate_handler = void (*)();
+typedef void (*terminate_handler)();
+
+terminate_handler set_terminate(terminate_handler);
+
+------------------
+
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	throw 1; // program burada biticek
+	std::cout << "f4 sona erdi\n ";
+}
+
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
+
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
+
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+	std::cout << "main basladi\n";
+	f1();
+	std::cout << "main sona erdi\n";
+}
+
+---------------
+
+void myabort()
+{
+	std::cout << "myabort cagrildi\n";
+	exit(EXIT_FAILURE);
+}
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	throw 1; // program burada biticek
+	std::cout << "f4 sona erdi\n ";
+}
+
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
+
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
+
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+set_terminate(&myabort);
+std::cout << "main basladi\n"
+f1();
+std::cout << "main sona erdi\n"
+}
+
+------------
+
+//exception main içinde de yakalanabilir
+
+void myabort()
+{
+	std::cout << "myabort cagrildi\n";
+	exit(EXIT_FAILURE);
+}
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	throw 1; // program burada biticek
+	std::cout << "f4 sona erdi\n ";
+}
+
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
+
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
+
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+std::cout << "main basladi\n";
+try { //eğer try bloğu içinde çalışan koddan hata nesnesi göderilirse
+f1();
+}
+catch(int) { //ve gönderilen hata nesnesinin türü int ise programın akış
+//buraya çekilicek
+std::cout << "hata yakalandi(catch(int)\n";
+}
+
+std::cout << "devam ediyor\n";
+}
+
+!! dönüşüm olmaz catch int ise throwda int olmak zorunda
+
+-------------
+
+void myabort()
+{
+	std::cout << "myabort cagrildi\n";
+	exit(EXIT_FAILURE);
+}
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	throw 1; // program burada biticek
+	std::cout << "f4 sona erdi\n ";
+}
+
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
+
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
+
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+std::cout << "main basladi\n";
+try { 
+}
+catch(int) { 
+std::cout << "hata yakalandi(catch(int)\n";
+}
+catch(unsigned int) { 
+std::cout << "hata yakalandi(catch(int)\n";
+}
+catch(float) { 
+std::cout << "hata yakalandi(catch(int)\n";
+}
+catch(double) { 
+std::cout << "hata yakalandi(catch(int)\n";
+}
+std::cout << "devam ediyor\n";
+}
+
+---------------------
+
+2 ayrı throw vardır
+
+throw; //rethrow
+
+throw MathError{} //matematik ile ilgili bir hata
+
+throw std::bad_alloc{} //allocation ile ilgili bir hata var demek
+
+-------------------
+
+	       ExceptionBase
+
+MathException  StringException  FileException
+		    FileReadException FileWriteException
 
 
 
+--------------------
 
+void myabort()
+{
+	std::cout << "myabort cagrildi\n";
+	exit(EXIT_FAILURE);
+}
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	throw DivideByZero{};
+	std::cout << "f4 sona erdi\n ";
+}
 
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
 
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
 
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+std::cout << "main basladi\n";
+try { 
+}
+catch(DivideByZero&) //değişkeni kullanmıycan isim verme
+{ //upcasting vardır ExBase& dahil hepsini yakalayabilir
+std::cout << "hata yakalandi\n";
+}
+std::cout << "devam ediyor\n";
+}
+
+-----------------
+
+//out_of_range ==> logic_error ==> exception
+
+void f4()
+{
+	std::cout << "f4 cagrildi\n";
+	std::string str{"emrecan"};
+
+	auto c = str.at(456);
+	std::cout << "f4 sona erdi\n ";
+}
+
+void f3()
+{
+	std::cout << "f3 cagrildi\n";
+	f4();
+	std::cout << "f3 sona erdi\n";
+}
+
+void f2()
+{
+	std::cout << "f2 cagrildi\n";
+	f3();
+	std::cout << "f2 sona erdi\n";
+}
+
+void f1()
+{
+	std::cout << "f1 cagrildi\n";
+	f2();
+	std::cout << "f1 sona erdi\n";
+}
+
+int main()
+{
+std::cout << "main basladi\n";
+try { 
+f1();
+}
+catch(const std::exception& ex) //bütün hataları yakalar
+//    const std::logic_error& ex) //logic hataları yakalar	
+//    const std::out_of_range& ex) //out_of_range hataları yakalar	
+{
+std::cout << "hata yakalandi\n" << ex.what() << "\n";
+}
+
+std::cout << "devam ediyor\n";
+}
+
+--------------
+//bu yapı lojik açıdan yanlış çünkü en üsttteki genel olarak yakaladağı için
+aşağıdakilere şans bırakmaz
+int main()
+{
+std::cout << "main basladi\n";
+try { 
+f1();
+}
+catch(const std::exception& ex) 
+{
+std::cout << "hata yakalandi\n" << ex.what() << "\n";
+
+}
+catch const std::logic_error& ex)
+{
+std::cout << "hata yakalandi\n" << ex.what() << "\n";
+
+}
+catch const std::out_of_range& ex) 	
+{
+std::cout << "hata yakalandi\n" << ex.what() << "\n";
+}
+
+std::cout << "devam ediyor\n";
+}
+
+-------------
+
+özel bir catch yapısı
+
+int main()
+{
+std::cout << "main basladi\n";
+try { 
+f1();
+}
+catch(...)  //catch all, hangi türden olursa olsun tüm hataları yakalar
+{
+}
 
