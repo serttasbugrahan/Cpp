@@ -41,7 +41,7 @@ p1 + p2;
 ---------------------------------
 
 string sınıfı yazılardan sayılara
-sayılardan yazılara dönüşüm olanapı verir
+sayılardan yazılara dönüşüm olanağı verir
 
 int main()
 {
@@ -455,18 +455,16 @@ int main()
 {
 std::cout << "main basladi\n";
 try { 
+f1();
 }
 catch(int) { 
 std::cout << "hata yakalandi(catch(int)\n";
 }
 catch(unsigned int) { 
-std::cout << "hata yakalandi(catch(int)\n";
+std::cout << "hata yakalandi(catch(double)\n";
 }
 catch(float) { 
-std::cout << "hata yakalandi(catch(int)\n";
-}
-catch(double) { 
-std::cout << "hata yakalandi(catch(int)\n";
+std::cout << "hata yakalandi(catch(float)\n";
 }
 std::cout << "devam ediyor\n";
 }
@@ -589,7 +587,8 @@ std::cout << "devam ediyor\n";
 
 --------------
 //bu yapı lojik açıdan yanlış çünkü en üsttteki genel olarak yakaladağı için
-aşağıdakilere şans bırakmaz
+aşağıdakilere yakalama şansı bırakmaz
+
 int main()
 {
 std::cout << "main basladi\n";
@@ -627,4 +626,804 @@ f1();
 catch(...)  //catch all, hangi türden olursa olsun tüm hataları yakalar
 {
 }
+
+//////////////////////////////////////////////////////////2. Ders/////////////////////////////////////////////////
+
+class Nec {
+unsigned char buf[1024 * 1024]{};
+};
+
+int main()
+{
+std::vector<Nec*> nvec;
+int i{};
+try{
+for (i = 0; i < 1'000'000; ++i) {
+nvec.push_back(new Nec{});
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+std::cout << "i = " << i << '\n';
+}
+}
+
+
+------------------
+
+#include <string>
+
+int main()
+{
+using namespace std;
+
+string str(10, 'A');
+
+try
+{
+	auto c = str.at(463);
+}
+//catch(const std::exception& ex) //hatayı yakalar
+//catch(const std::out_of_range& ex) //hatayı yakalar
+//catch(const std::logic_error& ex) //hatayı yakalar
+//catch(...) //catch all
+catch(const std::out_of_range& ex)
+{
+	std::cout << "exception caught: " << ex.what() << '\n';
+}
+
+}
+
+//sırlamaa özelden genele olmalı
+
+
+----------------------------
+
+hatayı neden yakalarız?
+-hataya müdahele etmek için
+
+1) resumption :  exception yakalanır bir kaynak sızıntısı olmadığı 
+garantisi sağlanmıştır programın akışı o noktadan devam eder
+
+2) terminate : exception yakalanır ancak o exception yakalandıktan sonra
+programın sağlıklı bir şekilde çalışmasının şansı yoktur ve program sonlandırılır
+
+3) kismi müdahale : exception yakalanır bir takım işlemler yaparız
+ancak benim sorumluluğum bu kadar diyip exception tekrar göndeririz
+exception rethrow ederiz
+
+4) translate etmek : bizim yakaladığımız exception daha alt seviyede bir
+exception ama kendi clientlarınız için daha yüksek seviyede exception
+gönderiyoruz
+
+
+--------------
+
+int foo();
+
+int main()
+{
+	using namespace std;
+
+	try
+	{
+		int x = foo();
+	}
+	catch (const std::exception &ex)
+	{
+		std::cout << "hata yakalandi x = " << x << '\n'; //block scopedan dolayı geçersiz
+	}
+}
+
+------------
+
+int foo();
+
+int main()
+{
+	using namespace std;
+
+	try
+	{
+
+	}
+	catch (const std::exception &ex)
+	{
+		int x{};
+	}
+
+	x++; //Hata olur try ve catch ikiside bloktur
+}
+
+
+----------------
+
+a) gönderilen exception'lar yakalanıyor mu
+b) hataların yakalanmasi durumunda kaynak sızıntısı oluyor mu?
+
+-------------
+//burada kaynak sızıntısı olur
+
+class Myclass{
+};
+
+void foo();
+void bar();
+
+void func()
+{
+Myclass *p = new Myclass;
+foo();
+bar();
+delete p;
+}
+
+------------
+
+kaynak sızıntısı nasıl engellenir ?
+-RAII
+
+stack unwinding (yığının geri sarımı)
+
+f1 ==> f2 ==> f3 ==> f4 ==> f5 
+
+----------
+//stack unwinding (yığının geri sarımı) yapısı
+//bu yapı bize sen exception yakalarsan otomatik ömürlü nesnelerin destroy edilicek
+//dinamik ömürlü nesneler için bu durum geçerli değildir
+
+class Myclass {
+
+public:
+~Myclass()
+{
+std::cout << this << "adresindeki Myclass nesnesinin kaynaklari geri veriliyor"
+}
+
+private:
+int ar[100]{};
+
+};
+
+void f4()
+{
+Myclass m4;
+throw std::exception{}; //tek başına tr catch olmadan hata verir
+}
+
+void f3()
+{
+Myclass m3;
+f4();
+}
+
+void f2()
+{
+Myclass m2;
+f3();
+}
+
+void f1()
+{
+Myclass m1;
+f2();
+}
+
+
+int main()
+{
+try
+{
+f1();
+}
+catch(const std::exception& ex)
+{
+std::cout << "exception caught: "<< ex.what() << '\n';
+}
+}
+
+---------------
+
+class Myclass {
+
+};
+
+void foo();
+void bar();
+
+void func()
+{
+FILE* f = fopen("necati.txt", "w);
+
+foo();
+bar();
+
+fclose(f); //dosya kapatılmaz kaynak sızıntısı olur
+}
+
+--------------
+
+class File {
+public:
+File(const char*);
+~File();
+};
+
+void foo();
+void bar();
+
+void func()
+{
+File myfile("necati.txt");
+
+foo();
+bar();
+}
+
+--------------
+
+aksi biçimde bir durum olmadıkça
+dinamik ömürlü nesneleri (ya da genel olarak kaynakları)
+ham pointer'lar ile değil
+smart pointer nesneleri ile kullanın
+
+----------------------------------------------
+
+exception'in rethrow edilmesi: yakalanan hatanın tekrar gönderilmesi
+------------------------------
+rethrow sentaxı:
+
+try {
+foo();
+
+}
+catch(const std::MathError& ex) {
+throw;
+}
+
+---------
+
+//aşağıdaki yapı rethrow statement değildir.
+try {
+foo();
+
+}
+catch(const std::bad_alloc& ex) {
+throw ex;
+}
+
+-----------
+
+void func()
+{
+	try
+	{
+		throw std::out_of_range{"range hatasi"};
+	}
+	catch(const std::exception& ex)
+	{
+		std::cout << "hata func icinde yakalandi: "<< ex.what() << '\n';
+		//iki farkli
+		throw;
+		
+	}
+	
+}
+
+int main()
+{
+	try
+	{
+		func();
+	}
+	catch(const std::out_of_range& ex)
+	{
+		std::cout << "hata yakalandi (std:out_of_range)\n";
+	}
+	
+	catch(const std::exception&)
+	{
+		std::cout << "hata yakalandi (std:exception)\n";
+	}
+	
+}
+
+-----------------
+
+struct NecEx
+{
+	unsigned char buffer[1024]{};
+};
+
+void func()
+{
+	try
+	{
+		throw NecEx{};
+	}
+	catch(const NecEx& necex)
+	{
+		std::cout << "&necex=  "<< &necex << '\n';
+		//throw
+		throw necex;
+		
+	}
+}
+
+void foo()
+{
+	try
+	{
+		func();
+	}
+	catch(const NecEx& necex)
+	{
+		std::cout << "&necex=  "<< &necex << '\n';
+	}
+}
+
+int main()
+{
+foo();
+}
+
+---------------
+
+void bar()
+{
+std::cout << "bar called!\n";
+throw;
+}
+
+void foo()
+{
+try{
+if (1) {
+//throw std::out_of_range{} //hata
+throw std::out_of_range{"out of range} //legal
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+bar();
+}
+}
+
+int main()
+{
+try {
+foo();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+------------
+//aşağıdaki durumda terminate çağrılır
+//terminate azraildir
+
+void bar()
+{
+throw;
+}
+
+int main()
+{
+bar();
+}
+
+!! eğer bir rethrow statement yürütüldüğünde yakalanmış bir hata nesnesi yok ise
+std::terminate çağrılır
+
+------------
+
+void bar()
+{
+throw;
+}
+
+int main()
+{
+try {
+bar();
+}
+catch (...) { //terminate edilir
+catch (const std::exception& ex) { //terminate edilir
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+----------------------------------
+
+!! bir nesne hayata getirilemiyor ise ctor yapması gereken exception throw etmek
+
+//aşağıdaki yapıda dtor çağrılmaz, ctor hayatı bitmemiştir
+//böyle durumlarda da akıllı pointer kullanmak gerekir
+//akıllı pointer olsaydı hayata gelen dtor çağrılcaktı
+
+#include <stdexcept>
+class Myclass {
+public:
+
+Myclass(int x)
+{
+if (x < 0) {
+throw std::invalid_argument{"gecersiz arguman"};
+}
+}
+~Myclass()
+{
+std::cout << "Myclass destructor\n";
+}
+};
+
+int main()
+{
+try {
+Myclass m{ -12 };
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+----------------
+
+exception safety : gönderilen exceptionlar yakalanacak 
+exception yakalandığı zaman bir kaynak sızıntısı olmıycak
+
+--------------
+
+class A {
+public:
+A(int)
+{
+std::cout << "A(int) ctor\n";
+}
+~A()
+{
+std::cout << "A(int) dtor\n";
+}
+};
+
+class B {
+public:
+B(int)
+{
+std::cout << "A(int) ctor\n";
+}
+~B()
+{
+std::cout << "A(int) dtor\n";
+}
+};
+
+class Myclass {
+public:
+
+Myclass() : ax(0), bx(1) {}
+{
+if (1)
+{
+throw std::bad_alloc{};
+}
+}
+
+~Myclass()
+{
+std::cout << "Myclass detor\n";
+}
+private:
+A ax;
+B bx;
+};
+
+void foo()
+{
+Myclass m;
+}
+
+int main()
+{
+foo();
+}
+
+int main()
+{
+try{
+foo();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+---------------
+//hayata gelmiş nesnelerin dtor'ları çağrılıcak
+
+class A {
+public:
+A(int)
+{
+std::cout << "A(int) ctor\n";
+}
+~A()
+{
+std::cout << "A(int) dtor\n";
+}
+};
+
+class B {
+public:
+B(int x)
+{
+std::cout << "A(int) ctor\n";
+if (x > 0)
+{
+throw std::invalid_argument{"gecersiz deger"};
+}
+}
+}
+~B()
+{
+std::cout << "A(int) dtor\n";
+}
+};
+
+class Myclass {
+public:
+
+Myclass() : ax(0), bx(1) {}
+{
+
+~Myclass()
+{
+std::cout << "Myclass detor\n";
+}
+private:
+A ax;
+B bx;
+};
+
+void foo()
+{
+Myclass m;
+}
+
+int main()
+{
+foo();
+}
+
+int main()
+{
+try{
+foo();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+------------
+//nec dtor çağrılmadığı için mp içinde dtor çağrılmıycak
+
+class Member {
+public:
+Member()
+{
+std::cout << "Member ctor\n";
+}
+
+~Member()
+{
+std::cout << "Member dtor\n";
+}
+ 
+};
+
+class Nec {
+public:
+Nec() : mp {new Member} 
+{
+throw 1;
+}
+~Nec(){ //member dtor çağrılmıycak, smart pointer kullanılmalı
+delete mp;
+}
+private:
+Member* mp;
+};
+
+int main()
+{
+try {
+Nec mynec;
+}
+catch (int ) {
+std::cout << "exception caught\n";	
+}
+}
+
+-------------------
+
+class Member {
+public:
+Member(int x)
+{
+std::cout << "Member ctor\n";
+if (x < 0)
+throw std::runtime_error{"exception from member\n"}
+}
+};
+
+//hatayı nec ctor'da yakalamanın bir yolu var mı
+
+class Nec {
+public:
+Nec(int val) : mx(val)  //nec'i ctoru mx(val)'i  yakalamanın yolu function try block kullanarak yakalar, özell bir sentax ile yani
+{
+try {
+
+}
+catch (...) {
+std::cout << "hata yakalandi\n"
+}
+}
+private:
+Member mx;
+};
+
+int main()
+{
+
+Nec mynec(-23);
+}
+
+---------------------
+
+function try block:
+-------------------
+//sentaxı
+
+void func(int x)
+try{
+
+}
+catch (const std::bad_alloc& ex) {
+
+}
+
+-------
+
+int func(int x)
+try{
+
+if (x < 0)
+throw std::runtime_error{"gecersiz deger"};;
+return 3;
+}
+catch (const std::runtime_error&) {
+return 1; //hata yok
+}
+
+---------
+
+int func(int x)
+try{
+int y = 5;
+if (x < 0)
+throw std::runtime_error{"gecersiz deger"};
+
+return 3;
+}
+catch (const std::runtime_error&) {
+return x * y; //hata
+}
+
+----------
+//mülakatlarda sorulur
+
+class Member {
+public:
+Member(int x)
+{
+std::cout << "Member ctor\n";
+if (x < 0)
+throw std::runtime_error{"exception from member\n"}
+}
+};
+
+
+class Nec {
+public:
+Nec(int val) try : mx(val)  
+{
+
+}
+catch(const std::exception& ex){
+std::cout << "exception caught..." << ex.what()  << '\n';
+(void)getchar(); //kaldırırsak hata olur
+//burada ya program sonlanıcak (terminate edilicek), ya throw edilicek, ya da başka bir exception göndericez 
+}
+private:
+Member mx;
+};
+
+int main()
+{
+Nec mynec(-23);
+}
+
+------------
+
+class A {
+public:
+A() = default;
+A(const A&)
+{
+std::cout << "A copy ctor\n";
+throw std::runtime_error{"error form copy ctor class A\n"}
+}
+};
+
+class Nec {
+public:
+Nec(A) try
+{
+
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught... " <<ex.what() << '\n';
+(void)getchar();
+}
+private:
+};
+
+int main()
+{
+A ax;
+Nec mynec(ax);
+}
+
+---------------------
+//mülakatlarda çok sorulur
+
+exception gurantee(s):
+----------------------
+
+kesinlikle olmaması gereken bir durum:
+exception yakalandığında eğer bir kaynak sızıntısı (memmory leak ile larıştırma)
+(mesela dosyanın kapatılmaması) oluşması ya da programın geçersiz bir duruma gelmesi
+
+basic guarantee : exception göderildiğinde bir kaynak sızıntısı olmıycak
+bu garanti altına alınıcak nesnesin ya da nesnelerin stati geçerli olucak
+bu şartların sağlanmasına denir
+
+strong guarantee : basic'in üstüdür, basic'e ek olarak state'de değiştirmez
+'commit or rollback' da denir. ya işini yap ya da işe başlaamdan önceki state'i koru
+
+nothrow guarantee : strong üstüdür, exception göndermemeyi garanti eder
+
+-----------
+exception specification
+
+//eski cpp'de aşağıdaki şekildeymiş sentax
+
+void func(int) //bu konuda bilgi vermiyorum
+void func(int) throw(std::bad_alloc, std::invalid_argument); //bu listeki türlerden exception gönderir
+void foo(int)throw(); //exception göndermeme garantisi veriyor
+
+/////////////////////////////////3. Ders////////////////////////////////
+
+
+
+
+
+
+
+
+
+
 
