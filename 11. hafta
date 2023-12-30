@@ -238,10 +238,10 @@ catch
 
 --------
 
-throw : işimi yapamamakla ilgili bilgiyi size ieticek bir nesne oluşturdum ve bu nesneyi size göderiyorum
+throw : işimi yapamamakla ilgili bilgiyi size ileticek bir nesne oluşturdum ve bu nesneyi size gönderiyorum
    throw statement	
 
-try block : bir hata göderilirse ben bu hatayı yakalamakla görevliyim demektir
+try block : bir hata gönderilirse ben bu hatayı yakalamakla görevliyim demektir
 try {
 
 }
@@ -528,7 +528,7 @@ int main()
 std::cout << "main basladi\n";
 try { 
 }
-catch(DivideByZero&) //değişkeni kullanmıycan isim verme
+catch(DivideByZero&) //değişkeni kullanmıycam isim verme
 { //upcasting vardır ExBase& dahil hepsini yakalayabilir
 std::cout << "hata yakalandi\n";
 }
@@ -745,6 +745,7 @@ b) hataların yakalanmasi durumunda kaynak sızıntısı oluyor mu?
 //burada kaynak sızıntısı olur
 
 class Myclass{
+
 };
 
 void foo();
@@ -754,7 +755,7 @@ void func()
 {
 Myclass *p = new Myclass;
 foo();
-bar();
+bar(); 
 delete p;
 }
 
@@ -777,7 +778,7 @@ class Myclass {
 public:
 ~Myclass()
 {
-std::cout << this << "adresindeki Myclass nesnesinin kaynaklari geri veriliyor"
+std::cout << this << "adresindeki Myclass nesnesinin kaynaklari geri veriliyor";
 }
 
 private:
@@ -869,8 +870,11 @@ smart pointer nesneleri ile kullanın
 
 ----------------------------------------------
 
-exception'in rethrow edilmesi: yakalanan hatanın tekrar gönderilmesi
+exception'in rethrow edilmesi: yakalanan hatanın tekrar gönderilmesi, yeniden throw etme
 ------------------------------
+!!eğer catch parametresini kullanmıycak isim vermeyin, okuyan yanılır
+!!eğer catch parametresi referans ise const'dikka et ve const kullan
+
 rethrow sentaxı:
 
 try {
@@ -903,8 +907,9 @@ void func()
 	catch(const std::exception& ex)
 	{
 		std::cout << "hata func icinde yakalandi: "<< ex.what() << '\n';
-		//iki farkli
-		throw;
+		//iki farkli throw statement arasındaki farkı görünüz
+		//throw ex; //dinamik tür bilgisini kaybeder exception catch yakalar yakalar
+		throw; //dinamik tür bilgisi değişmez
 		
 	}
 	
@@ -944,8 +949,8 @@ void func()
 	catch(const NecEx& necex)
 	{
 		std::cout << "&necex=  "<< &necex << '\n';
-		//throw
-		throw necex;
+		//throw //aynı adres yazar
+		throw necex; //farklı adres yazar
 		
 	}
 }
@@ -1001,7 +1006,7 @@ std::cout << "exception caught: " << ex.what() << '\n';
 
 ------------
 //aşağıdaki durumda terminate çağrılır
-//terminate azraildir
+//terminate azraildir!!
 
 void bar()
 {
@@ -1048,11 +1053,11 @@ public:
 
 Myclass(int x)
 {
-if (x < 0) {
+if (x <	 0) {
 throw std::invalid_argument{"gecersiz arguman"};
 }
 }
-~Myclass()
+~Myclass() //kaynak sızıntı olucak
 {
 std::cout << "Myclass destructor\n";
 }
@@ -1070,8 +1075,10 @@ std::cout << "exception caught: " << ex.what() << '\n';
 
 ----------------
 
-exception safety : gönderilen exceptionlar yakalanacak 
-exception yakalandığı zaman bir kaynak sızıntısı olmıycak
+exception safety : gönderilen exceptionlar yakalanacak exception yakalandığı zaman 
+bir kaynak sızıntısı olmıycak
+
+kaynak sızıntısı olmayan kodlara exception safe denir.	
 
 --------------
 
@@ -1102,7 +1109,7 @@ std::cout << "A(int) dtor\n";
 class Myclass {
 public:
 
-Myclass() : ax(0), bx(1) {}
+Myclass() : ax(0), bx(1)
 {
 if (1)
 {
@@ -1124,10 +1131,6 @@ void foo()
 Myclass m;
 }
 
-int main()
-{
-foo();
-}
 
 int main()
 {
@@ -1142,68 +1145,68 @@ std::cout << "exception caught: " << ex.what() << '\n';
 ---------------
 //hayata gelmiş nesnelerin dtor'ları çağrılıcak
 
-class A {
+class A
+{
 public:
-A(int)
-{
-std::cout << "A(int) ctor\n";
-}
-~A()
-{
-std::cout << "A(int) dtor\n";
-}
+	A(int)
+	{
+		std::cout << "A(int) ctor\n";
+	}
+	~A()
+	{
+		std::cout << "A(int) dtor\n";
+	}
 };
 
-class B {
+class B
+{
 public:
-B(int x)
-{
-std::cout << "A(int) ctor\n";
-if (x > 0)
-{
-throw std::invalid_argument{"gecersiz deger"};
-}
-}
-}
-~B()
-{
-std::cout << "A(int) dtor\n";
-}
+	B(int x)
+	{
+		std::cout << "B(int) ctor\n";
+		if (x > 0)
+		{
+			throw std::invalid_argument{"gecersiz deger"};
+		}
+	}
+	~B()
+	{
+		std::cout << "B(int) dtor\n";
+	}
 };
 
-class Myclass {
+class Myclass
+{
 public:
+	Myclass() : ax(0), bx(1)
+	{
+	}
+	~Myclass()
+	{
+		std::cout << "Myclass detor\n";
+	}
 
-Myclass() : ax(0), bx(1) {}
-{
-
-~Myclass()
-{
-std::cout << "Myclass detor\n";
-}
 private:
-A ax;
-B bx;
+	A ax;
+	B bx;
 };
 
 void foo()
 {
-Myclass m;
+	Myclass m;
 }
+
 
 int main()
 {
-foo();
-}
-
-int main()
-{
-try{
-foo();
-}
-catch (const std::exception& ex) {
-std::cout << "exception caught: " << ex.what() << '\n';
-}
+	try
+	{
+		foo();
+	}
+	catch (const std::exception &ex)
+	{
+		std::cout << "exception caught: " << ex.what() << '\n';
+	}
 }
 
 ------------
@@ -1254,7 +1257,7 @@ Member(int x)
 {
 std::cout << "Member ctor\n";
 if (x < 0)
-throw std::runtime_error{"exception from member\n"}
+throw std::runtime_error{"exception from member\n"}; 
 }
 };
 
@@ -1268,7 +1271,7 @@ try {
 
 }
 catch (...) {
-std::cout << "hata yakalandi\n"
+std::cout << "hata yakalandi\n";
 }
 }
 private:
@@ -1331,7 +1334,7 @@ Member(int x)
 {
 std::cout << "Member ctor\n";
 if (x < 0)
-throw std::runtime_error{"exception from member\n"}
+throw std::runtime_error{"exception from member\n"};
 }
 };
 
@@ -1394,8 +1397,8 @@ exception gurantee(s):
 ----------------------
 
 kesinlikle olmaması gereken bir durum:
-exception yakalandığında eğer bir kaynak sızıntısı (memmory leak ile larıştırma)
-(mesela dosyanın kapatılmaması) oluşması ya da programın geçersiz bir duruma gelmesi
+exception yakalandığında eğer bir kaynak sızıntısı (memmory leak ile karıştırma,
+mesela dosyanın kapatılmaması) oluşması ya da programın geçersiz bir duruma gelmesi
 
 basic guarantee : exception göderildiğinde bir kaynak sızıntısı olmıycak
 bu garanti altına alınıcak nesnesin ya da nesnelerin stati geçerli olucak
