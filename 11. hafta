@@ -1710,6 +1710,211 @@ oldukça öenmlidir.
 noexcept yok ise copy ctor çağırdı
 
 
+-------------------
+
+class Nec {
+public:
+};
+
+class Myclass {
+Nec nec;
+};
+
+int main()
+{
+constexpr bool b = noexcept(Myclass{}); //true
+}
+
+-------------
+
+class Nec {
+public:
+Nec(); //noexcept olsaydı true olucaktı
+};
+
+class Myclass {
+Nec nec;
+};
+
+int main()
+{
+constexpr bool b = noexcept(Myclass{}); //false
+}
+
+------------
+//c++20 ile geldi
+
+class A {
+public:
+A();
+};
+
+class Nec {
+public:
+Nec()noexcept = default;
+
+private:
+A ma;
+};
+
+int main()
+{
+constexpr auto b = noexcept(Nec{});
+}
+
+==========================================================================
+GENERIC PROGRAMMING IN C++
+(templates)
+
+türden bağımsız
+
+--------------------------
+
+c dilinde bu türden bağımsızlık gerektiren (generic programlama) işleri void pointer ile yapabiliyroduk 
+
+void gswap(void* vp1, void* vp2, size_t sz)
+{
+char* p1 = (char*)vp1;
+char* p1 = (char*)vp1;
+
+while (sz--) {
+char temp = *p1;
+*p1++ = *p2;
+*p2++ = temp;
+}
+}
+
+
+----------------------------
+
+template (şablon) : derleyiciye kod yazdırmak için yazılan kod
+
+aslında string diye sınıf yoktur. basic string adlı sınıf şablonundan 
+elde edilen sınıf kodu vardır
+
+-------------
+
+template kategorileri :
+
+-function template :derleyiciye fonksiyon kodu yazdırır
+-class template : derleyiciye sınıf kodu yazdırır
+-variable template : derleyiciye değişken tanımala kodu yazdırır
+-alias template : derleyiciye tür eş bildirimi kodu yazdırır
+-concept
+
+--------------
+
+specialization : vectore elemanları şnt olucak dinamik dizi
+sınıfı yazdırdığımızda vector sınıfının int specialization'ı oluyor.
+
+----------------------------------
+
+template genel sentaksı
+-----------------------
+
+
+template <>
+
+template parameters: template açısal parantex içinde tanıttığımız parametrelere denir
+-type parameter : bu isim bir türe karşılık gelir 
+-non-type paramter : bu isim sabite karşılık gelir, tür değil
+-template parameter : //buna daha sonra değinilicek
+
+----------------------
+
+type parameter:
+
+template <class T> //bu da kullanılır
+template <typename T> //bu da kullanılır, 'T bir tür olmak üzere' anlamına gelir 
+
+
+template <typename T, typename U> //bu şekilde olur
+template <typename T, class U> //bu şekilde olur, bunu yapma okuyanı yanıltır
+template <typename> //legal
+
+--------------
+
+template <typename T>
+void func(T x, T u); //template bir türe karşılık gelir 
+
+---------------
+
+template <typename T, typename U> //iki farklı tür alabilir
+class Myclass {
+
+};
+
+Myclass<int, double> //T yerine int, U yerine int
+
+---------------------
+
+non-type parametre: tür değil değer kullanılır
+
+template <int N> //N bir değere karşılık gelir
+class Myclass {
+
+int a[N]
+};
+
+------------
+
+#include <bitset>
+
+template <std::size_t n>
+class Bitset {
+
+};
+
+int main()
+{
+Bitset<32>
+}
+
+------------
+
+template<typename T, int N>
+void func(T(&)[N])
+{
+
+}
+
+-------------
+
+template <typename T, std::size_t N>
+
+int main()
+{
+std::array<double, 20> //20 elemanlı double diziyi sarmalar
+}
+
+-------------
+
+template <typename T, T x>
+class Myclass {
+
+};
+
+//Myclass<int, 10> //bu açılımlar olabilir
+//Myclass<long, 20L> /
+
+---------------------
+
+derleyicinin oluşturduğu specialization'da template parametrelerine
+karşılık seçilicek, alınacak argümanların hangi gerçek türler ya da sabitler
+olduğu derleyici tarafından belirlemenin birden fazla yolu vardır
+
+
+1-deduction
+fonksiyon şan
+
+
+
+
+
+
+
+
+
 
 
 
