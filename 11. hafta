@@ -1402,7 +1402,7 @@ mesela dosyanın kapatılmaması) oluşması ya da programın geçersiz bir duru
 
 basic guarantee : exception göderildiğinde bir kaynak sızıntısı olmıycak
 bu garanti altına alınıcak nesnesin ya da nesnelerin stati geçerli olucak
-bu şartların sağlanmasına denir
+bu şartların sağlanmasına denir. yazılan kodun en az bu şartı sağlaması gerekir
 
 strong guarantee : basic'in üstüdür, basic'e ek olarak state'de değiştirmez
 'commit or rollback' da denir. ya işini yap ya da işe başlaamdan önceki state'i koru
@@ -1410,7 +1410,7 @@ strong guarantee : basic'in üstüdür, basic'e ek olarak state'de değiştirmez
 nothrow guarantee : strong üstüdür, exception göndermemeyi garanti eder
 
 -----------
-exception specification
+exception specification : eski cpp de var artık bu yok, bunun yerine noexcept var
 
 //eski cpp'de aşağıdaki şekildeymiş sentax
 
@@ -1420,11 +1420,294 @@ void foo(int)throw(); //exception göndermeme garantisi veriyor
 
 /////////////////////////////////3. Ders////////////////////////////////
 
+noexcept: ben exception göndermeme garantisi veririm
+---------
+
+noexcept bir anahtar sözcüktür ancak iki farklı anlamda kullanılır
+
+-noexcept specifier
+-noexcept operator
 
 
+void foo(int)noexcept; //bu fonksiyon exception göndermez
+//hem okuyucuya söyler hem derleyiciye
+
+!! exception göndermeme garantisine rağmen exception gönderirse terminate çağrılır
+
+-----
+#include <exception>
+
+void func()
+{
+if (1) {
+throw std::exception{};
+}
+}
+
+void foo()noexcept
+{
+func();
+}
+
+void myterminate()
+{
+std::cout << "my terminate called!\n";
+abort();
+}
+
+int main()
+{
+set_terminate(myterminate);
+
+try {
+foo();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught:" << ex.what() << '\n';
+}
+}
+
+--------------
+
+void foo()noexcept(constant expression);
+
+void foo()noexcept(true); //aşağıdaki ile aynı anlamda
+void foo()noexcept; 
+
+void bar()noexcept(false); //aşağıdaki ile aynı anlamda
+void bar(); 	
 
 
+//bir fonksiyonun no throw garantisi verip vermemesini bir koşuma bağlıycaz.
+//varlık nedeni templateler ile alakalı
 
+void foo()noexcept(sizeof(int) > 2);
+
+-----------------------------------
+
+cpp dilinde 2 farklı kod vardır:
+
+normal olan
+
+derleyiciye yazdırılan kod = template / meta kod
+
+-----------------------------------
+
+noexcept operator
+
+noexcept(expr) //bu ifade ya true ya da false, compiler time'da belli olur
+
+-------
+
+noexcept(expr) 
+//eğer expression throw etme şansı yok ise noexcept true değeri üretir
+//aksi halde false üretir
+
+int main()
+{
+int a[5]{};
+constexpr bool b = noexcept(a[3]); //true
+}
+
+--------
+
+int main()
+{
+int x = 4576;
+constexpr bool b = noexcept(++x); //true
+}
+
+-------
+
+void foo(int); //expression throw etmeme garantisi vermez
+
+int main()
+{
+contexpr bool b = noexcept(foo(4)); //false
+}
+
+---------
+
+void foo(int)noexcept;
+
+int main()
+{
+constexpr bool b = noexcept(foo(4)); //true
+}
+
+---------
+
+class Myclass {
+public:
+void foo(int, int);
+};
+
+int main()
+{
+constexpr bool b = noexcept(Myclass{}.foo (1, 5)); //falss
+}
+
+----------
+
+class Myclass {
+public:
+void foo(int, int)noexcept;
+};
+
+int main()
+{
+constexpr bool b = noexcept(Myclass{}.foo(1, 5)); //true
+}
+
+-----------
+
+class Myclass {};
+void func()noexcept(noexcept(Myclass{}));
+	 ---------- --------
+	  specifier  operator
+
+------------
+
+class Myclass {
+public:
+Myclass& operator++();
+};
+
+void func(Myclass m)noexcept(noexcept(++m));
+//func fonksiyonunun expression throw etmeme garantisi
+verip vermemesi ++m ifadesinin expression throw etmeme garantisine bağlanıyor
+
+------------
+
+template <typename T>
+void func(T x) noexcept(noexcept(++x)); //no throw garantisi veriyor ise 
+func'da no throw garantisi verir
+
+-----------
+#include <exception>
+#include <type_traits>
+
+template <typename T>
+void func(T x)noexcept(noexcept(++x) && noexcept(--x));
+
+class Myclass {
+public:
+Myclass& operator++()noexcept;
+Myclass& operator--()noexcept;
+};
+
+int main()
+{
+Myclass mx;
+constexpr auto b = noexcept(func(12));
+}
+
+-------------
+
+//taban sınıfın sanal fonksiyonunu override ederken 
+onun verdiği garantiyi gevşetemeyiz
+
+class Base {
+public:
+virtual void func()noexcept;
+};
+
+class Der : public Base {
+public:
+void func()override; //sentax hatası, çünkü
+//taban sınıf expression throw etmeme garantisi verir, func override expression
+throw edebilir
+};
+
+!! taban sınıf sanal fonksiyonu eğer noexcept ile bildirilmişse
+onu override edicek türemiş sınıfta noexcept olmak zorunda bu compiler time'da kontrol edilir
+
+----------------
+
+class Base {
+public:
+virtual void func()noexcept;
+};
+
+class Der : public Base {
+public:
+void func()noexcept override; 
+};
+
+-----------------
+
+void func(); //bu sentax hatası
+void func()noexcept;
+
+----------------
+//burası function pointer ile ilgili
+
+void foo();
+
+int main()
+{
+int (*fp)(int)noexcept; //fp'ye yapılan çağrılar expression throw etmez
+
+fp = foo; //hata, foo expression throw etmemesi şazım
+
+fp(12);
+}
+
+-----------------
+
+int foo(int)noexcept;
+
+int main()
+{
+int (*fp)(int);
+
+fp = foo; //legal, foo 	expression throw eder  ya da etmez buna
+}
+
+------------
+//dtorlar için özel bir durum
+
+class Myclass {
+public:
+~Myclass();
+
+};
+
+int main()
+{
+constexpr bool b = noexcept(Myclass{}.~Myclass()); //false olmaz çünkü dtor'lar her zmana no excepts
+}
+
+-----------------
+
+stack unwinding : exception gönderiliyor exception yakalanıyor
+yakalandığı otomatik ömürlü nesneler destroy edilir.
+
+//asla asla dtor expresion throw etmemeli demiyruz
+
+class Myclass {};
+
+int main()
+{
+Myclass m;
+}
+
+-------------------
+
+bazı fonksiyonların ideal olarak no throw garantisi vermesi gerekir
+eğer vermesse problemler olabilir
+
+-move ctor
+-swap
+-memory deallocation
+
+------------------
+
+bir sınfın no throw garantisi verip vermemesi neden önemli ?
+
+derleyici noexcept gördüğü zmaan move ctor ile aktardı bu da optmizasyon açısından 
+oldukça öenmlidir. 
+noexcept yok ise copy ctor çağırdı
 
 
 
