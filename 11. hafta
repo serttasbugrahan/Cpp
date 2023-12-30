@@ -1901,18 +1901,62 @@ class Myclass {
 
 derleyicinin oluşturduğu specialization'da template parametrelerine
 karşılık seçilicek, alınacak argümanların hangi gerçek türler ya da sabitler
-olduğu derleyici tarafından belirlemenin birden fazla yolu vardır
+olduğu derleyici tarafından belirlemenin birden fazla yolu vardır.
 
+-----------
 
 1-deduction
-fonksiyon şan
+fonksiyon / sınıf şablonlarında(C++17)
+
+------
+
+2-explicit template argument: bu templatte bu türü kullanıcaksın
+
+vector<int> //derleyiciye int kullanıcaksın demektir
+
+---
+
+int main()
+{
+using namespace std;
+bitset<16> //16 sabitini kullan
+}
+
+---
+
+int main()
+{
+using namespace std;
+
+array<int, 20> //1 specialization oluşturmanı istiyorum
+ama bu specialization'da 1. tür parametresi yerine int, 2. tür parametresi yerine 20 kullan
+}
+
+---
+
+int main()
+{
+using namespace std;
 
 
+make_unique<int>(12) //int türünü kullan
+}
 
+-------------
 
+3. varsayılan argüman alması
 
+vector<int> //normalde 2 parametresi vardır, 2. varsasyılan paramtere alır
 
+int main()
+{
+using namespace std;
 
+vector<int> x;
+//vector<int, allocator<int>
+}
+
+-----------------
 
 
 
