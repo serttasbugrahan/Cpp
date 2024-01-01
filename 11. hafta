@@ -1478,7 +1478,7 @@ void bar()noexcept(false); //aşağıdaki ile aynı anlamda
 void bar(); 	
 
 
-//bir fonksiyonun no throw garantisi verip vermemesini bir koşuma bağlıycaz.
+//bir fonksiyonun no throw garantisi verip vermemesini bir koşula bağlıycaz.
 //varlık nedeni templateler ile alakalı
 
 void foo()noexcept(sizeof(int) > 2);
@@ -1523,7 +1523,7 @@ void foo(int); //expression throw etmeme garantisi vermez
 
 int main()
 {
-contexpr bool b = noexcept(foo(4)); //false
+constexpr bool b = noexcept(foo(4)); //false
 }
 
 ---------
