@@ -1,22 +1,239 @@
 //////////////////////////////////////////////////1. Ders//////////////////////////////////////////
 
+template tekrarı...
+
+variadic template:
+
+template <typename ...Ts> //template parameter pack
+template <int ...Vals>
+
+------------------------------------
+
+int main()
+{
+using namespace std;
+
+bitset<32> //template argümanının 32 olmasını istiyoruz
+}
+
+-----------
+
+template <typename T, typename U = int>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<double, long>
+}
+
+-----------
+
+!! template tanımları başlık dosyalarında yapılamaz
+cpp dosyasında her şey gerçekleşir
+
+!! template kod gizlenemez
+
+---------
+
+template <typename T>
+class Neco;
+
+template <typename T, typename U>
+void foo(T, U);
+
+#include "bugra.hpp" //burada tanım ile içeriği birbirinden gizlemek için
+böyle bir hile kullanılabilinir
+
+-------------------------------------------------------------
+
+fonkksiyon template (fonksiyon şablonu): derleyicinin fonksiyon kodu yazmasını sağlayan kod kalıbı 
+----------------------------------------
+
+template <typename T>
+void foo(T x)
+{
+T y{};
+T* p = &y;
+T** ptr = &p;
+}
+
+------
+
+template <typename T>
+void foo(int x, int y); //bu şekilde olabilir template kullanmak zorundna değiliz
+
+------
+
+template <typename T>
+void foo(T x, int y) //bu şekilde de olabilir
+{
+
+}
+
+------
+
+template <typename T>
+void foo() //bu şekilde de olur tür kullanılmak zorunda değil
+{
+
+}
+
+int main()
+{
+foo<int>();
+}
+
+------------------------------------------------
+
+template argument deduction : 
+-----------------------------
+
+derleyici bir şablon söz konusu olduğunda bu şablondaki 
+template parametreleri karşılığı instanci yapmak için hangi template argümanlarını kullanıcağını
+koda bakarak anlıycak
 
 
+!! auto ile template argument arasında 1 istisna dışında fark yoktur
 
+-------
 
+int main()
+{
+auto x = 10;
 
+foo(10);
+}
 
+------
 
+auto haşağıdaki şekillerde olabiliyordu
 
+auto x = expr;
+auto& x = expr;
+auto && y = expr;
 
+------
+istisna :
 
+#include <initializer_list>
 
+int main()
+{
+auto x = {1, 2, 3, 4, 5};
+}
 
+--------
+#include <initializer_list>
 
+template <typename T>
+void foo(T) 
+{
 
+}
 
+int main()
+{
+foo({1, 2, 3, 4, 5}); //tek fark burasısıdr hata verir
+}
 
+--------
 
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int main()
+{
+const int ival = 4;
+foo(ival); T çıkarımı int ival, const düşer
+}
+
+---------
+
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int main()
+{
+const int ival = 4;
+int y{};
+int& r = y;
+
+foo(r); //T için yapılan çıkarım int
+}
+
+-------
+
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int main()
+{
+const int ival = 4;
+int y{};
+const int& r = y;
+
+foo(r); //T için yapılan çıkaarım int
+}
+
+-------
+
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int main()
+{
+int a[5]{}
+
+foo(a); //int için yaplan çıkarım int*
+}
+
+-------
+
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int main()
+{
+const int a[5]{}
+
+foo(a); //int için yaplan çıkarım const int*
+}
+
+--------
+
+template <typename T>
+void foo(T) 
+{
+
+}
+
+int bar(int);
+
+int main()
+{
+
+foo(bar); //int (*)(int)
+
+}
+
+//42.35
 
 
 
