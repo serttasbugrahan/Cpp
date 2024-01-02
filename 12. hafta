@@ -229,12 +229,359 @@ int bar(int);
 int main()
 {
 
-foo(bar); //int (*)(int)
+foo(bar); //int (*)(int), function pointer type
+
+}
+//Bu söylenenlerin hepsi auto içinde geçerli
+
+--------
+
+template <typename T>
+void foo(T) 
+{
 
 }
 
-//42.35
+int main()
+{
+foo("bugrahan"); //const char*
+}
+
+------------------
+
+!! Aşağıdaki yapı ile derleyicinin bize verdiği hata mesajı ile
+türünü bulabiliriz
+
+template <typename T>
+class TypeTeller;
+
+template <typename T>
+void foo(T) 
+{
+TypeTeller<T> x;
+}
+
+int main()
+{
+const int x{}
+foo(x); //x türü bulunur 
+foo("bugrahan"); 
+}
+
+---------------------
+
+deduction her zaman başarılı olmak zorunda değil 
+fonksyion argümanında gönderilen argüman olduğu zaman çıkarımın yapılamaması
+
+template <typename T> 
+void foo();
+
+int main()
+{
+foo();
+}
+
+---------
+
+template <typename T> 
+void foo(int, int);
+
+int main()
+{
+foo(12, 56); //hata
+}
+
+---------
+
+template <typename T> 
+void foo(T, T);
+
+int main()
+{
+foo(12, 56); //legal
+foo(12, 5.8); //ambigidious hata
+}
+
+---------
+
+template <typename T, typename U> 
+void foo(T, U);
+
+int main()
+{
+foo(12, 5.8); //legal
+}
 
 
+--------
 
+template <typename T> 
+void foo(T, T);
+
+int main()
+{
+int a[10]{};
+int b[234]{};
+foo(a, b); //legal
+}
+
+-------
+
+template <typename T> 
+void foo(T, T);
+
+int main()
+{
+int a[10]{};
+double b[234]{};
+foo(a, b); //hata 
+}
+
+-------
+
+template <typename T> 
+void foo(T, T);
+
+int main()
+{
+foo("bugrahan", "serttas"); //legal
+}
+
+------------------
+
+template <typename T>
+class TypeTeller;
+
+template <typename T>
+void foo(T&) 
+{
+TypeTeller<T> x;
+}
+
+int main()
+{
+int x = 10;
+foo(x); //t iiçin yapılan int ama fonksiyon parametresi t&
+}
+
+------------
+
+template <typename T>
+class TypeTeller;
+
+template <typename T>
+void foo(T&) 
+{
+TypeTeller<T> x;
+}
+
+int main()
+{
+const int x = 10; //const int
+foo(x); 
+}
+
+---------------
+
+template <typename T>
+class TypeTeller;
+
+template <typename T>
+void foo(T&) 
+{
+TypeTeller<T> x;
+}
+
+int main()
+{
+int a[4]{};
+foo(a); //int(&)[4]
+}
+
+---------------
+
+template <typename T>
+class TypeTeller;
+
+template <typename T>
+void foo(T&) 
+{
+TypeTeller<T> x;
+}
+
+int main()
+{
+const int a[4]{};
+foo(a); 
+}
+
+----------------
+//mülakatta sorulan bir soru
+
+template <typename>
+class TypeTeller;
+
+template <typename T>
+void foo(T&, T&) 
+{
+
+}
+
+int main()
+{
+foo("can", "eda"); //legal, const char[4], const char[4]
+foo("naci", "cemal"); //hata ,const char[5], const char[6]
+}
+
+-----------------
+
+template <typename>
+class TypeTeller;
+
+template <typename T>
+void foo(T&, T) 
+{
+
+}
+
+int main()
+{
+int a[5]{};
+foo(a, a); //illegal
+}
+
+--------------------
+
+template <typename>
+class TypeTeller;
+
+template <typename T>
+void foo(T&) 
+{
+TypeTeller<T> x;
+}
+
+int bar(int);
+
+int main()
+{
+foo(bar); //int(int)
+}
+
+--------------------
+
+zor olan kısıma geçiruz, programcıların en çok karıştırdığı kısım
+
+template <typename T>
+void func(T &&) //universal referans  /std ==> forwarding reference
+{
+//bu fonksiyona yapılan bütün çağrılarla yapılan çağrılar legaldir
+
+}
+
+-------
+
+class Myclass{};
+
+void func(Myclass &&) //R value
+{
+
+}
+
+-----------
+
+template <typename T>
+void func(T &&) 
+{
+
+}
+
+int main()
+{
+int x = 10;
+const double dval = 4.5;
+
+func(x); //legal
+func(45); //legal
+func(dval); //legal
+}
+
+--------------
+
+template <typename T>
+void func(T &&) //Nec&, refernas collapsing. ile ilgili
+{
+
+}
+
+class Nec{};
+
+int main()
+{
+Nec mynec;
+func(mynec);
+}
+
+--------------
+
+class Nec{};
+
+using refref = Nec&&;
+
+int main()
+{
+Nec mynec;
+refref& r = Nec{} //nec&
+refref&& r = Nec{} //nec&&
+
+}
+
+-------------
+
+template <typename>
+class TypeTeller;
+
+template <typename T>
+void func(T &&) // T ==> Myclass
+{
+TypeTeller<T> x;
+}
+
+class Myclass {};
+
+int main()
+{
+func(Myclass{});
+}
+
+--------------
+!! 
+template <typename T>
+void func(T&&)
+{
+//L value gönderirsek fonksiyon parametre değişkeni L value
+//R value gönderirsek fonksiyon parametre değişkeni R value
+}
+
+-------------
+
+template <typename T>
+void func(T&& X)
+{
+
+}
+
+int main()
+{
+const int x{};
+func(x);
+}
+
+--------------
+
+int main()
+{
+int x = 5;
+auto&& r = x;
+}
 
