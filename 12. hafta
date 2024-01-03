@@ -162,7 +162,6 @@ void foo(T)
 
 int main()
 {
-const int ival = 4;
 int y{};
 int& r = y;
 
@@ -179,11 +178,10 @@ void foo(T)
 
 int main()
 {
-const int ival = 4;
 int y{};
 const int& r = y;
 
-foo(r); //T için yapılan çıkaarım int
+foo(r); //T için yapılan çıkarım int
 }
 
 -------
@@ -271,7 +269,7 @@ foo("bugrahan");
 ---------------------
 
 deduction her zaman başarılı olmak zorunda değil 
-fonksyion argümanında gönderilen argüman olduğu zaman çıkarımın yapılamaması
+fonksiyon argümanında gönderilen argüman olduğu zaman çıkarımın yapılamaması
 
 template <typename T> 
 void foo();
@@ -566,7 +564,7 @@ void func(T&&)
 -------------
 
 template <typename T>
-void func(T&& X)
+void func(T&& x)
 {
 
 }
@@ -700,7 +698,7 @@ std::cout << s1 << " " << s2 << "\n";
 -------------
 
 template <typename F>
-void func(Fn f)
+void func(F f)
 {
 auto val = f(12);
 std::cout << "val = " << val << "\n";
@@ -750,7 +748,7 @@ void func(T x)
 
 }
 
-//yukarıdaki aşağıdaki şekilde yazılabilir, çok sık kullanılıyor
+//yukarıdaki, aşağıdaki şekilde yazılabilir, çok sık kullanılıyor
 
 void func(auto x)
 {
@@ -819,7 +817,6 @@ auto return type : fonksiyonun geri dönüş değeri türünün return ifadesind
 
 auto foo(int x)
 {
-
 return x * 1.3; //geri dönüş değeri double
 }
 
