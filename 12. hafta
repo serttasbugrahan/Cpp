@@ -1700,6 +1700,477 @@ int main()
 Myclass<12.5> x; //cpp 20 öncesinde hatalı bir koddu
 }
 
+----------
+
+template <int *p>
+class Myclass {
+
+};
+
+int g{ 24 };
+
+int main()
+{
+Myclass<&g> m1;
+}
+
+---------
+
+template <int &r>
+class Myclass {
+
+};
+
+int g{ 24 };
+
+int main()
+{
+Myclass<g> m1; //r'nin kullanıldığı yerlerde g değişkenine ref. olucak 
+}
+
+-----------
+
+fonksiyon adresi olabilir
+
+template <int (*fp)(int)>
+class Myclass {
+
+};
+int foo(int);
+
+int main()
+{
+Myclass<&foo> m;
+}
+
+--------------------
+
+template <typename T, T x> //bu yapının kısaltılmış hali vardır
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<int, 5>
+}
+
+------
+
+template <auto n>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<5> m1;
+Myclass<1u> m2;
+Myclass<'A'> m2;
+
+}
+
+-----------------------------------
+
+templateler ile ilgili başa bir araca bakıyoruz
+
+templateler ile ilgili başka hangi önemli özellikleri 
+ve hangi terimleri bilmemiz gerekiyor
+
+!! template ergümanlarının ne olduğunun bilinmesi için yollar şunlardır
+
+-deduction (çıkarım)
+-explicit template argument
+-default template argument
+
+default template argument :
+---------------------------
+
+!! modern c++ öncesinde default template argumnt 
+yalnızca sınıflar için kullanılabiliyordu
+ancak modern c++ da fonksiyon şablonları içinde 
+varsayılan template argümanı kullanma olanağı getirildi
+
+-------------
+
+template <typename t = int>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<double> m1;
+Myclass<> m1; // içi boş olduğu için int olur
+
+std::out << typeid(m2).name();
+
+}
+
+----------
+
+template <typename T = int, typename U = double>
+class Myclass {};
+
+int main()
+{
+Myclass<int> m1;
+Myclass<> m2;
+Myclass<long, long> m2;
+
+}
+
+-----------
+
+template <typename T>
+class Nec {
+
+};
+
+template <typename T = int, typename U = Nec<T>>
+class Myclass {};
+
+int main()
+{
+Myclass<double> m1; 
+std::cout << typeid(m1).name << '\n';
+}
+
+------------
+
+stl kütüphaneleri hep varsayılan argüman alır
+
+template <typename T, typename A = std::allocator<T>>
+class Vector {
+
+};
+
+int main()
+{
+Vector<int> ivec;
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+std::cout << typeid(ivece).name();
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+set<int> x;
+
+set<int, less<int>, allocator<int>> x2; //2. ve 3. varsayılan argüman alır
+}
+
+
+-----------
+
+int main()
+{
+using namespace std;
+
+set<int> x;
+
+std::cout << typeid(x).name();
+}
+
+-----------
+
+template <int x = 10, int y = 20>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<3, 5> m1;
+Myclass<3> m2;
+Myclass<> m3;
+}
+
+-------------
+
+fonksiyon şablonları ile ilgili fonksiyoon yazıyoruz
+
+mülakatlardaki sorulan temel bir soru
+
+c dilinde bu şekilde yazılırdı
+
+int main()
+{
+int a[]{1, 4, 7, 8;
+
+constexpr auto size = sizeof(a) / sizeof(*a);
+}
+
+
+--------
+c++ dilinde bu şekilde yazılır
+
+template <typename T, std::size_t N> //1. parametresi type 2. parametresi non-type
+constexpr auto asize(const T(&)[N])
+{
+return N
+}
+
+int main()
+{
+int a[]{1, 4, 7 ,8};
+
+constexpr auto size = asize(a);
+}
+
+-----------
+//sadece boyutu belli bir dizinin elemanlarını yazdırabiliriz
+
+void print_array(const int* p std::size_t size)
+{
+for (size_t i = 0; i < size; ++i)
+printf("%d", p[i]);
+
+printf("\n"),
+}
+
+int main()
+{
+int a[] = {3, 6, 1, 2, 9};
+print_array(a, 5);
+}
+
+---------
+
+c++'da bu kodu aşağıdaki şekilde yazarız
+
+template <typename T, std::size_t N>
+void print_array(const T(&P)[N])
+{
+for (size_t i = 0; i < size; ++i)
+printf("%d", p[i]);
+
+printf("\n"),
+}
+
+int main()
+{
+int a[] = {3, 6, 1, 2, 9};
+print_array(a); //derleyici compile time'da dizinin boyutunu anlar, c de bunu yapamayız
+}
+
+------------------------------
+
+specialization : bir template'den oluşturulan kodun kendisi
+
+sınıf ve fonksiyon şablonları ile ilgili önemli 
+kurallardan bazıları
+
+a) explicit specialization (full specialization)
+b) partial specialization
+
+explicit specialization ve partial specialization derleyiciye derleyicinin oluşturacağı specialization'ın kodunu vermemiz demektir
+
+----------
+
+explicit specialization sentaxı :
+
+template <typename T>
+class Nec {
+public:
+Nec()
+{
+std::cout << "primary template type T is :"
+<<typeid(T).name() << '\n';
+}
+};
+
+
+int main()
+{
+Nec<int> n1;
+Nec<double> n1;
+Nec<int*> n3;
+Nec<Nec<float>> n4;
+}
+
+---------------
+
+template <typename T>
+class Nec {
+public:
+Nec()
+{
+std::cout << "primary template type T is :"
+<<typeid(T).name() << '\n';
+}
+};
+
+//explicit specialization
+//full specialization
+template <> //diamond denir buna, derleyiciye normalde primary kullanıcaksın ama int için bu kodu kullanıcaksın denir
+class Nec<int> {
+public:
+Nec()
+{
+std::cout << "explicit specialization for Nec<int>\n"; 
+}
+};
+
+int main()
+{
+Nec<int> n1;
+Nec<double> n1;
+Nec<int*> n3;
+Nec<Nec<float>> n4;
+}
+
+-----------
+
+template <typename T>
+class Nec {
+public:
+Nec()
+{
+std::cout << "primary template type T is :"
+<<typeid(T).name() << '\n';
+}
+void foo();
+void bar();
+
+};
+
+template <> 
+class Nec<int> {
+public:
+Nec()
+{
+std::cout << "explicit specialization for Nec<int>\n"; 
+}
+
+void f1();
+void f2();
+};
+
+int main()
+{
+Nec<int> n1;
+
+n1.f1();
+n1.f2();
+n1.foo()//yoktur
+Nec<double> n2;
+n2.foo();
+n2.bar();
+}
+
+--------------------
+
+template <typename>
+class Myclass;
+
+int main()
+{
+Myclass<int> x; //sınıf tanımı yok haatsı verir
+}
+
+---------
+
+template <typename>
+class Myclass;
+
+template <>
+class Myclass<int> {
+
+};
+
+template <>
+class Myclass<double> {
+
+};
+
+int main()
+{
+Myclass<int> m1;
+Myclass<double> m2 ;
+}
+
+-------------
+#include <string>
+
+template <typename T>
+T Max(T x, T y)
+{
+return x > y ? x : y;
+}
+
+int main()
+{
+int i1{78}, i2{34};
+std::cout << Max(i1, i2) << '\n';
+std::cout << Max(2.3, 9.6) << '\n';
+
+std::string s1{ "bilge" }, s2{ "damla" };
+std::cout << Max(s1, s2) << '\n';
+
+
+}
+
+------------
+
+#include <string>
+
+template <typename T>
+T Max(T x, T y)
+{
+return x > y ? x : y;
+}
+
+int main()
+{
+char s1[] = "ayla";
+char s2[] = "kerim";
+
+std::cout << Max(s1, s2) << '\n'; //bu kod yanlıştır çünkü adresler karşılaştırılır
+std::cout << Max(s2, s1) << '\n'; // //büyük olan adresi döndürğr
+//char * ve const char* için doğru çalışmaz
+}
+
+---------------
+#include <cstring>
+
+template <typename T>
+T Max(T x, T y)
+{
+return x > y ? x : y;
+}
+
+template <>
+char* Max<char*>(char* p1, char* p2)
+{
+return strcmp(p1, p2) > 0 ? p1 : p2;
+}
+
+int main()
+{
+char s1[] = "ayla";
+char s2[] = "kerim";
+
+auto x = Max(s1, s2);
+}
+
+---------------
+
+
+
+
+
 
 
 
