@@ -1547,6 +1547,148 @@ p.second //ikinci öğeye erişir
 }
 
 
+-------------
+
+std::pair<int, double> foo();
+
+int main()
+{
+using namespace std;
+
+pair<double, double> pd{2.3, 5.6};
+pair<int, int> pi{12, 23};
+
+pd = pi;
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+pair p1{4, 5.6}; //CTAD(sitak)
+pair<int, string> x;
+
+cout << "x.first = " << x.first << '\n';
+cout << "x.second = " << x.second << '\n';
+}
+
+---------------
+pair kullanarak kod yazıyoruz...
+
+
+int main()
+{
+using namespace std;
+
+pair<int, double> px{3, 6.7};
+
+cout << px; //hata
+}
+
+-----------
+
+std::ostream& operator<<(std::ostream& os, std::pair<int, double>& p)
+{
+return os << '[' << p.first << ", " << p.second << ']';
+}
+
+int main()
+{
+using namespace std;
+
+pair<int, double> px{3, 6.7};
+
+cout << px; 
+}
+
+--------------
+
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& os, const std::pair<T, U>& p)
+{
+return os << '[' << p.first <<", " << p.second << ']';
+}
+
+int main()
+{
+using namespace std;
+pair<string, double> p1{ "tamer dundar", 6.7};
+pair<int, char> p2{862, 'A'};
+
+cout << p1 << " " << p2 << '\n';
+
+}
+
+-------------
+
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& os, const std::pair<T, U>& p)
+{
+return os << '[' << p.first <<", " << p.second << ']';
+}
+
+int main()
+{
+using namespace std;
+pair p1{2, 6.7};
+pair<string, string> p2("furkan", "emrecan");
+
+pair <pair<int, double>, pair<string, string>> p3{p1, p2};
+cout << p3 << "\n";
+
+}
+
+----------------
+
+idiyomatik bir yapıya daha bakıyoruz
+
+template <typename T>
+std::pair<T, U> MakePair(const T& t, const U& u)
+{
+return std::pair<T, U>(t, u);
+}
+
+int main()
+{
+auto p = MakePair(12, 5.6); //geri dönüş değeri std::pair(int, double)
+}
+
+------------------
+
+template <typename T, typename U>
+std::ostream& operator<<(std::ostream& os, std::pair<int, double>& p)
+{
+return os << '[' << p.first << ", " << p.second << ']';
+}
+
+int main()
+{
+using namespace std;
+std::string s1{"melike"}, s2{"bilge"};
+cout << make_pair(make_pair(2, 5.6), make_pair(s1, s2)) << '\n';
+}
+
+------------------
+//c++ 20 öncesinde non-type parametrelere karşılık gelen argümanlar 
+aşağıdakiler olabiliyordu
+
+a) tam sayi türleri
+b) enum türleri
+c) object pointer  / referasn türleri
+d) function pointer türleri
+e) member function pointer türleri
+
+template <double dval> //c++ 20 öncesi hatalı idi
+class Myclass {
+
+};
+
+//c++20 ile gerçek sayı türleri non-type parametre olarak kullanılabiliyor
+bazı sınıf türleri de kullanılabiliyor
+-------------------
+
 
 
 
