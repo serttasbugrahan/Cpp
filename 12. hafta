@@ -1687,10 +1687,18 @@ class Myclass {
 
 //c++20 ile gerçek sayı türleri non-type parametre olarak kullanılabiliyor
 bazı sınıf türleri de kullanılabiliyor
+
 -------------------
 
+template <double dval>
+class Myclass {
 
+};
 
+int main()
+{
+Myclass<12.5> x; //cpp 20 öncesinde hatalı bir koddu
+}
 
 
 
