@@ -984,7 +984,6 @@ void func(T *p)
 partial ordering rules : daha spesifik daha fazla nitelenmiş parametreye sahip
 template seçilir, (kısa bir değindi konu daha detaylı)
 
-
 template <typename T>
 void func(T x)
 {
@@ -1004,21 +1003,548 @@ func(&x);
 }
 ------------
 
+explicit template : açısal parantez içine yazılana denir. //void func<int>(int) 
+ 
 ////////////////////////////////////////////////////2. Ders///////////////////////////////////////////////////
 
+sınıf şablonları (template)
+----------------------------
+
+----------
+
+template paeamteresi birden fazla olabilir, parametreler type, non-type, template parametre olabilir
+bunların paket hali olabilir
+
+template <typename T>
+
+template <int x> //non-type
+
+template <std::size_t x>
+
+-----------
+//Bu bir sınıf değildir, class templatedir
+derleyici için bir sınıfın kodunun nasıl yazılabiliceğini gösteren bir meta koddur
+
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<int>
+Myclass<double>
+
+}
+
+-----------
+
+template <typename T>
+class Myclass {
+
+};
+
+template <typename T>
+class Nec {
+
+};
+
+int main()
+{
+Nec<Myclass<int>>
+
+}
+
+-------------
+
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<Myclass<Myclass<int>>> //modern cpp öncesi >> maximul munc kuralına takılırdı
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<int> //vectörün int açılımı, öğeleri int türden olan specializtanı temsil ediyor
+vector<vector><int>> //elemanları int vector olucak
+vector<vector<vector<int>> //elemanları int vector vector olucak
+}
+
+-------------
+
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<int> x; //bu yapıların hepsi olabilir
+Myclass<int>* p{ &x };
+Myclass<int>&r{ x };
+}
+
+--------------
+
+template <typename T>
+class Myclass {
+
+};
+
+void foo(const std::vector<int>&);
+std::vector<double> bar();
+//foo geri dönüş değeri double türden elemanlar tutucak bir dinamik dizi döndürürdöndürür, 
+
+-------------
+//en tipik hatalar...
+
+template <typename>
+class Myclass{
+
+};
+
+int main()
+{
+Myclass<double> dm;
+Myclass<int> im;
+//dm ile im türü farklıdır
+
+dm = im; //Hata olur, Myclass<int> türden Myclass<double> türüne dönüşüm olmaz
+}
+
+-------------
+
+template <typename>
+class Myclass{
+
+};
+
+int main()
+{
+Myclass<5> x;
+Myclass<6> y;
+
+y = x; //hata, ayrı ayrı sınıflardır dönüşüm olmaz
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+vector<double> dvec(100);
+vector<int> ivec(100);
+
+dvec = ivec; //hata 
+}
+
+------------------
+
+template <typename T>
+class Myclass {
+
+public:
+void foo(T x)
+{
+++x;
+}
+};
+
+class Nec {};
+
+int main()
+{
+Myclass<Nec> mynec; //hata olmaz, ++x çağrılmadı
+
+mynec.foo(mynec)
+}
+
+--------------
+
+template <typename T>
+class Myclass {
+
+public:
+void foo(T x)
+{
+++x;
+}
+};
+
+class Nec {};
+
+int main()
+{
+Myclass<Nec> m;
+Nec mynec;
+
+m.foo(mynec); //hata olur
+}
+
+------------
+
+yukarıdaki durumun avantajları vardır boş yere fonksiyon çağırmamış oluruz
+
+------------
+
+//myclass.h
+
+template <typename T>
+class Myclass {
+
+public:
+T bar(T);
+void foo(T x)
+{
+x.f();
+++x;
+x = 0;
+}
+};
+
+//myclass.hpp
+#include "myclass.h"
 
 
+----------------
+
+üye fonksiyonun tanımını görmek zorundadır
+
+template <typename T>
+class Myclass {
+
+public:
+void foo(T x)
+{
+x.foo();
+++x;
+x = 0;
+}
+};
+
+template <typename T>
+T Myclass<T>::bar(T x)
+{
+
+}
+
+-----------
+//myclass.h
+
+template <typename T, typename U>
+class Myclass {
+
+public:
+void foo(int); //
+};
+
+template <typename T, typename U>
+void Myclass<T, U>::foo(int cx) //foo class dışında bu şekilde tanımlanır
+{
+
+}
+-------------
+//myclass.h
+//tanımları bu şekilde olucal
+template <typename T>
+class Myclass {
+
+public:
+void foo(T);
+void bar(T, T);
+void bar(int);
+
+};
+
+template <typename T>
+void Myclass<T>::foo(T)
+{
+
+}
+
+template <typename T>
+void Myclass<T>::bar(T, T)
+{
+
+}
+
+template <typename T>
+void Myclass<T>::baz(int)
+{
+
+}
+
+-------------
+fonksiyon şablonları ile sınıf şablonları birlikte kullanılacak çoğu zaman
+
+template <typename T>
+class Myclass {
+
+};
+
+template <typename T>
+void func(Myclass<T>&);
+
+int main()
+{
+Myclass<int> x;
+func(x);
+}
+
+--------------
+
+template <typename T>
+class Myclass {
+
+};
+
+template <typename T>
+bool operator==(const Myclass<int>&, const Myclass<int>&)
+{
+
+return true;
+}
+
+---------------
+
+2 tane vectorü toplıycak kod
+
+template <typename T>
+class Myclass {
+
+};
+
+template <typename T>
+std::vector<T> operator+(const std::vector<T>&, const std::vector<T>&)
+{
+
+return {};
+}
+
+-----------------
+//en çok karşımıza çıkan durumlardan bir tanesi
+//sınıf şablonlarının üye fonksiyonlarında yine sınıf şablonu olması
+
+//mülakatlarda necati hocanın çok sorduğu birkaç soru
+
+template <typename T>
+class Myclass {
+
+public:
+void foo(T&&); //üniversel refernas tür çıkarımı olduğu zamandı
+};
+
+int main()
+{
+Myclass<int> m; 
+
+m.foo(12);
+
+}
+
+--------------
+
+class Myclass {
+public:
+
+template <typename T>
+void func(T x); //member template  
+};
+
+//yukarıdaki yapı bize aşağıdakini sağlar
+//bir sınıfın üye fonksiyonu template olabilir
+
+int main()
+{
+Myclass m;
+
+m.func(1); 
+m.func(1.3);
+m.func<float>(1);
+
+}
+
+-------------
+
+class Myclass {
+public:
+
+template <typename T>
+bool operator()(T)const; //her farklı argüman için
+};
+
+int main()
+{
+Myclass m;
+
+m(12);
+m.operator()(12);
+m(1.2);
+}
+
+-------------
+//sınıfın özel fonksiyonları bile template olabilir
+
+class Myclass {
+public:
+template <typename T>
+explicit Myclass(T);
+};
+
+int main()
+{
+Myclass m1(12);
+Myclass m2(1.2);
+
+}
+
+-------------
+
+templatelere geliyoruz
+
+template <typename T>
+class Nec {
+
+public:
+void func()
+{
+Nec x; //Nec'in scobunda bunu yazmakla aşağıdakini yazmak aynı anlamdadır
+Nec<T> x;
+}
+};
+
+int main()
+{
+
+}
+
+-------------
+
+template <typename T>
+class Nec {
+
+public:
+Nec func(Nec x) //Nec<T> func(Nec<T> x), aynı anlamdadır
+{
+return x;
+}
+};
+
+-----------
+
+template <typename T>
+class Nec {
+
+public:
+Nec func(Nec x)
+{
+Nec<T*> x;
+}
+};
 
 
+-----------
+//sınıfın dışında bildirirsek
 
+template <typename T>
+class Nec {
 
+public:
+Nec func(Nec x);
+};
 
+template <typename T>
+Nec<T>::func(Nec<T> x)
+{
+Nec y{ x }; //bu şekilde tanımlayabiliriz
+return y;
+}
 
+-----------
 
+template <typename T>
+class Nec {
 
+public:
+Nec func(Nec x); //burasıda template yapılabilinir aşağıda ki örnekte gösterdim
 
+};
 
+int main()
+{
+Nec<double> x;
+Nec<int> y;
 
+x.func(y); //Hata, nec'in açılımından double dönüşüm var
+}
+
+-------------
+
+//bir template'in farklı speciliationları için 
+kod yazmak istiyorsak member template olmalıdır
+
+template <typename T>
+class Nec {
+
+public:
+template <typename U>
+Nec func(Nec<U> x)
+{
+std::cout << typeid(*this).name() << "\n";
+std::cout << typeid(x).name() << "\n";
+}
+};
+
+int main()
+{
+Nec<int> x;
+Nec<double> y;
+
+x.func(y);
+}
+
+--------------
+#include <utility>
+
+std::pair //2 tane farklı türden öğeyi paketliyor
+
+--------------
+
+öyle yerler vardır ki 2 tane farklı veya aynı türden öğeyi
+bir arada tutmak isteriz 
+
+//basitleştirilmiş hali
+
+template <typename T, typename U>
+struct Pair {
+
+T first;
+U second;
+
+};
+
+Pair<int, double> 
+
+-------------
+
+std::pair<int, double> foo(); //bir int birde double döndürülür
+
+int main()
+{
+auto p = foo();
+p.first //ilk öğeye erişir
+p.second //ikinci öğeye erişir
+
+}
 
 
 
