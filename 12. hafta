@@ -1101,7 +1101,7 @@ class Myclass {
 
 void foo(const std::vector<int>&);
 std::vector<double> bar();
-//foo geri dönüş değeri double türden elemanlar tutucak bir dinamik dizi döndürürdöndürür, 
+//foo geri dönüş değeri double türden elemanlar tutucak bir dinamik dizi döndürür 
 
 -------------
 //en tipik hatalar...
@@ -1151,7 +1151,6 @@ dvec = ivec; //hata
 
 template <typename T>
 class Myclass {
-
 public:
 void foo(T x)
 {
@@ -1232,7 +1231,7 @@ x = 0;
 };
 
 template <typename T>
-T Myclass<T>::bar(T x)
+T Myclass<T>::foo(T x) //hata
 {
 
 }
@@ -1254,14 +1253,15 @@ void Myclass<T, U>::foo(int cx) //foo class dışında bu şekilde tanımlanır
 }
 -------------
 //myclass.h
-//tanımları bu şekilde olucal
+//tanımları bu şekilde olucak
+
 template <typename T>
 class Myclass {
 
 public:
 void foo(T);
 void bar(T, T);
-void bar(int);
+void baz(int);
 
 };
 
@@ -1331,6 +1331,7 @@ return {};
 }
 
 -----------------
+
 //en çok karşımıza çıkan durumlardan bir tanesi
 //sınıf şablonlarının üye fonksiyonlarında yine sınıf şablonu olması
 
@@ -1340,7 +1341,7 @@ template <typename T>
 class Myclass {
 
 public:
-void foo(T&&); //üniversel refernas tür çıkarımı olduğu zamandı
+void foo(T&&); //universel referans tür çıkarımı olduğu zamandır
 };
 
 int main()
@@ -1348,7 +1349,6 @@ int main()
 Myclass<int> m; 
 
 m.foo(12);
-
 }
 
 --------------
@@ -1370,7 +1370,6 @@ Myclass m;
 m.func(1); 
 m.func(1.3);
 m.func<float>(1);
-
 }
 
 -------------
@@ -1453,11 +1452,11 @@ Nec<T*> x;
 
 
 -----------
+
 //sınıfın dışında bildirirsek
 
 template <typename T>
 class Nec {
-
 public:
 Nec func(Nec x);
 };
@@ -1476,7 +1475,6 @@ class Nec {
 
 public:
 Nec func(Nec x); //burasıda template yapılabilinir aşağıda ki örnekte gösterdim
-
 };
 
 int main()
@@ -1541,9 +1539,8 @@ std::pair<int, double> foo(); //bir int birde double döndürülür
 int main()
 {
 auto p = foo();
-p.first //ilk öğeye erişir
-p.second //ikinci öğeye erişir
-
+p.first; //ilk öğeye erişir
+p.second; //ikinci öğeye erişir
 }
 
 
@@ -1567,8 +1564,7 @@ int main()
 {
 using namespace std;
 
-pair p1{4, 5.6}; //CTAD(sitak)
-pair<int, string> x;
+pair<int, string> x{4, 5.6};
 
 cout << "x.first = " << x.first << '\n';
 cout << "x.second = " << x.second << '\n';
@@ -1642,7 +1638,7 @@ cout << p3 << "\n";
 
 ----------------
 
-idiyomatik bir yapıya daha bakıyoruz
+bir idiyomatik yapıya daha bakıyoruz
 
 template <typename T>
 std::pair<T, U> MakePair(const T& t, const U& u)
@@ -1767,17 +1763,16 @@ int main()
 Myclass<5> m1;
 Myclass<1u> m2;
 Myclass<'A'> m2;
-
 }
 
 -----------------------------------
 
-templateler ile ilgili başa bir araca bakıyoruz
+templateler ile ilgili başka bir araca bakıyoruz
 
 templateler ile ilgili başka hangi önemli özellikleri 
 ve hangi terimleri bilmemiz gerekiyor
 
-!! template ergümanlarının ne olduğunun bilinmesi için yollar şunlardır
+!! template argümanlarının ne olduğunun bilinmesi için yollar şunlardır
 
 -deduction (çıkarım)
 -explicit template argument
@@ -1786,7 +1781,7 @@ ve hangi terimleri bilmemiz gerekiyor
 default template argument :
 ---------------------------
 
-!! modern c++ öncesinde default template argumnt 
+!! modern c++ öncesinde default template argument  
 yalnızca sınıflar için kullanılabiliyordu
 ancak modern c++ da fonksiyon şablonları içinde 
 varsayılan template argümanı kullanma olanağı getirildi
@@ -1803,7 +1798,7 @@ int main()
 Myclass<double> m1;
 Myclass<> m1; // içi boş olduğu için int olur
 
-std::out << typeid(m2).name();
+std::cout << typeid(m2).name();
 
 }
 
@@ -1817,7 +1812,6 @@ int main()
 Myclass<int> m1;
 Myclass<> m2;
 Myclass<long, long> m2;
-
 }
 
 -----------
@@ -1838,7 +1832,7 @@ std::cout << typeid(m1).name << '\n';
 
 ------------
 
-stl kütüphaneleri hep varsayılan argüman alır
+//stl kütüphaneleri hep varsayılan argüman alır
 
 template <typename T, typename A = std::allocator<T>>
 class Vector {
@@ -1857,7 +1851,7 @@ int main()
 using namespace std;
 
 vector<int> ivec;
-std::cout << typeid(ivece).name();
+std::cout << typeid(ivec).name();
 }
 
 ----------
@@ -1899,7 +1893,7 @@ Myclass<> m3;
 
 -------------
 
-fonksiyon şablonları ile ilgili fonksiyoon yazıyoruz
+fonksiyon şablonları ile ilgili fonksiyon yazıyoruz
 
 mülakatlardaki sorulan temel bir soru
 
@@ -1912,14 +1906,14 @@ int a[]{1, 4, 7, 8;
 constexpr auto size = sizeof(a) / sizeof(*a);
 }
 
+-------------
 
---------
 c++ dilinde bu şekilde yazılır
 
 template <typename T, std::size_t N> //1. parametresi type 2. parametresi non-type
 constexpr auto asize(const T(&)[N])
 {
-return N
+return N;
 }
 
 int main()
@@ -1930,6 +1924,7 @@ constexpr auto size = asize(a);
 }
 
 -----------
+
 //sadece boyutu belli bir dizinin elemanlarını yazdırabiliriz
 
 void print_array(const int* p std::size_t size)
@@ -1937,7 +1932,7 @@ void print_array(const int* p std::size_t size)
 for (size_t i = 0; i < size; ++i)
 printf("%d", p[i]);
 
-printf("\n"),
+printf("\n");
 }
 
 int main()
