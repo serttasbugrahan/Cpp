@@ -2160,16 +2160,697 @@ char s2[] = "kerim";
 auto x = Max(s1, s2);
 }
 
+
+//////////////////////////////////////////////// 3. Ders /////////////////////////////////////////////////
+
+//mülakatlarda sorulan çok tipik bir soru
+
+template<typename T> //primary template
+void func(T)
+{
+std::cout << 1;
+}
+
+template<> //explicit speciliation
+void func(int*)
+{
+std::cout << 2;
+}
+
+template<typename T> //başka bir fonksiyon şablonu
+void func(T*)
+{
+std::cout << 3;
+}
+
+int main()
+{
+int* p = nullptr;
+func(p); //3 çalışır, 2. function overloading resolution a girmez
+}
+
+-----------
+
+template<typename T> 
+void func(T)
+{
+std::cout << 1;
+}
+
+template<typename T>
+void func(T*)
+{
+std::cout << 2;
+}
+
+template<> 
+void func(int *)
+{
+std::cout << 3;
+}
+
+int main()
+{
+int* p = nullptr;
+func(p); //2. seçilir 2.,  3. yü seçer
+}
+
+------------
+
+template<typename T> 
+void func(T)
+{
+std::cout << 1;
+}
+
+template<>
+void func(int*)
+{
+std::cout << 2;
+}
+
+template<typename T> 
+void func(T*)
+{
+std::cout << 3;
+}
+
+template<> 
+void func(int*)
+{
+std::cout << 4;
+}
+
+int main()
+{
+int* p = nullptr;
+func(p); //4 yazar
+}
+
+---------------------------
+
+partial specialization (kısmi) : alt küme için alternatif kod veriyoruz
+
+template <typename T>
+struct Myclass {
+public:
+Myclass()
+{
+std::cout << "primary template type T is : " << typeid(T).name() << '\n';
+}
+};
+
+template <typename T>
+struct Myclass<T *> { //template argümanı pointer olduğunda partial kullanılcak
+
+};
+
+
+------------
+template <typename T>
+struct Myclass {
+public:
+Myclass()
+{
+std::cout << "primary template type T is : " << typeid(T).name() << '\n';
+}
+};
+
+template <typename T>
+struct Myclass<T *> { 
+Myclass()
+{
+std::cout << "partial spec. T *\n";
+}
+};
+
+int main()
+{
+Myclass<int> m1;
+Myclass<double> m2;
+Myclass<void> m3;
+Myclass<int*> m4;
+Myclass<double**> m5;
+}
+
+------------
+
+!! explicit specilation sadece 1 specialiton için (örn. int*) 
+partial bir küme için (int*, void* ...)
+
+template <typename T, typename U>
+struct Mert {
+Mert()
+{
+std::cout << "primart template\n";
+}
+};
+
+template <typename T>
+struct Mert<int, T> {
+Mert()
+{
+std::cout << "partial template\n";
+}
+};
+
+int main()
+{
+Mert<double, int> m1; // primart
+Mert<int, int> m2; //partial
+
+}
+
+-----------------
+
+template <typename T, typename U>
+struct Mert {
+Mert()
+{
+std::cout << "primart template\n";
+}
+};
+
+template <typename T>
+struct Mert<T, T> { //2 template argümanı aynı ise
+Mert()
+{
+std::cout << "partial template\n";
+}
+};
+
+int main()
+{
+Mert<double, int> m1; 
+Mert<int, double> m2; 
+Mert<int, int> m2; 
+}
+
 ---------------
 
+template <typename T, typename U>
+struct Mert {
+Mert()
+{
+std::cout << "primart template\n";
+}
+};
 
 
+template <typename T, typename U>
+struct Mert <std::pair<T, U>> {
+Mert()
+{
+std::cout << "partial specialition\n";
+}
+};
+
+int main()
+{
+Mert<int> m1;
+Mert<std::pair<int, long>> m2;
+}
+
+------------------
+
+template <int BASE, int EXP>
+struct Power {
+static const int value = BASE * Power<BASE, EXP - 1>::value;
+};
+
+template <int BASE>
+struct Power<BASE, 0> {
+static const int value 1;
+};
+
+int main()
+{
+constexpr int val = Power<3, 5>::value;
+}
+
+--------------------------------
+
+alias template (tür eş isim şablonu) bahsediceğiz
+variable template bahsediceğiz
+variadic template bahsediceğiz
 
 
+---------------------------------
+sağ taraf referansı taşıma semantiği ve perfecr forwarding için eklenmiştir
+ 
+perfect forwarding (mükemmel gönderim)
+-------------------
+
+void func(T x)
+
+void foo(T x)
+{
+func(x);
+}
+
+int main()
+{
+foo(arg) //foo ben sana argğmanlar gönderiyorum sen benim göderdiğim argümanlar ile func çağırıcaksın
+//argüman L value ya da R value olabilir
+//argüman const ya da non const da olabilir
+//ancak ben const gönderirsem const, R gönderirsem R göndericeksin
+}
+
+-----------
+
+perfect forwarding önemi üzerine örnek
+
+class Myclass {};
+
+void foo(Myclass&)
+{
+std::cout << "Myclass&\n";
+}
+
+void foo(const Myclass&)
+{
+std::cout << "const Myclass&\n";
+}
+
+void foo(Myclass&&)
+{
+std::cout << "Myclass&&\n";
+}
+
+//call foo kullanmamnın uzun yolu
+
+void call_foo(Myclass& x)
+{
+foo(x);
+}
+
+void call_foo(const Myclass& x)
+{
+foo(x);
+}
+
+void call_foo(Myclass&& x)
+{
+foo(std::move(x));
+}
 
 
+int main()
+{
+Myclass m;
+const Myclass m;
+
+foo(m);
+call_foo(m);
+foo(cm);
+call_foo(cm);
+foo(Myclass{});
+call_foo(Myclass{});
+
+}
 
 
+-----------
+
+yukarıdakinin çözümü olarak universel ref. kullanabiliriz
+
+class Myclass {};
+
+void foo(Myclass&)
+{
+std::cout << "Myclass&\n";
+}
+
+void foo(const Myclass&)
+{
+std::cout << "const Myclass&\n";
+}
+
+void foo(Myclass&&)
+{
+std::cout << "Myclass&&\n";
+}
+
+template <typename T>
+void call_foo(T&& x)
+{
+//l value l value olarka, r value r value olucak
+foo(std::forward<T>(x));
+
+}
+
+int main()
+{
+Myclass m;
+const Myclass m;
+
+foo(m);
+call_foo(m);
+foo(cm);
+call_foo(cm);
+foo(Myclass{});
+call_foo(Myclass{});
+}
+
+-------------------
+tipik contanier örneği
+
+stl containerların isimlerinde "emplace" sözcüğü geçen ekleme (insertion) kodları var
+
+----------------------------
+
+alias template (eş isim) : türün yerine geçen eş isim
+------------------------
+
+using bildiriminin template olarak kullanılmasına alias denir
+
+template <typename T>
+using ptr = T*;
+
+int main()
+{
+ptr<int> p1;
+ptr<double> p;
+
+}
+
+-------
+
+template <typename T>
+using Ar10 = T[10];
+
+int main()
+{
+Ar10<int> x;
+Ar10<double> y;
+}
+
+-------
+
+template <typename T, std::size_t N>
+struct Array;
+
+template <std::size_t N>
+using intar = Array<int, N>;
+
+int main()
+{
+intar<20>
+}
+
+---------
+
+//çok sık kullanılan yapı
+
+template <typename T>
+using gset = std::set<T, std::greater<T>>;
+
+int main()
+{
+using namespace std;
+
+set<int, greater<int>> myset;
+gset<int> myset2;
+}
+
+-------
+
+template <typename T>
+struct Nec {
+
+using value_type = T;
+
+};
+
+template <typename T>
+using Nec_t = typename Nec<int>::value_type
+
+int main()
+{
+Nec_t<int>
+}
+
+-------------------------
+
+// variadic template
+
+template <typename T, typename U> // normalde 1,2,3 parametresi olabilir
+
+bizim ayrı ayrı templateler oluşturmamız gerekiyor, buna sağlayana araca template parameter packet
+
+template <typename T> // tür parametre
+template <int N> // non-type param
+template <typename <typename> typename T> // template template parametre
+
+bunların hepsini gerçekleştiren paket vardur
+
+sentaxı :
+
+template <typename ...TS>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<int, double>
+}
+
+------
+
+illa tür parametresi olması gerekmez
+
+template <int ...VALS>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<1, 3, 5> x;
+}
+
+--------
+
+parametre paketi ile sizeof operatörü de devreye girer ancak bu sizeof bizim bildiğimiz sizeof deği
+
+template <int ...VALS>
+class Myclass {
+public:
+static constexpr auto x = sizeof...(VALS); 
+
+};
+
+int main()
+{
+constexpr auto val = Myclass <1, 3, 7, 6, 8>::x
+}
+
+--------
+
+template <typename ...Ts> //template parametre pack
+void func(Ts ...args) //function parametre pack
+{
+
+}
+
+int main()
+{
+func(1, 2.3, 45L);
+}
+
+
+---------------
+
+class TypeTeller;
+
+//pack expansion
+
+template <typename ...Ts>
+void func(Ts ...args)
+{
+
+}
+
+int main()
+{
+func(2, 5, 3.4, "alican");
+
+}
+
+---------------
+
+pack extension tür parametrelerine de uygulanabilir
+
+template <typename ...Ts>
+class Myclass {
+
+};
+
+template <typename ...Ts>
+void func(Ts ...args)
+{
+Myclass<Ts...> mx;
+}
+
+int main()
+{
+func(2, 5L, 3.4, "alican");
+}
+
+------------
+
+template <typename ...Ts>
+void func(Ts&& ...args);
+
+template <typename ...Ts>
+void foo(Ts && ...args)
+{
+func(std::forward<Ts>(args)...);
+//func(std::forward<int>(p1), std::forward<double>(p2), std::forward<int>(p3) 
+}
+
+int main()
+{
+int ival;
+double dval;
+
+func(12, dval, ival);
+}
+
+-----------
+
+template <typename ...Ts>
+void func(Ts ...params)
+{
+int a[] = { params... };
+
+}
+
+int main()
+{
+func(1, 5, 7, 9);
+}
+
+-----------
+
+kalıtımda kullanılabilir
+
+class A {
+public:
+void fa();
+};
+
+class B {
+public:
+void fa();
+};
+
+class C {
+public:
+void fa();
+};
+
+
+template <typename ...Ts>
+class Myclass : public Ts... {
+
+/*
+public:
+using Ts::foo...;
+
+*/
+}
+
+int main()
+{
+Myclass<A, B, C> m1;
+
+m1.fa();
+m1.fb();
+m1.fc();
+}
+
+---------------
+recursive instantitiation
+
+template <typename T>
+void print(const T& t)
+{
+std::cout << t << " ";
+}
+
+
+template <typename T,typename ...Ts>
+void print(const T&t, const Ts& ...args)
+{
+print(t);
+print(args...);
+
+}
+
+int main()
+{
+print(1, 2.3, "alican", 4.5f);
+}
+
+-------------
+
+template <typename ...Ts>
+void print(const Ts& ...args)
+{
+((std::cout << args << " "), 0)...
+imt a[] = {((std::cout << p1 << " "), 0), ((std::cout << p2 << " "), 0)};
+}
+
+--------------
+
+template <typename ...Ts>
+void print(const Ts& ...args)
+{
+using ar = int[];
+
+Ar{ ((std::cout << args << '\n'), 0)... };
+}
+
+int main()
+{
+print(2, 6, 1.2, "mustafa",std::string{necati"}, 56765);
+}
+
+------------
+
+c++ 17 ile fold expressions eklendi variadic işlemlerin daha kolay yapılmasını sağlıyır
+
+template <typename ...Ts>
+auto sum(Ts ...args)
+{
+// return (args + ...) //unary right fold
+return (... + args); //unary left fold
+//((p1 + p2) + p3) + p4
+}
+
+int main()
+{
+using namespace std;
+
+std::cout << sum(1, 3, 6, 5) << "\n";
+}
+
+----------
+
+template <typename ...Ts>
+auto div(Ts ...args)
+{
+return (args / ...)
+//p1 / (p2 / (p3 / p4))
+}
+
+int main()
+{
+using namespace std;
+std::cout << div(500, 100, 20, 10) << '\n';
+}
 
 
 
