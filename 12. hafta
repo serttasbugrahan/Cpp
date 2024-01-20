@@ -2852,5 +2852,90 @@ using namespace std;
 std::cout << div(500, 100, 20, 10) << '\n';
 }
 
+--------------------
+
+variadic templatesler
+ recursive function instantiation
+  static if
+ init list
+ fold expression
+  unary right fold
+  unary left fold
+  binary left fold
+ 
+--------------------
+
+makeuniqu
+
+template <typename T, typename ...Ts>
+std::unique_ptr<T> MakeUnique(Ts&& ...args)
+{
+return std::unique_ptr<T> (new T(std::forward<Ts>(args)...)
+}
+
+int main()
+{
+MakeUnique<Myclass>(2, 6, 7)
+}
+
+------------------
+
+class Myclass {
+public:
+Myclass(int, double);
+Myclass(std::string, std::string, int);
+};
+
+int main()
+{
+using namespace std;
+
+vector<Myclass> mvec;
+
+mvec.emplace_back(12, 4.5);
+mvec.emplace_back("ali", "veli", 12);
+}
+
+
+-----------------
+
+variable templates
+------------------
+
+template <typename T>
+constexpr T pi = T(3.1459265342432L);
+
+int main()
+{
+constexpr auto x = pi<int>;
+}
+
+---------
+
+template <typename T>
+constexpr T pi = T(3.1459265342432L);
+
+template <typename T>
+T get_circle_area(T radius)
+{
+return pi<T> radius * radius
+}
+
+int main()
+{
+get_circle_area(4.5L)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
