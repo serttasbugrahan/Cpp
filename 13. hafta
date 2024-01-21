@@ -47,8 +47,519 @@ static_assert(IsPointer<T>::value, "I am soryy. only for pointer types...");
 
 int main()
 {
-func(12);
+int x = 789;
+func(&x);
+//func(12);
 }
+
+//bu işlemler type_traits başlık dosyasında bulunur
+
+
+-----------------------
+
+#include <type_traits>
+
+template <typename T>
+void func(T x)
+{
+static_assert(std::is_pointer::value, "I am soryy. only for pointer types...");
+}
+
+int main()
+{
+int x = 678;
+func(&x);
+}
+
+-----------------------
+#include <type_traits>
+
+template <typename T>
+void func(T)
+{
+static_assert(std::ispointer_v<T>); //compile time da value hesaplamanın yöntemi
+}
+
+int main()
+{
+
+}
+
+---------------
+
+template <typename T>
+struct RemoveReferance {
+using type = T;
+};
+
+template <typename T>
+struct RemoveReferance<T&> {
+using type = T;    
+};
+
+template <typename T>
+struct RemoveReferance<T&&> {
+using type = T;    
+};
+
+template <typename T>
+using RemoveReferance_t = typename RemoveReference<T>::type;
+
+int main()
+{
+// RemoveReferance<int>::type //bunun yerine aşağıdaki yazılabilecek 
+RemoveReferance_t<int>
+}
+
+--------------
+//öyle bir fonksiyon yazılmak isteniyorki bu fonksiyona argüman olarak 
+//l value geldiğinde ayrı kod r value geldiğinde ayrı kod çalışıcakk ve bu seçim compiler time de olucak
+
+//birçok yolu vardır, bir tanesi : tag-dispatch
+
+void bar(std::true_type)
+{
+std::cout << "implementation for l values\n";
+}
+
+void bar(std::false_type)
+{
+std::cout << "implementation for r values\n";
+}
+
+
+template <typename T>
+void func(T&&)
+{
+bar(std::is_lvalue_referance<T>{});
+}
+
+int main()
+{
+func(12);
+int x { 21 };
+
+func(x);
+}
+
+----------------
+
+template <typename T>
+void func_impl(T, std::true_type)
+{
+std::cout << "tam sayi turleri icin\n";
+}
+
+template <typename T>
+void func_impl(T, std::false_type)
+{
+std::cout << "tam sayi olmayan turleri icin\n";
+}
+
+template <typename T>
+void func(T x)
+{
+func_impl(x, std::is_integral<T>{}); 
+}
+
+int main()
+{
+func(12); //patch dispatch
+}
+
+------------
+
+template <typename T>
+void func(T x)
+{
+if constexpr (ct expression) {
+//code for true path
+}
+else {
+//code for false path
+}
+}
+
+
+int main()
+{
+func(12); //patch dispatch
+}
+
+-----------------
+//static if (cpp 17 ile geldi)
+
+template <typename T>
+auto get_value(T x)
+{
+if constexpr(std::is_pointer_v<T>){
+return *x;
+}
+else {
+return x;
+}
+}
+
+int  main()
+{
+int x = 5;
+double dval = 4.677;
+
+int* ip{ &x };
+double* dp{ &dval };
+
+std::cout << get_value(x) << '\n';
+std::cout << get_value(dval) << '\n';
+std::cout << get_value(ip) << '\n';
+std::cout << get_value(dp) << '\n';
+
+}
+
+======================================================================
+
+STL (Standart Template Library)
+--------------------------------
+
+3 baş rol oyuncusu vardır
+
+constaniers 
+
+Iterators : pointerların daha fazla soyutlanmış hali
+
+Algorithms
+
+---------
+sequence contaniners
+
+vector : dinamik dizi sınıfı
+deque : dinamik dizinin dizisi
+list : çifte bağlı liste
+forward_list : tekli bağlı liste
+array : arrayleri sarmalayan
+string : yazı işleri
+
+
+associative contaniers : ikili arama ağaçları
+
+set: 1 keyden 1 tane tutulur anahatara erişilir
+multiset: 1 keyden birden fazla tutulur anahatara erişilir
+map: anahtara karşılık gelen value'a karşılık gelir
+multimap: : birden fazla anahtar tutulabilir
+
+unordered associative contaniers
+
+unordered_set
+unordered_multiset
+unordered_map
+unordered_multimap
+
+------------------------
+
+//c dilinde aşağıdaki şekilde yazılırdı
+
+void print_array(const int* ps, const int* pe)
+{
+while (ps != pe) {
+printf("%d ", *ps++);
+}
+}
+
+int main()
+{
+int a[5] = {1, 4, 7, 9, 2};
+
+print_array(a, a + 5);
+}
+
+----------
+//c++ ile yazımı
+
+template <typename Iter>
+void print_array(Iter beg, Iter end)
+{
+while (beg != end) {
+std::cout << *beg << ' ';
+++beg;
+}
+std::cout << '\n';
+}
+
+int main()
+{
+int a[5] = {1, 4, 7, 9, 2};
+int a[5] = {1.1, 4.5, 7.4, 9.1, 2.32};
+
+
+print_array(a, a + 5);
+print_array(a + 1, a + 5);
+
+}
+
+---------------
+//vector ile yazımı
+
+template <typename Iter>
+void print_array(Iter beg, Iter end)
+{
+while (beg != end) {
+std::cout << *beg << ' ';
+++beg;
+}
+std::cout << '\n';
+}
+
+int main()
+{
+std::vector<double> dvec{1.1, 4.5, 7.4, 9.1, 2.32};
+
+print_array(dvec.begın(), devic.end());
+
+}
+
+------------------
+//list ile yazımı
+
+template <typename Iter>
+void print_array(Iter beg, Iter end)
+{
+while (beg != end) {
+std::cout << *beg << ' ';
+++beg;
+}
+std::cout << '\n';
+}
+
+int main()
+{
+std::vector<double> dvec{1.1, 4.5, 7.4, 9.1, 2.32};
+
+print_array(dvec.begın(), devic.end());
+
+std::list<std::string> names{ "melike", "tamer", "serhat", "burak", "damla", "furkan" };
+
+print_array(names.begin(), names.end());
+}
+
+
+----------------------
+
+#include algorithm>
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{4, 6, 8,1,9,1,0 };
+
+sort(ivec.begin(), ivec.end());
+
+for (auto i : ivec)
+std::cout << i << ' ';
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{1, 4, 6, 8, 1, 9, 3, 1, 0 };
+
+count(ivec.begin(), ivec.end(), 1)
+}
+
+---------------
+
+iteratör sınıflarının hangi operasyonlara destek sağladığı 
+generic programlama araçları ile belli olur
+
+-------------
+
+//eski c++'da bu şekilde yazılırdı
+
+int main()
+{
+using namespace std;
+
+vector<list<pair<string, string>>> vec;
+vector<list<pair<string, string>>>::iterator iter = vec.begin(); //
+}
+
+-------
+
+//yeni c++'da yazım
+int main()
+{
+using namespace std;
+
+vector<list<pair<string, string>>> vec;
+auto iter = vec.begin(); //
+}
+
+-----------------
+
+using namespace std;
+
+int main()
+{
+vector<int> ivec(1000);
+
+//ivec.begin(); 
+begin(ivec); //modern cpp ile geldi daha çok tercih edilir
+}
+
+---------
+
+int main()
+{
+vector<int> ivec(1000);
+int ar[100]{};
+
+auto iter = begin(ivec);
+}
+
+-----------------------------
+
+iterator category:
+------------------
+
+iteratörün interfaceinde hangi operasyonların olduğunu belirleyen
+iteratörün kategorisi dediğimiz özelliktir
+
+
+-input iterator
+                              
+-output iterator
+
+-forward iterator                    !! bilgisayarda foto var!!
+
+-bidirectional iterator
+
+-random access iterator : c deki pointerlar gibi c deki pointerları sokabildiğimiz her yere sokabiliriz
+
+
+---------
+
+int main()
+{
+vector<int> ivece(100);
+
+auto iter1 = ivec.begin();
+auto iter2 = ivec.begin();
+
+*iter1;
+++iter1;
+--iter1;
+
+//hepsi legal
+
+iter1 += 6;
+iter1 - iter2;
+iter2[43];
+
+}
+
+-----------
+
+int main()
+{
+list<int> ilist(100);
+
+auto iter1 = ivec.begin();
+auto iter2 = ivec.begin();
+
+*iter1;
+++iter1;
+--iter1;
+//list iteratörleri biderctional iteratordür 
+iter1 += 6;
+iter1 - iter2;
+iter2[43];
+
+}
+
+-----------
+
+//forward_list
+
+int main()
+{
+forward_list<int> ilist(100);
+
+auto iter1 = ivec.begin();
+auto iter2 = ivec.begin();
+
+*iter1;
+++iter1;
+--iter1;
+}
+
+------------
+
+using namespace std;
+
+template <typename Iter>
+void func(Iter beg, Iter end)
+{
+//compile time'da sorgulanabilir
+}
+
+//tag class - empty class
+
+//std::input_iterator_tag
+//std::output_iterator_tag
+//std::forward_iterator_tag
+//std::biderctional_iterator_tag
+//std::random_access_iterator_tag
+
+int main()
+{
+cout << typeid(vector<int>::iterator::iterator_category).name() << "\n";
+cout << typeid(list<int>::iterator::iterator_category).name() << "\n";
+
+}
+
+---------------------
+
+bugün öğrendiklerimizi birleştirirsek...
+
+//T ve U türlerinin aynı olup olmadığını sınayabilir miyiz?
+
+template <typename T, typename U>
+struct IsSame : std::false_type {};
+
+template <typename T>
+struct IsSame<T, T> : std::true-type {};
+
+
+template <typename T, <typename U>
+constexpr bool IsSame_v = IsSame<T, U>::value
+
+int main()
+{
+IsSame<int, int>::value
+}
+
+----------
+
+template <typename Iter>
+void algo(Iter beg, Iter end)
+{
+if constexpr(std::is_same_v(typename Iter::iterator_category, std::random_access_iterator_tag>
+
+}
+else if constexpr (std::is_same_v<typename Iter::iterator_category, std::bidirectional_access_iterator_tag>)
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
