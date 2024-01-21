@@ -2302,7 +2302,7 @@ template <typename T, typename U>
 struct Mert {
 Mert()
 {
-std::cout << "primart template\n";
+ std::cout << "primart template\n";
 }
 };
 
@@ -2396,9 +2396,9 @@ variadic template bahsediceğiz
 
 
 ---------------------------------
-sağ taraf referansı taşıma semantiği ve perfecr forwarding için eklenmiştir
+sağ taraf referansı taşıma semantiği ve perfect forwarding için eklenmiştir
  
-perfect forwarding (mükemmel gönderim)
+perfect forwarding (mükemmel gönderim) :
 -------------------
 
 void func(T x)
@@ -2458,7 +2458,7 @@ foo(std::move(x));
 int main()
 {
 Myclass m;
-const Myclass m;
+const Myclass cm;
 
 foo(m);
 call_foo(m);
