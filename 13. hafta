@@ -552,6 +552,202 @@ if constexpr(std::is_same_v(typename Iter::iterator_category, std::random_access
 else if constexpr (std::is_same_v<typename Iter::iterator_category, std::bidirectional_access_iterator_tag>)
 }
 
+////////////////////////////////////////////////2. Ders ////////////////////////////////////////////////
+
+200 civarında stl algoritması vardır
+
+-algoritmalar exception throw etmez
+
+
+std::copy
+==========
+
+aşağıdaki kod ile örneğin person sınıfı türünden nesneleri
+vectore kopyalayabilirim
+
+
+template <typename InIter, typename OutIter>
+OutIter copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg
+}
+
+!! eğer bir algoritma bir yere yazma işlemi yapıyorsa algoritmanın 
+geri dönüş değeri en son yazılan konumdan sonraki konumdur.
+
+-------------------
+kodu anlamaya çalışma
+
+template <typename InIter, typename OutIter>
+OutIter copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg
+}
+
+int main()
+{
+using namespace std;
+vector<int> ivec{2, 5, 7, 9, 1, 3};
+list<int> ilist; //tanımsız davranış olur liste BOŞ
+//list<int> ilist(10);
+
+Copy(ivec.begin(), ivec.end(), ilist.begin());
+}
+
+-------------------
+
+1. algoritmaların parametre değişkeni iteratördür
+Yani bir algoritma örneğin şunları yapabilir
+
+-bir iteratör konumundaki nesneye atama yapabilir. (*destbeg++ = *beg++;=
+
+-aynı range'deki iki nesneyi takas edebilir
+
+-range'in ilişkin olduğu contaninera (kaba) ekleme, silme yapamaz
+sadece değerlerini değiştirebilir
+
+-contanier boş ise c.begin ile c.end eşit olur
+
+!!! asla asla boş contaninırın begin fonksiyonunun geri dönüş değerini direferans etme
+!!! asla asla boş olsa da dolu olsa da end direferans etme
+
+[begin, end) //begin konumu dahil end konumu hariç anlamına gelir
+
+-----------------------
+
+template <typename InIter, typename OutIter>
+OutIter copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg
+}
+
+int main()
+{
+using namespace std;
+vector<int> ivec{2, 5, 7, 9, 1, 3};
+
+auto iter = iter.begin(); //iter kullanarak bütün parametreler değişebilir
+auto iter2 = iter(); //iter2  kullanarak bütün parametreler değişebilir
+}
+
+-----------------------
+
+template <typename InIter, typename OutIter>
+OutIter Copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg
+}
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{2, 5, 7, 9, 1, 3};
+list<int> ilist(10);
+
+auto iter = Copy(ivec.begin(), ivec.end(), ilist.begin());
+}
+
+-----------------
+derleyici yukarıdakini şu şekilde yazar
+
+template<>
+list<int>::iterator Copy(vector<int>::iterator beg, vector<int>::iterator end, list<int>::iterator destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+const char * const p[] = { "emre", "bilge", "damla", "tamer" , "gokhan"};
+
+vector<string> svec(6);
+copy(begin(p), end(p), begin(svec)); //hata yok
+
+for (const auto& s : svec)
+cout << s << ' ';
+}
+
+!! her zmaan en son yazdığı konumdan sonraki konumu döndürür
+
+
+----------------------------------------
+
+bu algoritmayı anlamak çok önemli
+
+predicate : bool döndüren fonksiyonlara denir
+unary predicate :  'bool iseven(int)'
+binary predicate : 'bool is_less_than(int, int)'
+
+count : belli bir değere sahip olanı sayaar
+countif : belirli bir sorguya true döndürenleri sayıyor
+
+copyif : bir range'deki öğelerden belirli bir koşulu sağlayanları bir yere yazıyor
+======
+
+template <typename InIter, typename OutIter, typename Upred>
+OutIter CopyIf(InIter beg, InIter end, OutIter destbeg, Upred f)
+{
+while (beg != end) {
+if (f(*beg)) {
+*destbeg++ = *beg;
+}
+++beg;
+}
+return destbeg;
+}
+
+
+--------------
+
+template <typename InIter, typename OutIter, typename Upred>
+OutIter CopyIf(InIter beg, InIter end, OutIter destbeg, Upred f)
+{
+while (beg != end) {
+if (f(*beg)) {
+*destbeg++ = *beg;
+}
+++beg;
+}
+return destbeg;
+}
+
+bool iseven(int x)
+{
+return x % 2 == 0;
+}
+
+int main()
+{
+using namespace std;
+vector<int> ivec{2,5, 7, 10, 4, 3, 6, 8 ,1 ,9};
+
+CopyIf(ivec.begin(), ivec.end(), ililst.begin(), iseven); //diziye kopylanan değerler vektördeki çift sayılar olucak
+}
+
+
+
+
+
 
 
 
