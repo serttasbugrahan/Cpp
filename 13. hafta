@@ -740,24 +740,351 @@ int main()
 {
 using namespace std;
 vector<int> ivec{2,5, 7, 10, 4, 3, 6, 8 ,1 ,9};
+list<int> ilist(10);
 
 CopyIf(ivec.begin(), ivec.end(), ililst.begin(), iseven); //diziye kopylanan değerler vektördeki çift sayılar olucak
+
+for(auto i : ilist) {
+std::cout << i << ' ';
+}
+}
+
+------------------
+
+dinamik hale getirme
+
+template <typename InIter, typename OutIter, typename Upred>
+OutIter CopyIf(InIter beg, InIter end, OutIter destbeg, Upred f)
+{
+while (beg != end) {
+if (f(*beg)) {
+*destbeg++ = *beg;
+}
+++beg;
+}
+return destbeg;
+}
+
+bool iseven(int x)
+{
+return x % 2 == 0;
+}
+
+class DivPred {
+public:
+DivPred(int val) : mval{val}{}
+bool operator()(int x) const
+{
+return x % mval == 0;
+}
+private:
+mval;
+};
+
+int main()
+{
+using namespace std;
+vector<int> ivec{2,5, 7, 10, 4, 3, 6, 8 ,1 ,9};
+list<int> ilist(20);
+
+int n;
+
+std::cout <<"kaca tam bolunenleri kopyalayalım: ";
+cin >> n;
+
+
+CopyIf(ivec.begin(), ivec.end(), ililst.begin(), DivPred{n});
+
+for(auto i : ilist) {
+std::cout << i << ' ';
+}
+}
+
+------------------
+"
+class DivPred {
+public:
+DivPred(int val) : mval{val}{}
+bool operator()(int x) const
+{
+return x % mval == 0;
+}
+private:
+mval;
+};
+"
+yukarıdaki ifade de derleyiciye yazdırılabilinir 
+bunu yapmanın yolu lambda kullanmaktır
+
+
+template <typename InIter, typename OutIter, typename Upred>
+OutIter CopyIf(InIter beg, InIter end, OutIter destbeg, Upred f)
+{
+while (beg != end) {
+if (f(*beg)) {
+*destbeg++ = *beg;
+}
+++beg;
+}
+return destbeg;
+}
+
+bool iseven(int x)
+{
+return x % 2 == 0;
+}
+
+//lambda ifadesi karşılığı derleyici sınıf tanımlar
+//bu sınıfa closure type denir
+//lambda ifadesi aslında closure object
+
+int main()
+{
+using namespace std;
+vector<int> ivec{2,5, 7, 10, 4, 3, 6, 8 ,1 ,9};
+list<int> ilist(20);
+
+int n;
+
+std::cout <<"kaca tam bolunenleri kopyalayalım: ";
+cin >> n;
+
+
+CopyIf(ivec.begin(), ivec.end(), ililst.begin(),
+[n](int x) {return x % n == 0; } //bu pr value bir ifade
+);
+
+for(auto i : ilist) {
+std::cout << i << ' ';
+}
+}
+
+-----------------------------------------
+
+!! Bu kısımda hocanın yazdığı bir kaynak kod kullanılmıştır
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+//rname //rastgele isim döndürür 
+//rsurname //rastgele soyisim döndürür
+//rtown //rastgele şehir ismi döndürür
+
+rfill(svec, 100, rname); //ismi svec olan vektöre 100 tane öğe insert etmiş olucak ancak insert edilen fonksiyonlar rname'den alınacak
+print(svec); //aralarına 1 boşluk koyarak yazıcak
+}
+
+!! BU KISIM 'nutilty' dosyasında 
+
+--------------------
+1. kod(main.cpp) 
+
+class Lenpred {
+public:
+Lenpred(std::size_t len) : mlen{len}{};
+bool operator()(const std::string &s) const
+{
+    return s.length() == mlen;
+}
+private:
+std::size_t mlen;
+};
+
+bool is_len_13(const std::string& s)
+{
+    return s.length() == 14;
 }
 
 
 
+int main()
+{
+    using namespace std;
+
+    vector<string> svec;
+    rfill(svec, 1000, []{return rname() + ' ' + rfname(); });
+
+    std::ofstream ofs{ "out.txt "};
+    if (!ofs) 
+    {
+        std::cerr << "out.txt dosyasi olusturulamadi";
+        exit(EXIT_FAILURE);
+    }
+
+    
+    //dinamik şekilde yapma
+    std::size_t len;
+    std::cout << "uzunluk degeri girin: ";
+    cin >> len;
+    
+    vector<string> destvec(1000);
+   
+    //a copy if algoritması ile svec'te tutulan ogelerden uzunlugu 5 olanları detvec'e kopyalayın
+   
+    //auto iter = copy_if(svec.begin(), svec.end(), destvec.begin(), is_len_13);
+    auto iter = copy_if(svec.begin(), svec.end(), destvec.begin(), 
+    Lenpred{len}
+    
+    );
+    
+    
+    print(destvec.begin(), iter, "\n", ofs);    
+}
+
+-------------
+
+2. kod
+
+'int main()
+{
+    using namespace std;
+
+    vector<string> svec;
+    rfill(svec, 1000, rname);
+
+    // kac tane tamer olduğu yazsın
+    cout << count(svec.begin(), svec.end(), "tamer");
+
+    
+    std::string name;
+    std::cout << "sayilacak ismi girin: ";
+    cin >> name;
+    cout << count(svec.begin(), svec.end(), name);
+
+    char c;
+    std::cout << "icinde hangi karakter olanlar sayilsin";
+    cin >> c;
+    auto n = count_if(begin(svec), end(svec), [c](const string& s){
+        return s.find(c) != string::npos; //lambda ile yazdık
+    });
+
+    std::cout << n << '\n';
+
+    
+}'
+
+------------------
+
+3. kod  
+
+int main()
+{
+    using namespace std;
+
+    vector<string> svec;
+
+    rfill(svec, 200'000, []{rname() + ' ' + rfname() + ' ' + rfname(); });
+    
+    //sort random access iterator kategorisindedir, list sıralanamaz bu nedenle
+    std::cout << "siralama basladi";
+    sort(svec.begin(), svec.end());
+    std::cout << "siralama sona erdi";
+    
+    std::ofstream ofs{"out.txt"};
+
+    if(!ofs) {
+        std::cerr << "out.txt dosyasi olusutulamadi\n";
+        exit(EXIT_FAILURE);
+    }
+
+    print(svec, "\n", ofs);
+}
+
+------------
+
+bool scompare(const std::string& s1, const std::string& s2)
+{
+    return s1.length() < s2.length() || (s1.length() == s2.length() && s1 < s2);
+}
+
+int main()
+{
+    using namespace std;
+
+    vector<string> svec;
+
+    rfill(svec, 200'000, []{rname() + ' ' + rfname() + ' ' + rfname(); });
+    
+    //sort random access iterator kategorisindedir, list sıralanamaz bu nedenle
+    std::cout << "siralama basladi";
+    sort(svec.begin(), svec.end(), scompare);
+    std::cout << "siralama sona erdi";
+    
+    std::ofstream ofs{"out.txt"};
+
+    if(!ofs) {
+        std::cerr << "out.txt dosyasi olusutulamadi\n";
+        exit(EXIT_FAILURE);
+    }
+
+    print(svec, "\n", ofs);
+}
+
+-------------------------------------------
+!! Başka bir konuyu anlatmaya başladı
+
+struct Nec {
+
+};
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "tan" };
+
+const vector<string>::iterator iter = svec.begin();
+
+iter.operator++(); //hata
+
+*iter = "murathan"; //legal
+//iter.operator*() = "murathan"; //aslında bunu yazarız
+
+}
+
+---------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "tan" };
+
+vector<string>::const_iterator iter = svec.begin();
+
+cout << *iter << "\n"; //gecerli
+*iter = "tekin"; //hata
+}
+
+!! pointerdı const benzeri iterator kullanamk istiyorsak
+iteratörümüzün türü iterator nestet type olmıycak const iterator
+nestet type olucak
+
+----------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "tan" };
+
+auto iter = svec.cbegin(); //vectörün string açılımının const iteratörü türü
+auto iter2 = cbegin(svec);
+
+}
 
 
 
+vektörün string açılımının const iteratörü türünden olması için
+yukarıdakş yapılır
 
-
-
-
-
-
-
-
-
+con.begin()
+con.end()
+begin(con)
+end(con)
 
 
 
