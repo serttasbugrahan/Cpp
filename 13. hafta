@@ -108,7 +108,7 @@ using RemoveReferance_t = typename RemoveReference<T>::type;
 int main()
 {
 // RemoveReferance<int>::type //bunun yerine aşağıdaki yazılabilecek 
-RemoveReferance_t<int>
+RemoveReferance_t<int>;
 }
 
 --------------
@@ -131,7 +131,7 @@ std::cout << "implementation for r values\n";
 template <typename T>
 void func(T&&)
 {
-bar(std::is_lvalue_referance<T>{});
+	bar(std::is_lvalue_reference<T>{});
 }
 
 int main()
@@ -237,7 +237,6 @@ list : çifte bağlı liste
 forward_list : tekli bağlı liste
 array : arrayleri sarmalayan
 string : yazı işleri
-
 
 associative contaniers : ikili arama ağaçları
 
@@ -442,7 +441,9 @@ iteratörün kategorisi dediğimiz özelliktir
 
 int main()
 {
-vector<int> ivece(100);
+using namespace std;
+
+vector<int> ivec(100);
 
 auto iter1 = ivec.begin();
 auto iter2 = ivec.begin();
