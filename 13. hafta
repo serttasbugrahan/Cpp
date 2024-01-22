@@ -1076,8 +1076,6 @@ auto iter2 = cbegin(svec);
 
 }
 
-
-
 vektörün string açılımının const iteratörü türünden olması için
 yukarıdakş yapılır
 
@@ -1086,7 +1084,151 @@ con.end()
 begin(con)
 end(con)
 
+------------
+//mülaktta sorulabilir
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "tan" };
+
+auto iter = svec.cbegin();
+++iter; //geçerli, const olan iteratör değildir const olan nesnesin itarörü
+*iter; //const ref. döndüreceği için hatalı
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "tan" };
+
+for (auto iter = svec.begin(); iter != svec.end(); ++iter) {
+iter->c; //Hata olmaz
+}
+}
+
+-----------
+algoritmaların çok önemli bir özelliği ile tanışıyoruz
+
+template <typename InIter>
+void print_range(InIter beg, InIter end)
+{
+while (beg != end) {
+std::cout << *beg++ << ' ';
+}
+std::cout << '\n';
+
+}
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"bilge", "gurkan", "halid", "mehöet", "onur", "kutay"};
+int a[] = {2,3,5,7,11,13,17,19};
+
+//print_range(svec.begin(), svec.end());
+print_range(svec.rbegin(), svec.rend()); //algoritmanın kodu değişmemesine rağmen nasıl olurda çıktı değişir
+//print_range(begin(a), end(a));
+print_range(rbegin(a), rend(a));
+
+//bunun açıklaması biraz karmaşıktır
+}
+
+-----
+
+template <typename InIter>
+void print_range(InIter beg, InIter end)
+{
+while (beg != end) {
+std::cout << *beg++ << ' ';
+}
+std::cout << '\n';
+
+}
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"bilge", "gurkan", "halid", "mehöet", "onur", "kutay"};
+
+vector<string>::reverse_iterator iter = svec.rbegin();
+cout << *iter << "\n";
+++iter;
+}
+
+ ARKA PLANDA ÇALIŞAN KODU İNCELEYELİM !!!!!!
+ -------------------------------------------
+ REVERSE ITERATÖR SINIF BIR ADAPTÖR SINIF YANI BU SINIF GERÇEK BIR ITERATÖR KULLANIYOR IÇINDE. BU DA GERÇEK KONUMU TUTUYOR.
+ DİKKAT!!!! 
+ REVERSE ITERATÖR, ITER KONUMUNU TUTTUĞUNDA FIZIKSEL OLARAK, * FUNCTIONU ONDAN BIR ÖNCEKI NESNENIN KONUMUNA ERIŞTIRIYOR.
+ YANI RBEGIN GERÇEK OLARAK CONTAINERDAKI END KONUMUNU TUTUYOR AMA * / IÇERIK / DEREFERENCE / INDIRECTION OPERATÖRÜ O KONUMDAKI NESNEYE DEĞIL
+ O KONUMDAN BIR ÖNCEKI NESNEYE ERIŞTIRIYOR.HILE BU !!!!!!!!!!!!
+
+---------------
+stl'deki arama fonksiyonları iteratör döndürür
+aranan bulunursa range'de var ise o konumun değerini döndürüuor
+eğer arana dğer yok ise fonksyiona geçtiğimiz end konumunu döndürüyor
+
+---------------
+//mülakatlarda çok sık sorulan bir soru
+
+template <typename InIter, typename Key>
+InIter Find(InIter beg, InIter end, const Key& val) //linear search
+{
+while (beg != end) {
+if (*beg == val)
+return beg;
+++beg;
+}
+return beg;
+}
 
 
+int main()
+{
+using namespace std;
 
+vector<int> ivec{4, 6, 7, 8, 1, 3, 98};
+
+int ival = 1;
+auto iter = find(ivec.begin(), ivec.edn(), ival);
+if (iter != ivec.end()) {
+cout << "bulundu" << *iter << "\n";
+cout << "index" << iter - ivec.begin() << "\n";
+
+}
+else {
+cout << "bulunamadi\n"
+}
+}
+
+---------
+
+template <typename InIter, typename Key>
+InIter Find(InIter beg, InIter end, const Key& val) //linear search
+{
+while (beg != end) {
+if (*beg == val)
+return beg;
+++beg;
+}
+return beg;
+}
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{1,1,1,4,6,7,81,3,2,2};
+
+auto iter = Find(ivec.rbegin(), ivec.rend(), 1);
+
+cout << *iterbase() << "\n"; //burası kritik (mülakatta sorulan kısm)
+}
 
