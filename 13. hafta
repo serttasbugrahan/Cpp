@@ -605,7 +605,7 @@ Copy(ivec.begin(), ivec.end(), ilist.begin());
 1. algoritmaların parametre değişkeni iteratördür
 Yani bir algoritma örneğin şunları yapabilir
 
--bir iteratör konumundaki nesneye atama yapabilir. (*destbeg++ = *beg++;=
+-bir iteratör konumundaki nesneye atama yapabilir. (*destbeg++ = *beg++)
 
 -aynı range'deki iki nesneyi takas edebilir
 
@@ -742,7 +742,7 @@ using namespace std;
 vector<int> ivec{2,5, 7, 10, 4, 3, 6, 8 ,1 ,9};
 list<int> ilist(10);
 
-CopyIf(ivec.begin(), ivec.end(), ililst.begin(), iseven); //diziye kopylanan değerler vektördeki çift sayılar olucak
+CopyIf(ivec.begin(), ivec.end(), ilist.begin(), iseven); //diziye kopylanan değerler vektördeki çift sayılar olucak
 
 for(auto i : ilist) {
 std::cout << i << ' ';
@@ -938,7 +938,7 @@ int main()
 
 2. kod
 
-'int main()
+int main()
 {
     using namespace std;
 
@@ -964,7 +964,7 @@ int main()
     std::cout << n << '\n';
 
     
-}'
+}
 
 ------------------
 
@@ -1197,7 +1197,7 @@ using namespace std;
 vector<int> ivec{4, 6, 7, 8, 1, 3, 98};
 
 int ival = 1;
-auto iter = find(ivec.begin(), ivec.edn(), ival);
+auto iter = find(ivec.begin(), ivec.end(), ival);
 if (iter != ivec.end()) {
 cout << "bulundu" << *iter << "\n";
 cout << "index" << iter - ivec.begin() << "\n";
