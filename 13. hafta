@@ -1232,3 +1232,162 @@ auto iter = Find(ivec.rbegin(), ivec.rend(), 1);
 cout << *iterbase() << "\n"; //burası kritik (mülakatta sorulan kısm)
 }
 
+
+///////////////////////////////////////////////// 3. Ders ///////////////////////////////////////////
+
+lambda derleyiciye sınıf yazdırmanın yçntemidir
+
+#include <vector>
+
+template <typename InIter>
+void PrintRange(InIter beg, InIter end)
+{
+while (beg != end) {
+std::cout << *beg++ << ' ';
+}
+std::cout << "\n--------------------------\n";
+}
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec,20, Irand{0, 100}); //20 tane 0-100 arasında sayı yazar
+
+//PrintRange(ivec.begin(), ivec.end()); //range'deki öğeleri yazar
+//PrintRange(ivec.rbegin(), ivec.rend());
+
+auto riter_beg = ivec.rbegin();
+auto riter_end = ivec.rend();
+PrintRange(riter_beg, riter_end);
+
+//riter_beg, riter_end kullanarak baştan sona doğru yazdır
+PrintRange(riter_beg.base(), riter_end.base());
+}
+
+------------------
+//burayı tekrar dinle anlamadım tam olarak
+
+template <typename InIter, typename OutIter>
+OutIter Copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+//öyle bir hile yapalım ki
+//*destbeg++ yazmak ile destbeg yazmak arasında fark olmasın
+
+}
+
+return destbeg;
+}
+
+template <typename Contanier>
+class BackInsertIterator {
+public:
+BackInsertIterator(Contanier &c) : rc(c) {}
+BackInsertIterator& operator++() {return *this; }
+BackInsertIterator& operator++(int ) {return *this; }
+BackInsertIterator& operator++(int ) {return *this; }
+BackInsertIterator& operator=(const typename Contanier::value_type& val)
+{
+rc.push_back(val);
+return *this;
+}
+private:
+Contanier& rc;
+};
+
+template <typename Con>
+BackInsertIterator<Con> BackInserter(Con &c)
+{
+return BackInsertIterator<Con>(c);
+}
+
+int main()
+{
+using namespace std;
+
+vector source_vec{2, 5, 1, 3, 4, 6, 9, 7};
+vector<int> dest_vec;
+
+//yukaridaki copy algoritmasına dokunmadan
+//ona çağrı yapacaksın
+//yapacağınız çağrı dest_vec source_vec'teki öğeleri sondan ekliycek
+
+BackInsertIterator<vector<int>> iter(dest_vec);
+Copy(source_vec.begin(), source_vec.end(), BackInsertIterator<vector<int>>(dest_vec));
+Copy(source_vec.begin(), source_vec.end(), BackInsertIterator(dest_vec));
+print(dest_vec);
+}
+
+-------------------
+
+yukarıdakilerin yazılmışı vardır
+
+------------------
+
+!! iyi bir kodlama için geçici bir nesne iş görüyorsa geçici nesne kullan
+isimlendirililmiş nesne kullanma
+
+------------------
+#include <iterator>
+#include <algorithm>
+
+int main()
+{
+using namespace std;
+
+vector source_vec{2, 5, 1, 3, 4, 6, 9, 7};
+vector<int> dest_vec;
+
+BackInsertIterator<vector<int>> iter(dest_vec);
+
+copy(source_vec.begin(), source_vec.end(), back_inserter(dest_vec)); //contenier sonuna eleman eklemek için kullanılır
+print(dest_vec);
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 10000, []{return rname() + ' ' + rfname(); });
+vector<string> dvec;
+size_t len;
+
+std::cout << "uzunlugu kac olanlar kopyalansin: ";
+cin >> len;
+//uzunluğu len olanları dvec'e kopyalıycağız
+
+copy_if(svec.begin), svec.end(), back_inserter(dvec),
+[len](const string &s) {return s.lenght() == len; }) //lamda kullanılmış bunu daha sonra öğreniceğiz detaylı
+
+std::ofstream ofs{ "out.txt" };
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+print(dvec, "\n", ofs);
+}
+
+----------------------
+
+//back_inserter ==> contanier'ın push_back fonksiyonunu çağrıya dönüştürüyor
+//front_inserter ==> contanier'ın push_front fonksiyonunu çağrıya dönüştürüyor
+//inserter ==> contanier'ın insert fonksiyonunu çağrıya dönüştürüyor
+
+59.44
+
+
+
+
+
+
+
+
+
+
