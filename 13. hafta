@@ -1641,12 +1641,243 @@ using namespace std;
 
 vector<string> svec{"ali", "can", "ece", "gul", "eda", "tan"};
 
-auto iter = nect(svec.begin(), 3); //3 sonraki konum elde edildi
+auto iter = next(svec.begin(), 3); //3 sonraki konum elde edildi
+//auto iter = slist.begin() + 3; //bu şekilde hata olurdu(list'den dolayı)  ancak next ile kullanmında hata olmaz
 
+cout << *next(slist.begin(), 3) << '\n';
+cout << *next(slist.begin()) << '\n';
+
+cout << *slist.end() << '\n'; // ub
+cout << *prev(slist.end()) << '\n';
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+list<string> slist{"ali", "can", "ece", "gul", "eda", "tan"};
+
+print(slist.begin(), slist.end());
+print(next(slist.begin()), prev(slist.end()));
+
+-------------
+
+advance iteratörün kendisini arttırır, parametresi referans call by referans
+next call by value, iterde herhangi bir değişiklik olamaz
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "tan", "ata" };
+list<string> slist{ "gun", "eda", "naz", "ela" };
+
+iter_swap(svec.begin(), slist.begin());
+print(svec);
+print(slist);
+
+iter_swap(next(svec.begin()), prev(slist.end(), 2));
+print(svec);
+print(slist);
 
 }
 
-1.49
 
+--------------------------------------
+
+algoritmaları görmeye devam ediyoruz
+
+geçen derste aşağıdakileri görmüştük
+
+copy
+copy_if
+count
+count_if
+sort
+find
+
+!! arama alg. aranan değeri bulamassa end konumunu döndürür
+
+
+----------------------
+find_if implemente ediyoruz
+
+template <typename InIter, typename Pred>
+InIter FindIf(InIter beg, InIter end, Pred f)
+{
+while (beg != end) {
+if (f(*beg))
+return beg;
+++beg;
+}
+return end;
+}
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+
+char c;
+
+std::cout << "hangi harf: ";
+cin >> c;
+
+auto iter = find_if(slist.begin(), slist.end(),
+[c](const string& s) {
+return s.contains(c);
+});
+
+if (iter != slist.end()) {
+std::cout << "bulundu... idx = " << distance(slist.begin(), iter) << '\n;
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+----------------
+
+yukarıdaki yapnın kolayı vardır
+if_with_initializer
+
+template <typename InIter, typename Pred>
+InIter FindIf(InIter beg, InIter end, Pred f)
+{
+while (beg != end) {
+if (f(*beg))
+return beg;
+++beg;
+}
+return end;
+}
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+
+char c;
+
+std::cout << "hangi harf: ";
+cin >> c;
+
+if (auto iter = find_if(slist.begin(), slist.end(),
+[c](const string& s) {
+return s.contains(c);
+}); iter != slist.end()) {
+
+std::cout << "bulundu... idx = " << distance(slist.begin(), iter) << '\n;
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+
+--------------------------
+
+transform : 2 tane overloadu vardır 1. rangedeki öğeler fonksiyona argüman olur geri dönüş değeri değeri olur
+----------
+
+template <typename InIter, typename OutIter, typename F>
+OutIter Transform(InIter beg, InIter end, OutIter destbeg, F f)
+{
+while (beg != end) {
+*destbeg++ = f(*beg++)
+}
+return destbeg;
+}
+
+-----
+
+auto get_len(const std::string& s) //lambda kullanmak yerine bunu yaptık
+{
+return s.size();
+}
+
+int main()
+{
+using namespace std;
+vector<string> svec;
+rfill(svec, 100, rname);
+print(svec);
+
+list<size_t< lenlist;
+
+transform(svec.begin(), svec.end(),
+back_inserter(lenlist), get_len);
+print(lenlist);
+}
+
+-------------
+
+std::string revstr(const std::string& s)
+{
+std::string temp(s);
+std::reverse(temp.begin(), temp.end());
+
+return temp;
+}
+
+/*
+std::string revstr(std::string s(
+{
+std::reverse(s.begin(), s.end()); //bu şekilde de kullanılır verim açısından daha verimli
+return s; 
+}
+*/
+
+int main()
+{
+using namespace std;
+vector<string> svec;
+rfill(svec, 100, rname);
+
+transform(svec.begin(), svec.end(), svec.begin(), revstr) //rangedeki öğeleri bir fonksyiona gönderip onun geri dönüş değerini aynı konuma azıcak
+print(svec);
+}
+
+-------------
+
+transportun 2. overloadu : 2 tane range var binary bir fonksiyona
+argüman göndericem 1 range 1 öğeyi alıp fonk. 1.parametresine göndericek
+2. rangeden öğeyi alıp fonk. 2. param gönderick fonksyionun geri dönüşünü 1 range yazıcak
+
+template <typename InIter1, typename InIter2, typename OutIter, typename F>
+OutIter Transform(InIter1 beg, InIter1 end, InIter2 beg2, OutIter destbeg, F f)
+{
+while (beg != end) {
+*destbeg++ = f(*beg++, *beg2++);
+}
+
+return destbeg;
+}
+
+
+--------------
+
+int main()
+{
+using namespace std;
+
+vector <int>v1{1,4,7,2,9,3};
+deque<int> d{1,4,7,2,9,3};
+list<int> ilist;
+
+transform(v.beign(), v.end(), d.begin(), back_inserter(ilist),
+[](int x, int y {return x * x + y * y});
+print(ilist);
+}
 
 
