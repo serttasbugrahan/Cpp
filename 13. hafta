@@ -1380,14 +1380,273 @@ print(dvec, "\n", ofs);
 //front_inserter ==> contanier'ın push_front fonksiyonunu çağrıya dönüştürüyor
 //inserter ==> contanier'ın insert fonksiyonunu çağrıya dönüştürüyor
 
-59.44
+-----------------------
+
+stl'de iteratörleri manpule eden algoritmalar vardır
+range'ler üzerinde işlem yapanlar ile karıştırma
+
+STL'de iteratörleri manüpule eden algoritmalar:
+-----------------------------------------------
+
+template<typename Iter>
+void algo(Iter beg, Iter end)
+{
+int n = 5;
+beg (n--)
+++beg;
+}
+
+standart kütüphane bu tür generic kodları manüpüle eden fonksyionlar veriyor
+bu fonksyionların isimleri
+
+advance(ref) : bir iteratörü n pozizyon arttırmak eksiltmek için kullanılır
+distance(iter1, iter2)  : 2 iteratör arasındaki farkı bulur
+next(iter, 5) : iteratörden 5 sonrakini döndürür 
+prev(iter, 5) : iteratörden 5 öncekini döndürür 
+iter_swap(iter_x, iter_y) : iter_X konumundaki nesne ile iter_y konumundaki nesneyi takas eder
+
+argüman olarak iteratör alırlar iteratörleri manüpüle ederler
+
+--------------
+
+template <typename Iter>
+void algo(Iter beg, Iter end)
+{
+//iter konumundaki nesnenin türü
+
+}
+
+using iter = std::vector<nt>::iterator;
+
+int main()
+{
+iter::value_type //value type int 
+iter::difference_type x; //
+iter::pointer //int* türü
+iter::referance
+iter::iterator_category
+}
+
+---------------
+
+rag dipatch yöntemi :  compile time da kod seçme yöntemi
+
+#include <forward_list>
+
+template <typename Iter>
+void func_impl(Iter beg, Iter end, std::random_access_iterator_tag)
+{
+std::cout << "random access";
+}
+
+template <typename Iter>
+void func_impl(Iter beg, Iter end, std::bidirectional_iterator_tag)
+{
+std::cout << "bidirectional";
+}
+
+template <typename Iter>
+void func_impl(Iter beg, Iter end, std::forward_iterator_tag)
+{
+std::cout << "forward";
+
+}
+
+template <typename Iter>
+void func(Iter beg, Iter end)
+{
+func_impl(beg, end, typename Iter::iterator_category{}); //compile time'da anlıycak
+
+}
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+list<int>ilist;
+
+func(ivec.begin(), ivec.end(); //random
+func(ilist.begin(), ilist.end()); 
+func(flist.begin(), flist.end());
+
+}
+
+-------------
+
+//3 tane yazmak yerine aşağıdaki ile de yapılabilir
+
+#include <type_traits>
+
+template <typename Iter>
+void func(Iter beg, Iter end)
+{
+using cat = typename Iter::iterator_category;
+
+if constexpr (std::is_same_v<cat, std::random_access_iterator_tag>) {
+std::cout << "random access\n";
+}
+else if constexpr (std::is_same_v<cat, std::bidirectional_iterator_tag>) {
+std::cout << "bidirectional\n";
+}
+else if constexpr (std::is_same_v<cat, std::forwardİterator_tag>) {
+std::cout << "forward\n";
+}
+
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+list<int>ilist;
+
+func(ivec.begin(), ivec.end(); //random
+func(ilist.begin(), ilist.end()); 
+func(flist.begin(), flist.end());
+
+}
+
+----------------
+type_traits kullanma nedeni dizileri de template gibi kullanmamızı sağlar
+
+
+template <typename Iter>
+void func(Iter beg, Iter end)
+{
+using cat = typename sdt::iterator_traits<Iter>::iterator_category;
+
+if constexpr (std::is_same_v<cat, std::random_access_iterator_tag>) {
+std::cout << "random access\n";
+}
+else if constexpr (std::is_same_v<cat, std::bidirectional_iterator_tag>) {
+std::cout << "bidirectional\n";
+}
+else if constexpr (std::is_same_v<cat, std::forwardİterator_tag>) {
+std::cout << "forward\n";
+}
+
+int main()
+{
+using namespace std;
+
+int a[10]{};
+
+func(a, a + 10);
+
+}
+
+------------------------------------------------
+
+iteratörleri manüpüle eden fonksiyonlara başlıyoruz:
+
+advance:
+--------
+
+template <typename Iter>
+void func(Iter it)
+{
+std::advance(it, 3); 
+std::cout << *it << '\n';
+
+/*
+for (int i = 0; i < 3; ++i) {
+++it;
+}
+std::cout << *it << '\n'; // bu şekilde de kullanılır ama gerkesiz bir döngü oluşur
+//advance kullanmak daha mantıklı
+*/
+}
 
 
 
+int main()
+{
+using namespace std;
+
+vector<int> ivec{2, 4, 6, 7, 9, 3, 1};
+list<int> ilist{2,4,6,7,9,3,1};
+
+auto vec_iter = ivec.begin();
+auto list_iter = ilist.begin();
+
+func(ivec.begin());
+func(ivec.begin());
+}
+
+------------------------
+advance'in basitleştirilmiş şekilde yazımı
+
+template <typename Iter>
+void Advance(Iter& it, int n, std::random_access_iterator_tag)
+{
+it += n;
+}
+
+template <typename Iter>
+void Advance(Iter& it, int n, std::bidirectional_iterator_tag)
+{
+while (n--)
+++it;
+}
+
+template <typename Iter>
+void Advance(Iter& it, int n, std::random_access_iterator_tag)
+{
+Advance(it, n, typename std::iterator_traits<Iter>::iterator_category{});
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{1,2,3,4,,5,6,7};
+auto iter = ivec.end();
+advance(iter, -3); // eksi şekilde de olur
+
+std::cout << *iter << '\n';
+}
+
+-----------------
+
+distance
+--------
+
+int main()
+{
+using namespace std;
+
+list<int> mylist{2, 5, 8, 9, 3, 1, 8};
+
+auto iter = mylist.begin();
+auto iter2 = mylist.end();
+advance(iter1, 2);
+advance(iter2, -1);
+
+auto n = distance(iter1, iter2);
+
+cout << "n = " << n << '\n';
+}
+
+----------------------
+
+advance ve distance modern c++ öncesinde de vardı
+ancak aşağıdakiler yoktu
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"ali", "can", "ece", "gul", "eda", "tan"};
+
+auto iter = nect(svec.begin(), 3); //3 sonraki konum elde edildi
 
 
+}
 
-
+1.49
 
 
 
