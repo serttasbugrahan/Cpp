@@ -413,6 +413,363 @@ return x * 5.6; //ambigidous dan dolayı hata var
 
 ------------------
 
+class Myclass {
+public:
+template <typename T>
+void func(T)
+{
+
+}
+};
+
+int main()
+{
+Myclass m;
+
+m.func(1);
+m.func(1.1);
+m.func(1.1f);
+m.func('A');
+}
+
+-------------------
+
+class Myclass {
+public:
+template <typename T>
+void operator()(T) 
+{
+
+}
+};
+
+int main()
+{
+Myclass m;
+m(12);
+m(1.2);
+m('A');
+}
+
+----------------
+
+yukarıdaki şekilde lambda fonksyionu yazılabilir
+
+class xyz_12 {
+public:
+template <typename T>
+auto operator()(T x)
+{
+return x * x;
+}
+};
+
+//derleyici yukarıdaki şekilde yazar, istediğimiz argümanla çağırabiliriz
+
+int main()
+{
+auto f = [](auto x) {
+return x + x;
+};
+}
+
+------------
+
+int main()
+{
+auto f = [](auto x) {
+return x + x;
+};
+std::string name{"gurkan"};
+
+auto a1 = f(12); //türü int değeri 24
+auto a1 = f(3.5); //türü double değeri 7
+auto a1 = f(name); //türü string değeri gurkangurkan
+}
+
+-------------
+
+labmda ile ilgili ilginç birkaç özellik ile devam ediyoruz
+
+int main()
+{
+auto f1 = []() {};
+auto f2 = []() {};
+
+//compile time'da f1 ve f2 türünün aynı olup olmadığı <type_traits> is_same ile bakılır
+
+constexpr bool b = std::is_same_v<decltype(f1), decltype(f2)>;
+
+std::cout << typeid(f1).name() << '\n';
+std::cout << typeid(f2).name() << '\n';
+
+}
+
+----------------
+
+int main()
+{
+auto f1 = []() {};
+
+auto f2 = f1; //legal, aynı türdendir copy ile hayata geldi
+}
+
+-----------------
+
+int main()
+{
+auto f1 = []() {};
+decltype(f1) f2; //cpp 20 öncesi hata 
+}
+
+
+stateless labmda : durumu olmayan 
+
+---------------
+
+int main()
+{
+auto f1 = []() {};
+auto f2 = f1;
+
+f1 = f2; //delete edilmiş çağrıya atama yapılıyor hata, cpp 20 sonrası legal
+}
+
+---------------
+
+int main()
+{
+auto f = []() {};
+
+decltype(f) f2;
+
+f = f2; 
+//cpp 20 ile yukarıdaki kodlarda hata olmaz
+}
+
+---------------
+
+int main()
+{
+auto f = [](int x) {return x * x; };
+
+int (*fptr)(int) = f;
+}
+
+-------------
+işaret operatörü + önemi
+
+int main()
+{
+
+auto x = +[](int a) {return a * a; };
+
+std::cout << typeid(x).name() << '\n';
+}
+
+
+--------------
+
+class Myclass {
+
+public:
+
+};
+
+int main()
+{
+Myclass m;
++m; //geçersiz
+}
+
+--------------
+
+class Myclass {
+
+public:
+operator int()const
+};
+
+int main()
+{
+Myclass m;
++m; //geçerli
+}
+
+---------------
+
+class Myclass {
+
+public:
+using fptr = double(*)(double);
+operator fptr()const
+};
+
+int main()
+{
+Myclass m;
++m; //geçerli, 12. satır sayesinde
+}
+
+---------------
+positive lamda : function pointer type yapar
+eğer function pointer type ifadesi oluşturmak istiyorsak ve elimizde statıs lamda var ise
+onu işaret operatörü + nın operanıd yapmak
+
+int main()
+{
+auto x = +[](int a) {return a * a;};
+
+std::cout << typeid(x).name() << '\n';
+
+}
+
+-------------
+
+template <typename F>
+void foo(F x)
+{
+std::cout << typeid(x).name() << '\n';
+}
+
+int main()
+{
+foo(+[](int a) {return a * a; });
+}
+
+-----------------
+
+[]()noexcept{code}; //exception throw etmememe garantisini istiyorsak bunu kullanıcağız
+
+int main()
+{
+auto f == [](int x) noexcept{return x * x; }; //exception göndermeme garantisi veriyor
+
+noexcept(f(12))
+}
+
+-----------------
+
+//constexpr olmasını engelliycek bir durum olmadığı sürece constexpr kabul ediliyor
+
+int main()
+{
+auto f = [](int x) {return x * x + 5; }; //constexpr
+constexpr auto val = f(5);
+}
+
+---------------
+
+int main()
+{
+auto f = [](int x) {
+static int ival = 15;
+return x * x + 5; };
+constexpr auto val = f(5); //hata constexpr içinde sttaic olamaz, global olamaz, f(5) sabit değil
+auto val = f(5); // legal olurdu
+}
+
+-------------
+
+int main()
+{
+auto f = [](int x) constexpr {static int y{};
+return x + y;};
+}
+
+-------------
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+auto f = [](int x) {return x * x; };
+
+Myclass<decltype(f)> m1;
+
+std::cout << sizeof(decltype(f));
+}
+
+-------------
+
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+sizeof(decltype([](int x) {return x * x; })) //cpp 17 ye kadar hataydı
+}
+
+------------
+
+template <typename T>
+class Myclass {
+
+};
+
+int main()
+{
+Myclass<decltype([] {}) > m1;
+}
+
+
+-------------
+//non-type paramlarda cpp 20 de deverimsel nitelikte yenilikler geldi
+
+template <auto x> //non-type param
+class Myclass {
+
+};
+
+int main()
+{
+
+}
+
+-----------
+
+template <auto x> /auto non-type param olduğunu gösterir
+class Myclass {
+
+};
+
+int main()
+{
+Myclass < [] {} > m
+}
+
+-------------
+
+template <auto x = []{}> 
+struct class Myclass {
+inline static int ival = 5;
+};
+
+int main()
+{
+Myclass<> m1;
+
+m1.ival++;
+m1.ival++;
+m1.ival++;
+
+Myclass<> m2;
+
+std::cout << m1.ival << '\n';
+std::cout << m2.ival << '\n';
+}
+
+---------------
+
+2.25 
+son 50 dk tekrar izle
+
+
+
 
 
 
