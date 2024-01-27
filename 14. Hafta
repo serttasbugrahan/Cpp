@@ -129,7 +129,290 @@ auto val = f(12);
 
 int main()
 {
-auto f = [](int x) {return x * x; };
+func([](int x) {return x * x; });
 }
+
+----------------
+
+#include "nutility.h"
+#include <algorithm>
+#include <vector>
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+print(svec); 
+
+cout << 
+count_if(svec.begin(), svec.end(), [](const string &s) {return s.lenght() == 7; })
+}
+
+
+/* //derleyiic bu şekilde yazar
+class xyz_tamer_ {
+public:
+bool operator()(const std::string& s)const 
+{
+return s.lenght() == 7;
+}
+};
+*/
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto val = [](int x) {return x * x + 5; }(20); //fonksiyona çağrı olarak 20 değeri verildi
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+auto x = [](int a, int b) {return a + b; }(4, 8); //a ve b'ye 4 ve 8 değeri verdik
+}
+
+----------------
+
+labmda function içinde statik ömürlü nesneleri doğrudan isimleriyle kullanabiliriz.
+
+
+int main()
+{
+int g = 5;
+
+auto f = [](int a) {return a * g; }; //g isim aramadan dolayı hatalı olur, globalda bildirsek hata olmaz
+}
+
+----------------
+
+int main()
+{
+
+auto iputc = [](int x) {
+std::cout << x << '\n'; //cout global bir değişken olduğu için hata olmaz
+};
+
+iputc(35);
+}
+
+----------------
+//derleyiciye bunu yazdırmak için capture clause denilen sentax oluşturulması gerekiyor
+
+class bgrsrtts {
+public:
+bgrsrtts(int x) : mx(x) {}
+int operator()(int a)const {
+return a * mx;
+}
+
+private:
+int mx;
+};
+
+-------------
+
+int main()
+{
+int x = 10;
+[x] //capture clouse, derleyicinin yazdığı sınıf elemanının bu türden olmasını istiyoruz kopyalama yapılmış oluyor
+}
+
+-----------
+
+int main()
+{
+int x = 10;
+
+auto f = [x]() {
+++x; //illegal, x const olduğu için geçersizdir
+
+}; 
+}
+
+-----------
+
+int main()
+{
+int x = 35;
+
+auto f = [x]()mutable { //x'in const üyeliği gider değiştirmek istendiği söylenir
+++x;
+};
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+string str{"bugrahan serttas" };
+
+auto f = [str]()mutable { //mutable kullanmassak hata olur
+str[0] = 'T';
+}
+}
+
+-------------
+int g = 6;
+
+int main()
+{
+using namespace std;
+
+int x = 3, y = 5, z = 9;
+
+auto f = [x, y, z, g](int a) { //hata olur g global olduğu için
+return a * (x + y + z);
+};
+}
+
+-------------
+
+bütün değişkenleri capture etmenin kısa yolu aşağıdadır
+
+int main()
+{
+using namespace std;
+
+int x = 3, y = 5, z = 9;
+
+auto f = [=](int a) {  // = koyulduğu zaman bütün değişkenler kullanılabilir
+return a * (x + y + z);
+};
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+int x = 6;
+
+auto f = [x]()mutable {
+x *= 10;
+};
+f();
+cout << "x = " << x << '\n';
+
+}
+
+------------
+
+class mxt_12 {
+public:
+mxt_12(int &r) : mr {r} {}
+void operator()()const
+{
+mr++; //hata olmaz, veri eleamnı değştirilmiyor gösterdiği eleman değiştiriliyor
+*ptr = 567; //hata değil
+ptr = 8778; //hata
+}
+private:
+int& mr;
+};
+
+int main()
+{
+using namespace std;
+
+int a = 75;
+
+mxt_12 f(a);
+
+f();
+
+cout << "a = " << a << '\n';
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+int a = 67;
+
+//a] //derleyici bana sınıf tanımla, sınıfın veri elemanını a ile init et demek
+[&a]() //derleyici bana sınıf tanımla, sınıfın veri elemanını &a ile init et demek
+{
+++a;
+};
+cout << "a = " << a << '\n'; //67 olur
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int a = 67;
+[&a]() {
+++a;
+}();
+
+cout << "a = " << a << '\n'; //68 olur
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int a = 67;
+int b = 23;
+int c = 5;
+double dx = 4.5;
+
+auto f = [a, &b, &c]() {}; //bu şekilde capture edilebilir
+auto f = [=]() {}; //hepsini copy olarka capture eder
+auto f = [&]() {}; //hepsini &a, &b, &c, &dx olarak capture eder
+auto f = [=, &dx]() {}; //dx hariç hepsini copy olarak capture eder dx &dx olarak
+auto f = [&, a]() {}; //a hariç hepsi & olarak capture edilir
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto f = [](int x)-> double { //çıkarım yapmaz direk geri dönüşü double yapar, trailing return type
+return x * x;
+};
+
+auto ret = f(4);
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto f = [](int x) {
+if (x > 10) {
+return x * x;
+}
+else {
+return x * 5.6; //ambigidous dan dolayı hata var
+//return x * 5; //legal
+}
+};
+
+------------------
+
+
 
 
