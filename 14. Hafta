@@ -1,0 +1,135 @@
+/////////////////////////////////////////////////1. Ders ////////////////////////////////////////////////////////
+
+Lambda expression
+-----------------
+
+Deleyiciye sınıf tanıtan nesne
+
+pr value expression
+
+Derleyicinin lambda ifadesi karşılığında oluşturduğu sınıf türüne closure type denir
+
+Oluşan nesnenin kendisine closure object
+
+En çok kullanılan durumu stl algoritmasına argüman olarak yollamak
+
+
+--------------
+Genel Sentax
+
+[] : lambda introducer, derleyici labda ifadesi ile karşılaştığını bununla anlar
+
+[]() : derleyici yazdığı sınıfın fonksiyon çağrı operatör fonksiyonun parametre parantezi
+[](int x){}
+
+[]() {} : code yazılan kısım
+[]() { // code}
+
+----------------
+class xyz23_87ds {
+public:
+void operator()()const
+{
+
+}
+};
+
+int main()
+{
+[]() {}(); //sentax hatası olmaz, hiçbir şey yapmaz
+-----
+xyz23_87ds{}() //aynı anlamda
+
+}
+
+-----------------
+//aşağıdakiler gelebilir
+
+[]() {//code}
+[]()constexpr{//code}
+[]()noexcept{//code}
+[]()mutable{//code}
+[]()-> type{//code}
+
+--------------------
+
+//parametre değişkeni yok ise () yazılmasa da olur
+
+int main()
+{
+[] {};
+}
+
+--------------------
+//eski cpp 'da niteleyicilerden biri var ise () kullanılmak zoruda idi
+
+int main()
+{
+[]()mutable{};
+}
+
+//cpp 23 ile bu özellik gitti
+
+-------------------
+
+en basit kavramlardan başlıyoruz 
+
+int main()
+{
+[](int x) {return x * x;}
+}
+
+---------------------
+
+class xyz13981 {
+public:
+double operator()(int x)const
+{
+return x * x;
+}
+};
+
+//aşağıda yazılan kodun karşılığı yukarıdaki koddur
+
+int main()
+{
+[](int x) {return x * x * .5; } 
+}
+
+----------------
+
+en fazla karşımıza çıkıcak durumlar:
+isimlendirilmiş nesne kullanımı
+
+/*class xyz13981 {
+public:
+double operator()(int x)const
+{
+return x * x;
+}
+};
+*/
+
+int main()
+{
+auto f = [](int x) {return x * x; };
+
+std::cout << f(2) << "\n" << f(5) << '\n';
+}
+
+----------
+
+hiç isimlendirmeden fonksiyon şablonuna argüman olarak göndermek
+
+template <typename F>
+void func(F f)
+{
+auto val = f(12);
+}
+
+int main()
+{
+auto f = [](int x) {return x * x; };
+}
+
+
