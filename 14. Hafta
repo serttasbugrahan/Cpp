@@ -812,5 +812,317 @@ return abs(a) < abs(b);
 print(ivec);
 }
 
+////////////////////////////////// 2. Ders //////////////////////////////
+
+stl algoritmalarına geri dönüyoruz
+
+foreach : bir aralıktaki her bir öğe üzerinde belirli bir işlemi gerçekleştirmenizi sağlar.
+-------
+//for each geri dönüş değeri function object'in kendisidir
+
+#include <algorithm>
+
+template <typename Iter, typename F>
+F ForEach(Iter beg, Iter end, F f)
+{
+while (beg != end) {
+f(*beg++);
+}
+return f;
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 1000, []{return rname() + '' + rfname(); }); //() yazmama nedeni, parametre değişkeni yok ise yazmaya gerek yoktur
+
+for_each(svec.begin(), svec.end(), [](const auto& s)){
+cout << s << '\n';
+});
+}
+
+-----------
+
+class Functor {
+public:
+void operator()(const std::string& s) {
+if (s.size() > 12)
+++m_count;
+std::cout << s << '\n';
+}
+int get_count()const
+{
+return m_count{};
+}
+
+private:
+std::size_t m_count{};
+};
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 1000, []{return rname() + '' + rfname(); });
+
+auto f = for_each(svec.begin(), svec.end(), Functor{}){
+
+std::cout << f.get_count() << '\n';
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+print(svec);
+
+for_each(begin(svec), end(svec), [](auto& s) {
+s + = "can";
+});
+}
+
+std::cout << "\n";
+print(svec);
+}
+
+----------------
+aşağıdaki kodda sıkıntı vardır, avoid raw loops
+
+vector<Fighter> fighter_vec;
+
+bool flag = false;
+for (size_t i{}; i < figter_vec.size(); ++i) {
+if (is_wounded(fighter_vec[i])) {
+flag = true;
+break;
+}
+}
+
+---------------
+
+any_of
+-------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+
+if (any_of(svec.begin(), svec.end(), [](const string& s) {
+return s.contains('x');
+}))
+}
+
+---------------
+
+any_of : bunlardan herhangi biri
+all_of : hepsini destekliyor mu
+none_of : herhangi birini destekliyor mu
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int a[] = {1,3,5,7,9,13}; //buranın da contxexpr olması gerekir
+constexpr bool b = any_of(begin(a), end(a), [](int x) {return x % 2 == 0 })
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+bool b = all_of(ivec.begin(), ivec.end(), [](int x) {return x % 2 == 0});
+
+boolalpha(cout);
+cout << "b = " << b << '\n';
+
+}
+
+----------------
+arama algoritmalarına bakıyoruz,  aramam iterat
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+size_t len;
+
+cout << "uzunlugu girin: ";
+cin >> len;
+
+if (const auto iter = find_if(svec.begin(), svec.end(), [len](const string& s) {
+return s.size() == len;}); iter != svec.end()) {
+std::cout << "bulundu: " << *iter << "indeks = " << iter - svec.begin() << '\n';
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+//find_if_not : bu koşulu sağalamayanları bulur
+
+-----------------
+
+replace  
+---------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, Irand{0, 9});
+print(ivec);
+
+replace(ivec.begin(), ivec.end(), 5, 9999); //değeri  5 olanların yerine 9999 yazar
+}
+
+------------
+
+reverse_copy : orijinal aralıktaki sıraları tersine çevirerek başka bir aralığa kopyalar.
+replace_copy : , bir aralıktaki öğeleri başka bir aralığa kopyalarken belirli bir değeri başka bir değerle değiştirmenize olanak tanır.
+remove_copy : silinmesi gereken haricinde diğerlerini kopyalıyor
+
+-----------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+
+reverse_copy(svec.begin(), svec.end(),back_inserter(slist));
+list<string> slist
+//vectördeki öğelerin tersini listeye kopyalıycağız
+
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+vector ivec{1,2,4,3,5,32,423 };
+vector<int> destvec(100);
+
+/*
+//kötü yazılmcı aşağdaıki şekilde yazar
+auto iter = destvec.begin();
+for (auto i : ivec) {
+if (i != 1) {
+*iter++ = i;
+}
+}
+*/
+
+auto iter = remove_copy()ivec.begin(), ivec.end(), destvec.begin(), 1);
+std::cout << "toplam" << distance(destvec.begin(), iter) << "eleman kopyalandi\n";
+
+print(destvec.begin(), iter);
+}
+
+---------------
+
+remove_copy_if
+--------------
+//bu örneği yazmaya çalış
+
+int main()
+{
+using namespace std;
+
+vector<Date> dvec;
+rfill(dvec, 1000, Date::random);
+print(dvec, "\n");
+
+//sadece kasim aynı olanları silerek dest_vec'e kopyalamk istiyoruz
+vector<Date> dest_vec;
+
+remove_copy_if(dvec.begin(), dvec.end(), back_inserter(dest_vec), [](const Date& d) {
+return d.monthh() ==  11;
+});
+print(dest_vec, "\n");
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec. 1000, Irand{0, 9});
+
+vector<int> dest_vec;
+
+replace_copy(ivec.begin(), ivec.end(), back_inserter(dest_vec), 5, 3333);
+
+print(dest_vec);
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{0, 9});
+print(ivec);
+
+
+
+replace_if(ivec.begin(), ivec.end(), [](int x){return x % 2 == 0; }, -1)
+
+print(ivec);
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{0, 9});
+print(ivec);
+
+list<int> ilist;
+
+replace_copy_if(ivec.begin(), ivec.end(), back_inserter(ilist), [](int x){return x % 2 == 0; -1})
+
+print(ivec);
+}
+
+==================================================
+
+CONTANIERS
+----------
+
+dianmik dizi veri yapısı : öğelerin bellekte tek blokta ardışık olarak tutulduğu yerdir, sondan ekleme ve sondan silme sabit zamana
+
+
+
 
 
