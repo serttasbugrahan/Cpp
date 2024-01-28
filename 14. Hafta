@@ -1122,6 +1122,163 @@ CONTANIERS
 
 dianmik dizi veri yapısı : öğelerin bellekte tek blokta ardışık olarak tutulduğu yerdir, sondan ekleme ve sondan silme sabit zamana
 
+template <typename Elem, typename A = std::allocator<Elem>>
+class Vector {
+
+public:
+void push_back(const T)
+
+};
+
+------------
+
+bütün contanierların nested type'ı vardır
+
+template <typename C>
+void foo(C&& r)
+{
+typename C::pointer
+}
+
+int main()
+{
+using namespace std;
+
+vector<int>::difference_type
+}
+
+-------------
+
+öyle member functionlar vardır ki contanierların hepsinde vardır
+
+.size() : contanierda tutulan öğe saısı
+
+.empty() : boş olup olmadığını bool döndürür
+
+.clear() : size'ı sıfıra çeker her şeyi siler
+
+.erase() : öğe silme, 
+ 2 overload'u vardır : 
+ 1- myvec.erase(ivec.begin());
+ 2- myvec.erase(ivec.begin(), ivec.end());
+
+---------------
+//bu kısmı birdaha dinle 2.12'ye kadar
+mülakatlarda çok sık sorulan bir soru : push_back ile emplace_back arasındaki fark nedir
+neden push_back 2 ayrı overloadı var
+
+contanierların insert fonksiyonların 2 tane overloada sahip oluyor
+
+-----
+template <typename T>
+class Vector {
+public:
+
+void push_back(T&& r); //R value ref, nesne oluşturmak için sınıfın move ctoruna argüman geçilcek
+{
+
+}
+
+void foo(const T&) //L value, T türünde nesnesnin ctor çağrılmasını sağlıycak, copy ctor
+{
+
+}
+
+};
+
+---------
+
+vector<string> svec;
+
+string str(50000);
+
+svec.push_back(move(str));
+
+------------
+
+insert fonksiyonları :
+-insert 
+-push_front
+-push_back
+
+-----------
+
+template <typename T>
+class Vector {
+public:
+void push_back(const T&r)
+{
+
+}
+
+void push_back(T&& r) //r value
+{
+std::move(r)  
+}
+};
+
+move ctor yok ise copy çağrılır
+copy delete edilmiş sadece move var ise push_back çağrılırsa derleme zamanı hatası alırız, bunu çözmenin yolu std::move(r) ile r value yapmak
+
+------------
+
+emplace
+emplace
+emplace_back
+
+void push_back(const T&r)
+{
+
+}
+
+void push_back(T&& r) //r value
+{
+std::move(r)  
+}
+};
+
+//perfect forwarding edicek
+template <typename ...Args>
+void emplace_back(Args&& ...args)
+{
+T(std::forward<Args>(args)...)
+}
+
+--------------
+
+template <typename T>
+class Vector {
+public:
+void insert(Iterator iter, const T&r)
+{
+
+}
+
+void push_back(Iterator iter,T&& r)
+{
+std::move(r)  
+}
+};
+
+template <typename ...Args>
+void emplace_back(Iterator iter ,Args&& ...args)
+{
+T(std::forward<Args>(args)...)
+}
+
+//gereksiz kopyalamanın önüne geçer
+---------------
+
+!! taşıma semantiği move, copy bunları iyice bilmeden mülakatlara girme
+
+---------------
+
+bazı sınıflar non copy non move
+
+--------------------------------------
+
+vector
+------
 
 
 
