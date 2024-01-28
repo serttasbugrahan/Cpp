@@ -559,6 +559,8 @@ int (*fptr)(int) = f;
 -------------
 işaret operatörü + önemi
 
+//positive lambda
+
 int main()
 {
 
@@ -611,14 +613,18 @@ Myclass m;
 +m; //geçerli, 12. satır sayesinde
 }
 
+//lambdaların bu şekilde function pointer türüne dönüşüm yapan özelliği var
 ---------------
 positive lamda : function pointer type yapar
+
+
 eğer function pointer type ifadesi oluşturmak istiyorsak ve elimizde statıs lamda var ise
 onu işaret operatörü + nın operanıd yapmak
 
 int main()
 {
-auto x = +[](int a) {return a * a;};
+// [](int a) {return a * a;}; //closure type
+auto x = +[](int a) {return a * a;}; //function pointer türüne dönüştürdü
 
 std::cout << typeid(x).name() << '\n';
 
@@ -634,16 +640,21 @@ std::cout << typeid(x).name() << '\n';
 
 int main()
 {
-foo(+[](int a) {return a * a; });
+foo(+[](int a) {return a * a; }); //function pointer type oldu
 }
 
 -----------------
+
+noexcept
+--------
 
 []()noexcept{code}; //exception throw etmememe garantisini istiyorsak bunu kullanıcağız
 
 int main()
 {
-auto f == [](int x) noexcept{return x * x; }; //exception göndermeme garantisi veriyor
+auto f = [](int x) noexcept{return x * x; }; //exception göndermeme garantisi veriyor
+ 
+auto f = [](int x) noexcept{return x * x; }; //exception gönderebilir
 
 noexcept(f(12))
 }
@@ -654,7 +665,7 @@ noexcept(f(12))
 
 int main()
 {
-auto f = [](int x) {return x * x + 5; }; //constexpr
+auto f = [](int x) {return x * x + 5; }; //constexpr, engelliycek bir durum yok
 constexpr auto val = f(5);
 }
 
@@ -665,6 +676,7 @@ int main()
 auto f = [](int x) {
 static int ival = 15;
 return x * x + 5; };
+
 constexpr auto val = f(5); //hata constexpr içinde sttaic olamaz, global olamaz, f(5) sabit değil
 auto val = f(5); // legal olurdu
 }
@@ -678,6 +690,8 @@ return x + y;};
 }
 
 -------------
+c++ 20 ile gelen bir özellik
+
 template <typename T>
 class Myclass {
 
@@ -731,27 +745,28 @@ int main()
 }
 
 -----------
+//artık gerçek sayı türleri non-type parametreye argüman olabiliyor
 
-template <auto x> /auto non-type param olduğunu gösterir
+template <auto x> //auto non-type param olduğunu gösterir
 class Myclass {
 
 };
 
 int main()
 {
-Myclass < [] {} > m
+Myclass < [] {} > m; //
 }
 
 -------------
 
-template <auto x = []{}> 
+template <auto x = []{}> //non-type param ve default template argümanı
 struct class Myclass {
 inline static int ival = 5;
 };
 
 int main()
 {
-Myclass<> m1;
+Myclass<> m1; 
 
 m1.ival++;
 m1.ival++;
@@ -759,17 +774,39 @@ m1.ival++;
 
 Myclass<> m2;
 
-std::cout << m1.ival << '\n';
+std::cout << m1.ival << '\n'; //her bir lambda ifadesi farklı bir tür oluşturuyor bu yüzden m1 ve m2 aynı değil
 std::cout << m2.ival << '\n';
 }
 
 ---------------
 
-2.25 
-son 50 dk tekrar izle
+int main()
+{
+int a = 5;
+int b = 4;
+std::string str{"alican"}
 
+const int x = [=](int x) { //bu şekilde basit bir şekilde yapılabilir işelmler lambda kullanrak
+//code
+return a * b - 3 + x;
+}(12);
 
+--------------
 
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 30, Irand{-1000, 1000});
+print(ivec);
+
+sort(ivec.begin(), ivec.end(), [](int a, int b) {
+return abs(a) < abs(b);
+});
+
+print(ivec);
+}
 
 
 
