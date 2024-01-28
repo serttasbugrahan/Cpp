@@ -37,6 +37,11 @@ void operator()()const
 int main()
 {
 []() {}(); //sentax hatası olmaz, hiçbir şey yapmaz
+
+[ //dışardan aldığı param ]( // içerden aldığı param.) { //code }(//içerden aldığı param değerinin yazılması);
+[=](int x) {
+//code
+}(12)
 -----
 xyz23_87ds{}() //aynı anlamda
 
@@ -342,7 +347,7 @@ using namespace std;
 
 int a = 67;
 
-//a] //derleyici bana sınıf tanımla, sınıfın veri elemanını a ile init et demek
+//[a]() //derleyici bana sınıf tanımla, sınıfın veri elemanını a ile init et demek
 [&a]() //derleyici bana sınıf tanımla, sınıfın veri elemanını &a ile init et demek
 {
 ++a;
@@ -617,7 +622,6 @@ Myclass m;
 ---------------
 positive lamda : function pointer type yapar
 
-
 eğer function pointer type ifadesi oluşturmak istiyorsak ve elimizde statıs lamda var ise
 onu işaret operatörü + nın operanıd yapmak
 
@@ -654,7 +658,7 @@ int main()
 {
 auto f = [](int x) noexcept{return x * x; }; //exception göndermeme garantisi veriyor
  
-auto f = [](int x) noexcept{return x * x; }; //exception gönderebilir
+auto f = [](int x){return x * x; }; //exception gönderebilir
 
 noexcept(f(12))
 }
