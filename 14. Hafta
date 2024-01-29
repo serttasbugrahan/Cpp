@@ -1036,7 +1036,7 @@ if (i != 1) {
 }
 */
 
-auto iter = remove_copy()ivec.begin(), ivec.end(), destvec.begin(), 1);
+auto iter = remove_copy(ivec.begin(), ivec.end(), destvec.begin(), 1);
 std::cout << "toplam" << distance(destvec.begin(), iter) << "eleman kopyalandi\n";
 
 print(destvec.begin(), iter);
@@ -1132,7 +1132,13 @@ void push_back(const T)
 
 ------------
 
+üye fonksyion düğüm içine erişebilir ancak algoritma düğüm içine erişemez
+
+------------
+
 bütün contanierların nested type'ı vardır
+
+------------
 
 template <typename C>
 void foo(C&& r)
@@ -1163,23 +1169,30 @@ vector<int>::difference_type
  2- myvec.erase(ivec.begin(), ivec.end());
 
 ---------------
-//bu kısmı birdaha dinle 2.12'ye kadar
 mülakatlarda çok sık sorulan bir soru : push_back ile emplace_back arasındaki fark nedir
 neden push_back 2 ayrı overloadı var
 
 contanierların insert fonksiyonların 2 tane overloada sahip oluyor
+const T& : copy, L value
+T&& : move, R vale
 
------
+------------
+
 template <typename T>
 class Vector {
 public:
 
-void push_back(T&& r); //R value ref, nesne oluşturmak için sınıfın move ctoruna argüman geçilcek
+/*
+template <typename U>
+void foo(U &&) //universal ref
+*/
+void push_back(T&& r); //R value ref, nesne oluşturmak için sınıfın move ctoruna argüman geçilcek, nesnesnin kaynağını çalar
 {
-
+r //doğrudan bu şekilde çağrılmaz
+std::move(r) //bu şekilde çağrılır
 }
 
-void foo(const T&) //L value, T türünde nesnesnin ctor çağrılmasını sağlıycak, copy ctor
+void foo(const T& r) //L value, T türünde nesnesnin ctor çağrılmasını sağlıycak, copy ctor, nesnenin kopyasını çalar
 {
 
 }
@@ -1187,12 +1200,15 @@ void foo(const T&) //L value, T türünde nesnesnin ctor çağrılmasını sağl
 };
 
 ---------
+//çok sık yapılan bir hata
 
 vector<string> svec;
 
 string str(50000);
 
-svec.push_back(move(str));
+svec.push_back(str); //copy
+
+svec.push_back(move(str)); //move
 
 ------------
 
@@ -1221,11 +1237,18 @@ move ctor yok ise copy çağrılır
 copy delete edilmiş sadece move var ise push_back çağrılırsa derleme zamanı hatası alırız, bunu çözmenin yolu std::move(r) ile r value yapmak
 
 ------------
+çok sık hata yapılan alanlardan birisi
+
+---------
 
 emplace
 emplace
 emplace_back
 
+---------
+template <typename T>
+class Vector {
+public:
 void push_back(const T&r)
 {
 
@@ -1243,6 +1266,7 @@ void emplace_back(Args&& ...args)
 {
 T(std::forward<Args>(args)...)
 }
+};
 
 --------------
 
@@ -1267,15 +1291,17 @@ T(std::forward<Args>(args)...)
 }
 
 //gereksiz kopyalamanın önüne geçer
+
 ---------------
 
 !! taşıma semantiği move, copy bunları iyice bilmeden mülakatlara girme
 
 ---------------
 
-bazı sınıflar non copy non move
+bazı sınıflar non copy non move, emplace kullnarak bunları kullanmadan 
+sınıfın contrutırına çağrı yaparak kullanabiliriz
 
---------------------------------------
+================================================
 
 vector
 ------
