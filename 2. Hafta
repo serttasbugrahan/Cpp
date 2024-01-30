@@ -427,7 +427,7 @@ o zaman auto için yapılan çıkarım sol taraf referans olmayan tür olur ==> 
 ama r değişkenin türü yine l value ref. olur
 
 !! kural : Universal referansa l value ile ilk değer verirsek l value referans olur 
-                    R value ilk ilk değer verirsek R value referans olur 
+                               R value ilk ilk değer verirsek R value referans olur 
 
 int main()
 {
