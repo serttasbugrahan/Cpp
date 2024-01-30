@@ -415,7 +415,7 @@ int& r3{x};
 
 }
 
-!! referans sementiği için r value gerekiyor l value olamaz
+!! referans sementiği için l value gerekiyor r value olamaz
 !! refereans semantiği için aynı türden olması gerekiyor
 
 ---------
@@ -576,7 +576,7 @@ return g;
 }
 int main()
 {
-foo(); //l value exp.
+foo(); //r value exp.
 foo() = 999; //legal
 ++foo(); //legal
 
