@@ -170,8 +170,7 @@ cout << "bulunamadi\n";
 
 --------------------
 
-range arrayse : iteratör range'indeki tüm öğeleri siler
-
+range arrayse : iteratör range'indeki tüm öğeleri siler, silien öğelerden 1 sonraki konumu döndürür
 int main()
 {
 using namepsace std;
@@ -181,9 +180,510 @@ vector<string> svec{"nuri", "huriye", "selda", "yaren", "nazife", "kurthan"};
 print(svec);
 //ilk 3 öğeyi silmek isteseydik
 
-svec.erase(svec.begin(), svec.end(), 3)
+svec.erase(svec.begin(), svec.end(), 3);
+//svec.erase(prev(svec.begin(), svec.end(), 3));
+svec.erase(svec.begin() + 1, svec.end() -1);
+
+print(svec);
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{ "nuri", "huriye", "selda", "yaren", "nazife", "kurthan" };
+
+cout << "svec.size() = " << svec.size() << '\n';
+svec.clear(); //tamamen siler
+//svec.resize(0); //tamamen siler
+//svec.resize(svec.begin(), svec.end()); //tamamını siler
+//svec = {} ; //tamanını siler
+//svec.assign({});
+//svec = vector<string>{};
+
+cout << "svec.size() = " << svec.size() << '\n';
+
+}
+
+---------------
+//aşağıdaki örnek birçok yerde karşımıza çıkıcak
+
+using namespace std;
+
+template <typename T>
+void foo(T, T y)
+{
+cout << y.lenght();
+}
+
+int main()
+{
+using namespace std;
+
+string s{"necati"};
+foo(s, {});
+}
+
+--------------
+//copy alg. ile range streame verilir
+//anlamaya çalışma
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec(20, 5);
+
+copy(ivec.begin(), ivec.end(), ostream_iterator<int>{cout, " "});
+}
+
+--------------
+
+range' e okuma yaparak aldığımız değerler ile işlme yapma
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{istream_iterator<int>{cin}, {}};
+//vector<int> ivec{istream_iterator<int>{cin}, istream_iterator<int>{} }; 
+
+copy(begin(ivec), end(ivec), ostream_iterator<int>{cout, "\n"})
+}
+
+----------------
+shring to fit : kapasiteyi size'a büzüştürür
+--------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec(100'000, 7);
+
+cout << format("size = {}, capacity = {}\n", ivec.capacity(), ivec.size()); //dhaa sonra görücez
+
+ivec.erase(ivec.begin() + 5, ivec.end());
+
+//shring to fit yok iken swap-trick kullanılırdı
+
+vector<int>{ivec}.swap(ivec); 
+
+cout << format("size = {1}, capacity = {0}\n", ivec.capacity(), ivec.size()) << '\n';
+}
+
+-----------------
+
+// contanierların default karşılaştırma kriteri lexicographical compare ile yapılır
+
+a) 1 4 56 12 6 2
+
+b) 1 4 91 
+
+// b daha büyüktür (91 > 56)
+
+a) 1 4 56 12 6 2
+
+b) 1 4 91 12 6 2 6
+
+//b daha büyük
+
+
+------------------
+
+void array_print(const int* p, size_t size)
+{
+while(size--)
+printf("%d ", *p++);
+
+printf("\n");
+}
+
+void make_double(const int* p, size_t size)
+{
+while(size--) {
+*p *= 2;
+++p;
+}
+}
+
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{3, 6, 7, 9, 1, 2};
+
+array_print(ivec.data(), ivec.size());
+make_double(ivec.data(), ivec.size());
+array_print(ivec.data(), ivec.size());
+
+}
+
+---------------
+//mülakat klasik sorusu
+
+//vektördeki ilk öğenin adresini almak isteseydik bunu hangi yollarla yapabilirdik
+
+void array_print(const int* p, size_t size)
+{
+while(size--)
+printf("%d ", *p++);
+
+printf("\n");
+}
+
+void make_double(const int* p, size_t size)
+{
+while(size--) {
+*p *= 2;
+++p;
+}
+}
+
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{3, 6, 7, 9, 1,2};
+
+int *p1 = ivec.data(); //data vektördeki ilk öğenin adresini döndürür
+int *p2 = &ivec[0];
+int *p3 = &*ivec.begin();
+
+array_print(p1, ivec.size());
+array_print(p2, ivec.size());
+array_print(p3, ivec.size());
+
+}
+
+-------------------
+//2 cont. swap ederken kesinlikle swap fonksiyonu çağır aşağıdaki şekilde kod yazma
+//linnera complexity de oluyor, algoritmalar constant complexity
+
+int main()
+{
+vector<string> s1(100'000);
+vector<string> s2(100'000);
+
+auto temp = s1;
+s1 = s2;
+s2 = temp;
+
+}
+
+-----------------------------
+
+// mülakatlarda yazlış cevaplanan bir soru
+//diğer derste cevabı verilecek
+
+int main()
+{
+vector<string> svec;
+rfill(svec, 30, rname);
 print(svec);
 
+//your code
+//uzunluğu 6 olanlardan bir tane daha ekleyecek
+//uzunluğu 5 olanları silecek
+//diğerlerine dokunmayacak
+//contanier 1 kere dolaşılacak (for, while)
+
+print(svec);
+}
+
+------------
+
+//mülakatlarda sorarlar
+vector<bool> //bool değil, contanier değil
+
+vectörün bool açılımında tutulan öğeler aslında bool değil
+mesela 8 tane bool'u 1 byte'ın bitlerinde tutuyor
+
+int main()
+{
+vector<bool> myvec(20);
+
+auto b = myvec[0];
+
+bool b = myvec[4]; 
+}
+
+
+=======================================================
+
+STL silme algoritmaları
+
+stl'de silme algoritması olamaz çünkü algoritmaların parametreleri iterator
+ve iterator yoluyla o şterator konumuna sahip contanier nesnesine erişemeyiz
+eğer bir iteratör gönderirsek o nesneye erişirz sadece o nesneden öncesine ve sonrasına erişemeyiz
+bu nedenle o range'e öğe eklemesi ve silme işlemi yapamayız
+
+using namespace std;
+
+template<typename Iter, typename T>
+void Remov(Iter beg, Iter end, const T& val);
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{2, 5, 7, ,3,2,2,4};
+
+Remove(ivec.begin(), ivec.end(), 2) //Bu mümkün değildir
+
+ivec.size(); 
+}
+
+-----------------
+silme işlemi yapan algoritmalar
+
+remove 
+remove_if
+unique : ardışık aynı değerdeki sayıları 1'e indirir
+
+remove
+------
+silme algoritmaları genelde lojik and döndürür
+
+template <typename Iter, typename T>
+Iter remove(Iter beg, Iter end, const T& val);
+
+-----------
+//örneği tekrardan dşkkatli incele
+
+int main()
+{
+vector<string> svec {"ali", "can", "can", "eda", "naz", "gul", "ata", "nur", "can" };
+
+cout << "size = " << svec.size() << '\n';
+auto logic_end_iter = remove(svec.begin(), svec.end(), "can");
+cout << "size = " << svec.size() << '\n';
+
+cout << "silinmemis oge sayisi: " << distance(svec.begin(), logic_end_iter) << '\n
+cout << "silinmemis oge sayisi: " << distance(logic_end_iter, svec.end()) << '\n
+cout << "silinmemis ogeler\n";
+print(svec.begin(), logic_end_iter); 
+
+svec.erase(logic_end_iter, svec.end());
+
+cout << "size = " << svec.size() << '\n';
+}
+
+----------------
+
+mülakatların en klasik sorusu remove arrays/remove idioumu
+
+int main()
+{
+vector<string> svec {"ali", "can", "can", "eda", "naz", "gul", "ata", "nur", "can" };
+
+//svec.erase(remove(svec.begin(), svec.end(), "can"), svec.end());
+auto n = erase(svec, "can"); // c++ 20 ile bu şekilde olur
+
+cout << n << "tane oge silindi\n";
+cout << "size = " << svec.size() << '\n';
+
+for (const auto& s : svec)
+cout << s << '\n';
+}
+
+--------------
+
+int main()
+{
+vector<string> svec {"ali", "can", "can", "eda", "naz", "gul", "ata", "nur", "can" };
+
+std::cout << "uzunlugu kac olanlar silinsin: ";
+size_t len;
+cin >> len;
+
+svec.erase(remove_if(svec.begin(), svec.end(), [len](const string& s) {return s.size() == len; }), svec.end());
+//auto n = erase_if(svec, [len](const string& s) {return s.size() == len; }); //c++ 20 ile 
+
+std::cout << n << "eleman silindi\n";
+cout << "size = " << svec.size() << '\n';
+}
+
+------------------
+bu şekilde function object/function class oluşturarak işimizi kolaylaştırabiliriz
+
+standart function object
+------------------------
+template <typename T>
+struct Less {
+bool operator()(const T&lhs, const T& rhs) const
+{
+return lhs < rhs;
+}
+};
+
+template <typename T>
+struct Plus {
+bool operator()(const T&lhs, const T& rhs) const
+{
+return lhs + rhs;
+}
+};
+
+template <typename T>
+struct Multiplies {
+bool operator()(const T&lhs, const T& rhs) const
+{
+return lhs * rhs;
+}
+};
+
+int main()
+{
+using namespace std;
+
+boolalpha(cout);
+
+Less<int>{}(12, 5  )
+}
+
+----------------
+
+int main()
+{
+vector<int> ivec {455, 4, 8, 981, 13, 7, 145, 4444,23,1,129};
+
+sort(ivec.begin(), ivec.end());
+sort(ivec.begin(), ivec.end(), less<int>{});
+sort(ivec.begin(), ivec.end(), less{}); //küçükten büyüğe sıralama yapar
+sort(ivec.begin(), ivec.end(), greater{}); //büyükten küçüğe sıralama yapar
+
+print(ivec);
+}
+
+-------------
+
+int main()
+{
+vector<int> y{455, 4, 8, 981, 145, 4444,23};
+vector<int> x{455, 4, 8, 981, 13, 7, 145};
+
+vector<int> z;
+//karşılık öğeleri topla, z' ye yaz
+
+transform(x.begin(), x.end(), y.begin(), back_inserter(z), plus{});
+
+//transform(x.begin(), x.end(), y.begin(), back_inserter(z),
+[int a, int b) {return a + b; }); //lambda ile yapımı
+
+print(x);
+print(y);
+print(z);
+
+}
+
+----------------
+
+int main()
+{
+vector<int> x{1,4,7,2,3,2,32,3,2};
+
+print(x);
+transform(x.begin(), x.end(), x.begin()), negate{});
+print(x);
+
+}
+
+--------------------------------------
+
+silme algoritmalarına devam ediyoruz
+
+int main()
+{
+vector vec {2, 5, 5,5,3,3,3,9,9,8,5,5,6,6,7,1,1};
+
+print(vec);
+vec.erase(unique(vec.begin(), vec.end()), vec.end());
+print(vec);
+}
+
+----------------
+
+//mülakatlarda sorulan bir soru
+
+int main()
+{
+string str;
+
+cout << "bir yazi girin: ";
+
+getline(cin, str);
+
+cout << "[" << str << "]\n";
+
+//boşlukların sayısını 1'e indiren kodu yaz
+
+str.erase(unique(str.begin(), str.end(), [](char c1, char c2) {return isspace(c1) && isspace(c2); }), str.end());
+
+cout << "[" << str << "]\n";
+}
+
+---------------
+
+std::ostream_iterator
+----------------------
+
+//yazma işlemi yapan bir algoritmayı
+//yazacağı öğeyi bir stream'e insert etmesini sağlamak
+
+copy alg. yazoyoruz
+
+template<typename InIter, typename OutIter>
+OutIter Copy(InIter beg, InIter end, OutIter destbeg)
+{
+while (beg != end) {
+*destbeg++ = *beg++;
+}
+return destbeg;
+}
+
+
+template <typename T>
+class OstreamIterator {
+public:
+OstreamIterator(std::stream &os, const char *p = "") : mos(os) , msep {p} {}
+OstreamIterator& operator*(){return *this; }
+OstreamIterator& operator*(){return *this; }
+OstreamIterator& operator++(){return *this; }
+OstreamIterator& operator++(int){return *this; }
+OstreamIterator& operator=(const T& val){
+mos << val;
+return *this; 
+}
+
+
+private:
+std::ostream& mos;
+const char* msep;
+};
+
+int main()
+{
+vector<int> ivec{4,2,3,4,3,4,4,3,2};
+
+copy(ivec.begin(), ivec.end(), OstreamIterator<int>{cout, " "});
+}
+
+-----------
+
+yukaradakilerin yazılmışı vardır
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec{2, 5, 7, 9, 1, 3, 6, 4};
+
+copy(ivec.begin(), ivec.end(), ostream_iterator<int>{cout, "\n"});
 }
 
 
