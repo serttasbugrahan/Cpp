@@ -1,0 +1,191 @@
+///////////////////////////////////////////////// 1. Ders ////////////////////////////////////////////
+
+std::vector devam ediyoruz...
+
+tekrar
+
+bir vektörün size arttırmak için ya bir insert fonksiyonu çağırıcaz
+emplace fonksiyonu var
+
+insert fonk. 2 tane overloadı var
+
+const T& //kopyasını çıkarır
+T&& //taşır
+
+
+emplace : cont. tutulcak öğeyi istemiyor onun ctor gönderillecek argümanı istiyor
+
+-------------------------------------------
+
+silme işlemi yapan fonksiyonlar
+--------------------------------
+
+//iterator
+//range
+//pop_back : son öğeyi siler
+//clear
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 10, rname);
+
+while (!svec.empty()) {
+print(svec);
+svec.pop_back();
+(void)getchar();
+}
+}
+
+-----------------
+
+using namespace std;
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 10, rname);
+
+while (!svec.empty()) {
+print(svec);
+svec.erase(svec.begin()); //istediğimiz öğeyi silebiliriz
+(void)getchar();
+}
+}
+
+----------------
+
+insert fonksiyonları geri dönüş değeri insert edeilen öğenin konumunu
+
+erase fonk. silinmiş öğe ya da öğelerden sonraki ilk öğeyi döndürü
+
+------------------
+
+using namespace std;
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 5, rname);
+
+print(svec);
+auto iter = svec.erase(svec.begin());
+(void)getchar();
+cout << *iter << '\n';
+}
+
+-----------------
+//mülakatlarda sorulan bir soru
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 5, rname);
+print(svec);
+
+string name;
+cout << "silincek ismi girin: ";
+cin >> name;
+
+//find ile arama yapılır
+//scope leake kaçın bunun için if with init kullanılır
+
+if (const auto iter = find(svec.begin(), svec.end(), name); iter != svec.end()) {
+svec.erase(iter);
+cout << "bulundu ve silindi\n";
+print(svec);
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 5, rname);
+print(svec);
+
+cout << "icinde hangi harf olan ilk oge silinsin : ";
+char c;
+cin >> name;
+
+//find_if ile arama yapılır
+if (const auto iter = find_if(svec.begin(), svec.end(), [c](const string& s); iter != svec.end()) { return s.contains(c);});
+iter != svec.end()) {
+svec.erase(iter);
+cout << "bulundu ve silindi\n";
+print(svec);
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+-----------------------
+
+//çok tuzak bir soru, mülakatlarda soruluyor
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(ivec, 30, Irand{0, 4});
+print(svec);
+
+cout << "silinecek deger: "; 
+int ival{};
+cin >> ival;
+
+//cont. belirli bir değere sahip son öğeyi silmek
+
+if (const auto iter = find(ivec.rbegin(), ivec.rend(), ival); iter != ivec.rend()) {
+ivec.erase(iter.base() - 1); //nedne -1 olduğunu önceki videolarda anlatıyor
+cout << "bulundu ve silindi\n";
+print(ivec);
+}
+else {
+cout << "bulunamadi\n";
+}
+}
+
+--------------------
+
+range arrayse : iteratör range'indeki tüm öğeleri siler
+
+int main()
+{
+using namepsace std;
+
+vector<string> svec{"nuri", "huriye", "selda", "yaren", "nazife", "kurthan"};
+
+print(svec);
+//ilk 3 öğeyi silmek isteseydik
+
+svec.erase(svec.begin(), svec.end(), 3)
+print(svec);
+
+}
+
+
+
+
