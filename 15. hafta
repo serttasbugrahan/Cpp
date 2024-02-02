@@ -2,10 +2,9 @@
 
 std::vector devam ediyoruz...
 
-tekrar
+tekrar...
 
-bir vektörün size arttırmak için ya bir insert fonksiyonu çağırıcaz
-emplace fonksiyonu var
+bir vektörün size arttırmak için ya bir insert fonksiyonu ya da emplace fonksiyonunu
 
 insert fonk. 2 tane overloadı var
 
@@ -13,7 +12,7 @@ const T& //kopyasını çıkarır
 T&& //taşır
 
 
-emplace : cont. tutulcak öğeyi istemiyor onun ctor gönderillecek argümanı istiyor
+emplace : cont. tutulcak öğeyi istemiyor onun ctor gönderilecek argümanı istiyor
 
 -------------------------------------------
 
@@ -35,7 +34,7 @@ rfill(svec, 10, rname);
 
 while (!svec.empty()) {
 print(svec);
-svec.pop_back();
+svec.pop_back(); //son öğeyi siler
 (void)getchar();
 }
 }
@@ -61,9 +60,9 @@ svec.erase(svec.begin()); //istediğimiz öğeyi silebiliriz
 
 ----------------
 
-insert fonksiyonları geri dönüş değeri insert edeilen öğenin konumunu
+insert fonksiyonları geri dönüş değeri insert edilen öğenin konumunu
 
-erase fonk. silinmiş öğe ya da öğelerden sonraki ilk öğeyi döndürü
+erase fonk. silinmiş öğe ya da öğelerden sonraki ilk öğeyi döndürür
 
 ------------------
 
@@ -156,10 +155,10 @@ cout << "silinecek deger: ";
 int ival{};
 cin >> ival;
 
-//cont. belirli bir değere sahip son öğeyi silmek
+//contanierda belirli bir değere sahip son öğeyi silmek
 
 if (const auto iter = find(ivec.rbegin(), ivec.rend(), ival); iter != ivec.rend()) {
-ivec.erase(iter.base() - 1); //nedne -1 olduğunu önceki videolarda anlatıyor
+ivec.erase(iter.base() - 1); //-1 olma nedeni erase 1 sonraki konumu tutar
 cout << "bulundu ve silindi\n";
 print(ivec);
 }
@@ -171,6 +170,7 @@ cout << "bulunamadi\n";
 --------------------
 
 range arrayse : iteratör range'indeki tüm öğeleri siler, silien öğelerden 1 sonraki konumu döndürür
+
 int main()
 {
 using namepsace std;
@@ -241,7 +241,7 @@ copy(ivec.begin(), ivec.end(), ostream_iterator<int>{cout, " "});
 
 --------------
 
-range' e okuma yaparak aldığımız değerler ile işlme yapma
+range' e okuma yaparak aldığımız değerler ile işlem yapma
 
 int main()
 {
@@ -292,6 +292,7 @@ b) 1 4 91 12 6 2 6
 
 
 ------------------
+data() fonksiyonu adres döndürür
 
 void array_print(const int* p, size_t size)
 {
@@ -301,7 +302,7 @@ printf("%d ", *p++);
 printf("\n");
 }
 
-void make_double(const int* p, size_t size)
+void make_double(int* p, size_t size)
 {
 while(size--) {
 *p *= 2;
@@ -323,6 +324,7 @@ array_print(ivec.data(), ivec.size());
 }
 
 ---------------
+
 //mülakat klasik sorusu
 
 //vektördeki ilk öğenin adresini almak isteseydik bunu hangi yollarla yapabilirdik
@@ -335,7 +337,7 @@ printf("%d ", *p++);
 printf("\n");
 }
 
-void make_double(const int* p, size_t size)
+void make_double(int* p, size_t size)
 {
 while(size--) {
 *p *= 2;
@@ -361,8 +363,8 @@ array_print(p3, ivec.size());
 }
 
 -------------------
-//2 cont. swap ederken kesinlikle swap fonksiyonu çağır aşağıdaki şekilde kod yazma
-//linnera complexity de oluyor, algoritmalar constant complexity
+//2 cont. swap ederken kesinlikle swap fonksiyonu çağırın aşağıdaki şekilde kod yazma
+//linnera complexity de oluyor, algoritmalar constant complexity'dedir
 
 int main()
 {
@@ -418,20 +420,22 @@ bool b = myvec[4];
 STL silme algoritmaları
 
 stl'de silme algoritması olamaz çünkü algoritmaların parametreleri iterator
-ve iterator yoluyla o şterator konumuna sahip contanier nesnesine erişemeyiz
+ve iterator yoluyla o iterator konumuna sahip contanier nesnesine erişemeyiz
 eğer bir iteratör gönderirsek o nesneye erişirz sadece o nesneden öncesine ve sonrasına erişemeyiz
 bu nedenle o range'e öğe eklemesi ve silme işlemi yapamayız
+
+---------
 
 using namespace std;
 
 template<typename Iter, typename T>
-void Remov(Iter beg, Iter end, const T& val);
+void Remove(Iter beg, Iter end, const T& val);
 
 int main()
 {
 using namespace std;
 
-vector<int> ivec{2, 5, 7, ,3,2,2,4};
+vector<int> ivec{2, 5, 7,,2,2,4};
 
 Remove(ivec.begin(), ivec.end(), 2) //Bu mümkün değildir
 
@@ -453,7 +457,7 @@ template <typename Iter, typename T>
 Iter remove(Iter beg, Iter end, const T& val);
 
 -----------
-//örneği tekrardan dşkkatli incele
+//örneği tekrardan dikkatli incele
 
 int main()
 {
@@ -463,10 +467,11 @@ cout << "size = " << svec.size() << '\n';
 auto logic_end_iter = remove(svec.begin(), svec.end(), "can");
 cout << "size = " << svec.size() << '\n';
 
-cout << "silinmemis oge sayisi: " << distance(svec.begin(), logic_end_iter) << '\n
-cout << "silinmemis oge sayisi: " << distance(logic_end_iter, svec.end()) << '\n
+cout << "silinmemis oge sayisi: " << distance(svec.begin(), logic_end_iter) << '\n';
+cout << "silinmis oge sayisi: " << distance(logic_end_iter, svec.end()) << '\n';
 cout << "silinmemis ogeler\n";
-print(svec.begin(), logic_end_iter); 
+
+print(svec); 
 
 svec.erase(logic_end_iter, svec.end());
 
