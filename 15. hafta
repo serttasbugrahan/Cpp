@@ -1024,14 +1024,191 @@ if (!ofs) {
 std::cerr << "out.txt dosyasi olusturulamadi\n";
 exit(EXIT_FAILURE);
 }
-//isme 
-sort(svec.begin(), svec.end
+//isme göre sırlaama yapıyoruz
+
+sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.first < y.first;});
+//sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.second < y.second;}); // stable olmadığı için sıralama bozuldu
+stable_sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.first < y.first;}); //bu şekilde olmalı
+
 print(svec, "\n", ofs);
 
 }
-  
-//1.50
 
+------------------,
+
+partial_sort : sıralama kriterine göre ilk n tane öğeyi yerine koymak için
+
+using sipair = std::pair<std::string, int>;
+
+int main()
+{
+using namespace std;
+
+vector<sipair> svec;
+
+rfill(svec, 20'000, Date::random);
+
+cout << "ilk kac tarih isteniyor: ";
+int n;
+cin >> n;
+
+partial_sort(dvec.begin(), dvec.begin() + n,dvec.end());
+
+sort(dvec.begin(), dvec.end());
+if (!ofs) {
+std::cerr <<  "out.txt dosyasi olusuturulmadi\n";
+exit(EXIT_FAILURE);
+}
+print(dvec, "\n", ofs);
+
+}
+
+-------------------
+
+partial_sort_copy : sıralanmış şekilde olanları başka bir range'e yazıyor
+
+int main()
+{
+using namespace std;
+
+rfill(dvec, 20'000, Date::random);
+
+cout << "ilk kac tarih isteniyor: ";
+int n;
+cin >> n;
+
+vector<Date> dest_vec(n);
+
+partial_sort_copy(dvec.begin(), dvec.end(), dest_vec.begin(), dest.vec.end());
+
+copy(dest_vec.begin(), dest_vec.end(), ostream_iterator<Date>{cout, "\n"});
+
+}
+
+-------------
+
+nth_element:
+
+int main()
+{
+using namespace std;
+
+vector<Date> dest_vec(n);
+
+rfill(dvec, 20'000, Date::random);
+
+cout << "ilk kac tarih isteniyor: ";
+int n;
+cin >> n;
+
+nth_element(dvec.begin(), dvec.begin() + n, dvec.end());
+
+std::ostream ofs{ "out.txt" };
+if (!ofs) {
+std::cerr <<  "out.txt dosyasi olusuturulmadi\n";
+exit(EXIT_FAILURE);
+}
+
+copy(dest_vec.begin(), dest_vec.end(), ostream_iterator<Date>{ofs, "\n"});
+}
+
+-------------
+
+int get_median(const std::vector<int> vec) //Burada ref kullanmak yerine bu şekilde yazmak maaliyeti düşürür
+{
+std::nth_element(vec.begin(), next(vec.begin(), vec.size() / 2), vec.end());
+
+return vec[vec.size() / 2];
+}
+
+int main()
+{
+using namespace std;
+
+vector ivec {5, 7, 1, 4, 9,3,23,12,8,6,15,-1,9,97};
+
+cout << "median is " << get_median(ivec);
+}
+
+----------------
+
+partial point : koşulu sağlamayanlardan ilkinin konumu
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+
+char c;
+
+std::cout << "bir harf girin: ";
+cin >> c;
+
+auto iter_par_point = partition(svec.begin(), svec.end(), [c](), [c](const string& s) {
+return s.find(c) != string::npos;
+});
+
+print(svec, "\n");
+std::cout << "partisyon indeksi: " << iter_par_point - svec.begin() << '\n';
+if (iter_par_point != sve.end()) {
+std::cout << "kosulu saglamayan ilk oge : " << *iter_par_point << "\n";
+}
+}
+
+-------------
+
+sadece koşulu sağlayanların yazılması
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 100, rname);
+
+char c;
+
+std::cout << "bir harf girin: ";
+cin >> c;
+
+auto iter_par_point = stable_partition(svec.begin(), svec.end(), [c](), [c](const string& s) {
+return s.find(c) != string::npos;
+});
+
+std::cout << "kosulu saglayanlar\n";
+copy(svec.begin(), iter, ostream_iterator<string>{cout, "\n"});
+std::cout << "kosulu saglamayanlar\n";
+copy(iter, svec.end(), ostream_iterator<string>{cout, "\n"});
+
+-----------------
+
+patition_copy : bir kaynak range ister 2 tane hedef range , koşulu sağlayanların 1 range, sağlmaaynları 2. range yazar
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+char c;
+
+std::cout << "bir harf girin: ";
+cin >> c,
+
+deque<string> ok(20);
+list<string> not_ok(20);
+
+auto ip = partition_copy(svec.begin(), svec.end(), ok.begin(), not_ok.begin(), 
+[c](const string &s) {return s.contains(c); });
+
+std::cout << "kosulu saglayan ogeler\n";
+print(ok.begin(), ip.first);
+std::cout << "kosulu saglamayan ogeler\n";
+print(not_ok.begin(), ip.second);
+}
 
 
 
