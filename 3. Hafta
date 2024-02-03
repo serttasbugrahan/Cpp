@@ -874,7 +874,7 @@ void func(bool){
 std::cout<<"bool\n";
 }
 
-void func(bool){
+void func(int*){
 std::cout<<"void *\n";
 }
 
