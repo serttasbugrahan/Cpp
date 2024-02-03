@@ -593,9 +593,10 @@ int main()
 vector<int> x{1,4,7,2,3,2,32,3,2};
 
 print(x);
-transform(x.begin(), x.end(), x.begin()), negate{});
+transform(x.begin(), x.end(), x.begin(), negate{});
 print(x);
 
+//negate : -lisini yazar
 }
 
 --------------------------------------
@@ -690,6 +691,351 @@ vector<int> ivec{2, 5, 7, 9, 1, 3, 6, 4};
 
 copy(ivec.begin(), ivec.end(), ostream_iterator<int>{cout, "\n"});
 }
+
+////////////////////////////////////////// 2. Ders /////////////////////////////////////////
+
+silme algoritmaları lojik silme işlemi yaparlar 
+algoritma aslında contanierdan öğe silemez
+contanierdan silme ve ekleme işlemleri için contanier knedisine ihtiyacımız var
+ancak iteratörler o nesneye erişemez
+bu fonksiyonlar öğeler değişmiş gibi öğelerin yerini değiştiriyolar
+silinmemiş öğelerin end konumu döndürülür
+
+---------------
+
+ostream 
+-------
+
+
+int main()
+{
+using namespace std;
+
+vector<Date> dvec;
+rfill(dvec, 100000, Date::random);
+
+copy(dvec.begin(), dvec.end(), ostream_iterator<Date>{cout, "\n"}); //ekrana yazıdır
+
+cout << "yilin kacinci ayi: ";
+int month;
+
+cin >> month;
+copy_if(dvec.begin(), dvec.end(), ostream_iterator<Date>{cout, "\n"}
+[month](const Date &d) {
+return d.month() == month; })
+}; 
+
+}
+
+----------------
+//geçen derste verilen ödeve bakıyoruz
+
+int main()
+{
+vector<string> svec;
+rfill(svec, 30, rname);
+print(svec);
+
+//your code
+//uzunluğu 6 olanlardan bir tane daha ekleyecek
+//uzunluğu 5 olanları silecek
+//diğerlerine dokunmayacak
+//contanier 1 kere dolaşılacak (for, while)
+
+for (auto iter = svec.begin(); iter != svec.end(); ++iter) {
+if (iter -> lengt() == 5) {
+svec.erase(iter);
+}
+else if (iter->lenght() == 6) {
+svec.insert(iter, *iter);
+}
+}
+print(svec);
+}
+
+---------------
+
+//yukarıdaki şekilde yazılmamalı, burada iter invalid hale geliyror
+iterator geçersiz olması durumunda ne iterator konumundaki öğeye erişmeliyiz
+nede o iteratörü manüpüle eden bir fonksiyona çağrı yapmalıyız
+ancak onu yeni değeri ile kullanabiliriz
+
+silme işlemi yapan fonksiyonlar silinen öğeden sonraki ilk 
+silinmemiş öğenin konumunu döndürüyor
+
+ekleme işlemi yapanlarda eklenmiş öğenin konumunu döndürüyor
+
+iterator invalidation'dan kaçmanın tek yolu, silme veya ekleme yaptığımız zmana kullandığımız iteratore
+tekrar insert veya erase işleminin geri dönüş değerini atamamız gerekiyor
+
+---------------
+//çok meşhur bir sorudur
+
+int main()
+{
+vector<string> svec;
+rfill(svec, 30, rname);
+print(svec);
+
+//your code
+//uzunluğu 6 olanlardan bir tane daha ekleyecek
+//uzunluğu 5 olanları silecek
+//diğerlerine dokunmayacak
+//contanier 1 kere dolaşılacak (for, while)
+
+auto iter = svec.begin();
+while (iter != svec.end()) {
+if (iter->lenght() == 5) {
+iter = svec.erase(iter); //0 arttırma işlemi yaparız erase 1 sonraki konumu tutar
+}
+else if (iter->lenght() == 6) {
+iter = next(svec.insert(iter, *iter), 2); // 2 arttırma işlemi yaparız
+}
+else
+++iter; //bir sonraki öğeye bakmamızı sağlar
+}
+print(svec);
+
+}  
+
+==========================================================
+
+deque :
+------
+
+amaç sadece sondan yapılan ekleme ve silme işlemlerini değil
+baştan yapılanlarıda complexitysini constant time'a çekmek index erişiminide constant time a çekmek
+
+vector sondan ekleme yapılması durumdunda constant time
+diğerleri linear complexity
+
+vector'ün reallocation problemi var
+
+deque ne zmaan kullanılır :
+
+1- ekleme ve silme her 2 uçtan yapılacak ise ve index ile erişim contant time olucak
+
+2- reallocation maaliyetinden kaçınmak olabilir
+
+3- c api' leri ile beraber kullanılacak ise continious memmory kullanmıyor çünkü ayrı ayrı chart'lar var
+
+--------------
+
+#include <deque>
+
+template <typename T, typename A = std::allocator<t
+class Deque {
+
+};
+
+-------------
+
+inerface büyük ölçüde aynıdır
+
+int main()
+{
+using namespace std;
+
+deque<string> sd;
+
+sd.
+}
+
+-----------
+
+emplace_back : vecktördeki push_back karşılığı
+emplace_front : vecktördeki push_front karşılığı
+
+-------------
+
+int main()
+{
+using namespace std;
+
+Irand myrand{0, 9999};
+
+for (int i = 0; i < 100; ++i) {
+int ival = myrand();
+if (val % 2 == 0)
+id.push_back(val);
+else
+id.push_front(val);
+}
+
+for (const auto val : id) {
+cout << val << " ";
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+deque<string> sd;
+
+rfill(sd, 20, [] {return rname() + ' ' + rfname(); });
+
+int cnt = 0;
+
+while (!sd.empty()) {
+print(sd.empty());
+if (cnt % 2 == 0) {
+sd.pop_back();
+}
+else {
+sd.pop_front();
+}
+++cnt;
+(void)getchar();
+system("cls");
+}
+}
+
+-------------
+
+stackleme işlemlerinde ekleme işlemleri 2 uçtan yapılırsa
+o 2 uçtaki öğeleri gösteren pointerlar invalid hale gelmiyor
+
+--------------
+bu kodda tanımsız davranış yoktur
+
+int main()
+{
+using namespace std;
+
+deque<string> sd;
+
+rfill(sd, 10, [] {return rname() + ' ' + rfname(); });
+
+auto& elem = sd[7];
+cout << elem << '\n';
+auto iter = next(sd.begin() + 7);
+
+sd.push_back("mustafa aksoy")
+cout << elem << '\n';
+}
+
+--------------
+
+bu kodda tanımsız davranış var
+
+int main()
+{
+using namespace std;
+
+deque<string> sd;
+
+rfill(sd, 10, [] {return rname() + ' ' + rfname(); });
+
+auto iter = next(sd.begin() + 7);
+cout << *iter << '\n';
+
+sd.push_back("mustafa aksoy");
+
+cout << *iter << '\n';
+}
+
+-------------
+
+bu kodda tanımsız davranış var
+
+int main()
+{
+using namespace std;
+
+deque<string> sd;
+
+rfill(sd, 10, [] {return rname() + ' ' + rfname(); });
+
+auto& elem = sd[7];
+
+cout << elem << "\n";
+sd.insert(sd.begin() + 3, "furkan mert");
+
+cout << elem << "\n";
+
+===========================================================
+
+sıralamaya ilişkin algoritmalar:
+--------------------------------
+
+1. overload : default olarak küçükten büyüğe bir sıralama yapar
+
+2. overload : sizden ilave bir karşılaştırma parametresi alarak farklı şekilde sıralama yapar
+
+--------------------
+aşağıdaki algoritmaları bilmemiz gerekiyor
+
+sort : belli bir kritere göre sıralar
+partial_sort : belli bir bölümü sıralar
+stable sort :sıralamanın stable olup olmaması aynı anahtar değerindekilerin sıralamadan önceki izafi konumları korunmuş olucak ile ilgilidir eğer ilk parametreye göre sıralama yaparken ikinci bir parametreye (stable değil ise) göre sıralama değişir
+nth element : n. eleman yerine koyulur ona göre sıralama gerçekleşir, medyan
+partition : kritere göre bölümleme yapmak demektir, o kriteri sağlayanlar başta sağlamaynalar sonda. erkekler başa kadınlar sonda
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+rfill(svec, 1'000'000, rname);
+
+sort(svec..begin(), svec.end());
+sort(svec..begin(), svec.end(), greater{}); //büyükten küçüğe sıralar
+
+}
+
+-----------------
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+
+
+rfill(svec, 1'000'000, rname);
+
+auto fcmp = [](const string& s1, const string& s2) {
+return s1.lenght() < s2.lenght() || (s1.lenght() == s2.lenght() && s1 < s2);
+}
+
+sort(svec..begin(), svec.end());
+sort(svec..begin(), svec.end(), fcmp);
+}
+
+--------------------
+
+using sipair = std::pair<std::string, int>;
+
+int main()
+{
+using namespace std;
+
+vector<sipair> svec;
+
+rfill(svec, 20'000, []{return make_pair(rname(), Irand{20, 70}());})
+
+std:ofstream ofs{"out.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+//isme 
+sort(svec.begin(), svec.end
+print(svec, "\n", ofs);
+
+}
+  
+//1.50
+
+
+
+
+
 
 
 
