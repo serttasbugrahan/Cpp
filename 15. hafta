@@ -1236,7 +1236,28 @@ cout << "min = " << *ip.second << '\n'; //iterator olduğu için içerik operat�
 
 }
 
+-----------------
 
+structure binding : bileşik denilen öğeyi ayrı ayrı değişkenlerde tutmamızı sağlar
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+
+auto ip = minmax_element(svec.begin(), svec.end());
+
+cout << "min = " << *ip.first << '\n';
+cout << "max = " << *ip.second << '\n';
+
+auto [iter_min, iter_max] = minmax_element(svec.begin(), svec.end()); //structure binding algoritması
+
+cout << *iter_min << iter_min - svec.begin() << '\n';
+
+}
 
 
 
