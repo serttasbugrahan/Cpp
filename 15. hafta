@@ -1256,21 +1256,224 @@ cout << "max = " << *ip.second << '\n';
 auto [iter_min, iter_max] = minmax_element(svec.begin(), svec.end()); //structure binding algoritması
 
 cout << *iter_min << iter_min - svec.begin() << '\n';
+cout << *iter_max << iter_min - svec.begin() << '\n';
 
 }
 
 
+-------------------------------------
+partiton_point: n. noktayı bulmak içindir, iterator döndürür.
+
+int main()
+{
+using namespace std;
+
+vector ivec{2,4,6,8,2,20,4,3,7,9,1,101};
+
+auto iter = partition_point(ivec.begin(), ivec.end(), [](int x) {
+    return x % 2 == 0;
+});
+
+cout << *iter << '\n';
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector ivec{2,4,6,8,20};
+
+cout << boolalpha << is_sorted(ivec.begin(), ivec.end()); //sıralamı diye balar
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+vector ivec{22,4,18,1,-1};
+
+cout << boolalpha << is_sorted(ivec.begin(), greater{});
+}
+
+------------
+
+//is_sorted_until()
+
+int main()
+{
+using namespace std;
+
+vector ivec{22,4,18,1,-1};
+
+cout << distance(ivec.begin(), is_sorted_until(ivec.begin(), ivec.end())) << "\n";
+cout << distance(ivec.begin(), is_sorted_until(ivec.begin(), ivec.end(), greater{})) << "\n";
+
+}
+
+-------------
+
+geri dönüş değeri end konumu ise onu iterator olarak kullanmakta sıkıntı yok
+ancak direferans etmek tanımsız davranış olur
+
+-------------
+binary heap:
+
+max heap : her ağacın tepe düğümü kendi ağacının en büyük değeri  
+min heap : her ağacın tepe düğümü kendi ağacının en küçük değeri
+
+!! vector ile bu işlemleri yapabiliriz
+
+-------------
+//vektörel bir veri yapısını heap haline getirmek için make_heap veri yapısını çağııryoruz
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{0, 1000});
+print(ivec);
+
+cout << "\n\n";
+make_heap(ivec.begin(), ivec.end()); //max heap
+
+print(ivec);
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{0, 1000});
+print(ivec);
+
+cout << "\n\n";
+make_heap(ivec.begin(), ivec.end(), grater{}); //min heap
+print(ivec);
+pop_heap(ivec.begin(), ivec.end());
+print(ivec);
+cout << ivec.back() << '\n';
+ivec.pop_back;
+print(ivec);
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{0, 1000});
+print(ivec);
+
+cout << "\n\n";
+make_heap(ivec.begin(), ivec.end(), grater{}); //min heap
+print(ivec);
+ivec.push_back(9871); //sona ekleriz
+print(ivec);
+push_heap(ivec.begin(), ivec.end()); //ancak push_heap sonra eklediğimiz değeri başa ekler
+print(ivec);
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec;
+rfill(ivec, 20, Irand{ 0, 1000 });
+print(ivec);
+
+make_heap(ivec.begin(), ivec.end())
+while (!ivec.empty()) {
+pop_heap(ivec.begin(), ivec.end());
+cout << ivec.back() << '\n';
+ivec.pop_back();
+(void)getchar();
+}
+}
+
+----------------
+//private queue sayesinde yukarıdaki yaptıklarımızı yapabiliriz
+
+#include <queue>
+
+int main()
+{
+using namespace std;
+
+priority_queue<int> x;
+
+Irand myrand{0, 198789};
+
+for (int i = 0; i < 20; ++i) {
+int ival = myrand();
+x.push(ival)
+cout << ival << "kuyruga eklendi\n";
+}
+
+while (!x.empty()) {
+cout << x.top();
+(void)getchar();
+x.pop();
+}
+}
+
+------------------
+
+heap sort algoritması aşağıdaki şekilde çalışır
+
+template <typename Ranit, typename Pred = std::less<>
+void heap_sort(Ranit beg, Ranit end, Pred f = {})
+{
+std::make_heap(beg, end, f);
+std::sort_heap(beg, end, f);
+}
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 1000, rname);
+
+heap_sort(svec.begin(), svec.end());
+
+print(svec);
+}
+
+====================================================
+
+bağlı liste contanierları
+-------------------------
+
+1 düğüm = 1 veri ve 2 pointer içeri,
+1. pointer kendisinden sonra gelen düğümü gösterir
+2. pointer kendisinden önce gelen düğümü gösterir
 
 
+çifte bağlı liste : 2 pointer bulunur, ileri ve geri harket edilebilir
+çifte bağlı liste avantajı konumunu bildiğimiz yerden isteğimiz konumdan öğe eklemenin/silmenin maaliyeti constant time
+
+!!vektörde sadece sondan ekleme/silme contant time
+!!deque sadece sondan/baştan ekleme/silme contant time
+
+tekli bağlı liste : 1 pointer tutulur sadece tek yönde hareket edilir
 
 
+vektör bağlı listeye göre çok daha avantajlı, 2000, 5000 öğe için vektör avantajlıdır. yüksek öğe miktarına çıkıldığı zmaan bağlı liste kullanılabilir
 
-
-
-
-
-
-
+her veri yapısı eklendiğinde düğüm allocate edilir, veri yapısından eleman silindiğinde de free edilcek
 
 
 
