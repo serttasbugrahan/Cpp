@@ -984,8 +984,8 @@ vector<string> svec;
 
 rfill(svec, 1'000'000, rname);
 
-sort(svec..begin(), svec.end());
-sort(svec..begin(), svec.end(), greater{}); //büyükten küçüğe sıralar
+sort(svec.begin(), svec.end());
+sort(svec.begin(), svec.end(), greater{}); //büyükten küçüğe sıralar
 
 }
 
@@ -1003,11 +1003,12 @@ auto fcmp = [](const string& s1, const string& s2) {
 return s1.lenght() < s2.lenght() || (s1.lenght() == s2.lenght() && s1 < s2);
 }
 
-sort(svec..begin(), svec.end());
-sort(svec..begin(), svec.end(), fcmp);
+sort(svec.begin(), svec.end());
+sort(svec.begin(), svec.end(), fcmp);
 }
 
 --------------------
+//pair 2 farklı türdeki öğeleri bir arada tutmak içindir
 
 using sipair = std::pair<std::string, int>;
 
@@ -1024,11 +1025,11 @@ if (!ofs) {
 std::cerr << "out.txt dosyasi olusturulamadi\n";
 exit(EXIT_FAILURE);
 }
-//isme göre sırlaama yapıyoruz
+//isme göre sırlama yapıyoruz
 
 sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.first < y.first;});
 //sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.second < y.second;}); // stable olmadığı için sıralama bozuldu
-stable_sort(svec.begin(), svec.end(), [](const sipair&x, const sipair& y) {return x.first < y.first;}); //bu şekilde olmalı
+stable_sort(svec.begin(), svec.end(), [](const sipair& x, const sipair& y) {return x.first < y.first;}); //bu şekilde olmalı
 
 print(svec, "\n", ofs);
 
@@ -1114,7 +1115,7 @@ copy(dest_vec.begin(), dest_vec.end(), ostream_iterator<Date>{ofs, "\n"});
 
 -------------
 
-int get_median(const std::vector<int> vec) //Burada ref kullanmak yerine bu şekilde yazmak maaliyeti düşürür
+int get_median(const std::vector<int> vec) //Burada referans kullanmak yerine bu şekilde yazmak maaliyeti düşürür
 {
 std::nth_element(vec.begin(), next(vec.begin(), vec.size() / 2), vec.end());
 
@@ -1184,7 +1185,7 @@ copy(iter, svec.end(), ostream_iterator<string>{cout, "\n"});
 
 -----------------
 
-patition_copy : bir kaynak range ister 2 tane hedef range , koşulu sağlayanların 1 range, sağlmaaynları 2. range yazar
+patition_copy : bir kaynak range 2 tane hedef range ister, koşulu sağlayanların 1 range, sağlamayanları 2. range yazar
 
 int main()
 {
@@ -1209,6 +1210,49 @@ print(ok.begin(), ip.first);
 std::cout << "kosulu saglamayan ogeler\n";
 print(not_ok.begin(), ip.second);
 }
+
+///////////////////////////////////////////////// 3. Ders ////////////////////////////////////////////////////
+
+minmax_element : hem en büyük hem en küçük öğenin konumunu döndürebilir
+çünkü minmax_element geri dönüş değeri iteratör değeri
+
+----------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 20, rname);
+print(svec);
+
+pair<vector<string>::iterator, vector<string>::iterator> ret = 
+minmax_element(svec.begin(), svec.end())
+
+//1129 yerine auto yazıp geçebiliriz, auto ret = minmax_element(svec.begin(), svec.end())
+
+cout << "min = " << *ip.first << '\n'; //iterator olduğu için içerik operatörü ile diferans etmek gerekir
+cout << "min = " << *ip.second << '\n'; //iterator olduğu için içerik operatörü ile diferans etmek gerekir
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
