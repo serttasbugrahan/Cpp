@@ -1476,9 +1476,263 @@ vektör bağlı listeye göre çok daha avantajlı, 2000, 5000 öğe için vekt�
 her veri yapısı eklendiğinde düğüm allocate edilir, veri yapısından eleman silindiğinde de free edilcek
 
 
+===========================================
+Çifte bağlı liste
+
+list
+----
+
+#include <list>
+
+int main()
+{
+using namespace std;
+
+list<int> mylist;
+//list<string> mylist;
+}
+
+-------------
+
+emplace : insert karşılığı
+
+siplice :  bir listenin belirli konumları arasında düğümleri taşımak için kullanılır.
 
 
+-------------
+//mülakatlarda sorulur
 
+int main()
+{
+using namespace std;
+
+list<string> mylist;
+rfill(mylist, 10, rname);
+print(mylist);
+
+mylist.reverse(); //iterator konumundaki öğeleri swap ederken
+// reverse(mylist.begin(), mylist.end()); //sınıfın reverse fonksiyonu pointer swap eder, yukarıdakini tercih et
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+list<string> mylist;
+rfill(mylist, 10, rname);
+print(mylist);
+
+mylist.sort(); //sıralama yapar
+mylist.sort(greater{}); //büyükten küçüğe sıralama yapar
+
+print(mylist);
+}
+
+-------------
+//remove
+
+int main()
+{
+using namespace std;
+
+list<string> mylist;
+rfill(mylist, 10000, Irand{0, 5});
+print(mylist);
+
+int ival;
+cout << "silinecek degeri giriniz: ";
+cin >> ival;
+
+auto n = mylist.remove(ival);
+
+print(mylist);
+
+cout << n << "eleman silindi\n";
+}    
+
+--------------
+//remove_İf
+
+int main()
+{
+using namespace std;
+
+list<string> mylist;
+rfill(mylist, 10000, Irand{0, 5});
+print(mylist);
+
+int ival;
+cout << "kaca tam bolunenler silinsin: ";
+cin >> ival;
+
+auto n = mylist.remove_if([ival](int z) {return x % ival == 0; });
+
+print(mylist);
+
+cout << n << "eleman silindi\n";
+}    
+
+---------------
+//merge
+
+int main()
+{
+using namespace std;
+
+list<string> x;
+list<string> y;
+
+auto fgen = []{return rname() + ' ' + rfname(); };
+
+rfill(x, 20, fgen);
+rfill(y, 20, fgen);
+
+x.sort();
+y.sort();
+
+x.merge(y); //sıralı birleştirme yapıyor
+
+cout << "x.size() = "<< x.size() << '\n';
+cout << "y.size() = "<< y.size() << '\n';
+(void)getchar();
+
+print(x, "\n");
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+list<string> x;
+list<string> y;
+
+auto fgen = []{return rname() + ' ' + rfname(); };
+auto fcomp = [](const string&s1, const string& s2) {
+return s1.lenght() < s2.lenght() || (s1.lenght() == s2.lenght() && s1 < s2)
+};
+
+rfill(x, 20, fgen);
+rfill(y, 20, fgen);
+
+x.sort(fcomp);
+y.sort(fcomp);
+
+x.merge(y, fcomp);
+
+cout << "x.size() = "<< x.size() << '\n';
+cout << "y.size() = "<< y.size() << '\n';
+(void)getchar();
+
+print(x, "\n");
+}
+
+------------------
+//splice : bir listeden çıkarıp başka bir listeye ekler  
+
+int main()
+{
+using namespace std;
+
+list<string> f{"ayse", "fatma", "esin", "gizem", "lale", "hulya" };
+list<string> m{"fuat", "ceyhun", "tarik", "cetin", "kaan"};
+
+f.splice(f.begin(), m); //1
+
+cout << "m.size() = " << m.size() << '\n';
+cout << "f.size() = " << m.size() << '\n';
+
+print(f); 
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+list<string> f{"ayse", "fatma", "esin", "gizem", "lale", "hulya" };
+list<string> m{"fuat", "ceyhun", "tarik", "cetin", "kaan"};
+
+f.splice(f.begin(), m, m.begin());
+
+cout << "m.size() = " << m.size() << '\n';
+cout << "f.size() = " << m.size() << '\n';
+
+print(f);
+print(m);
+
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+list<string> f{"ayse", "fatma", "esin", "gizem", "lale", "hulya" };
+list<string> m{"fuat", "ceyhun", "tarik", "cetin", "kaan"};
+
+f.splice(f.begin(), m, m.begin()), prev(m.end()));
+
+cout << "m.size() = " << m.size() << '\n';
+cout << "f.size() = " << m.size() << '\n';
+
+print(f);
+print(m);
+
+}
+
+
+------------
+//daha önceki konular burada da geçerliddir
+
+int main()
+{
+using namespace std;
+
+list<string> f{"ayse", "fatma", "esin", "gizem", "lale", "hulya" };
+
+if (auto iter = find(f.begin(), f.end(), "gizem"); iter != f.end()) {
+std::cout << "bulundu\n";
+f.erase(iter);
+print(f);
+}
+}
+
+-----------
+
+lower bound, upper bound, equal range
+
+
+lower bound : verilen bir değer için öyle bir konum ki o değeri
+sırayı bozmadan ekleyebileceğimiz ilk konum
+
+                    4 6 6 7 7 7 9 12 23 34 46 90
+7 için lower bound        * //burası  * //16 için burası
+
+---
+
+upper bound : verilen bir değer için öyle bir konum ki
+o değeri sırayı bozmadan ekleyebileceğimiz son konum
+
+
+                    4 6 6 7 7 7 9 12 23 34 46 90
+7 için upper bound              * //burası 
+
+
+------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+2.06
+}
 
 
 
