@@ -1724,15 +1724,113 @@ o değeri sırayı bozmadan ekleyebileceğimiz son konum
 7 için upper bound              * //burası 
 
 
-------
+----
+
+equeal range : pair döndürür, lower bound ve upper bound iteratörleri
+
+-------------
 
 int main()
 {
 using namespace std;
 
-vector<string> svec;
-2.06
+vector<int> svec;
+rfill(ivec, 20, Irand{0, 5});
+sort(ivec.begin(), ivec.end());
+print(ivec);
+
+std::cout << "anahtar degerini girin: ";
+int key;
+cin >> key;
+
+
+auto iterlower = lower_bound(ivec.begin(), ivec.end(), key);
+cout << "ilk ekleme yapilabilecek yerin indeksi: " << distance(ivec.begin(), iterlower) << '\n';
+
+auto iterupper = upper_bound(ivec.begin(), ivec.end(), key);
+cout << "ilk ekleme yapilabilecek yerin indeksi: " << distance(ivec.begin(), iterupper) << '\n';
+
+cout << key << " degerinden " << distance(iterlower, iterupper) << "tane var\n';
 }
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<int> svec;
+rfill(ivec, 20, Irand{0, 5});
+sort(ivec.begin(), ivec.end());
+print(ivec);
+
+std::cout << "anahtar degerini girin: ";
+int key;
+cin >> key;
+
+auto [iterlower, iterupper] = equal_range(ivec.begin(), ivec.end(), key);
+
+cout << "ilk ekleme yapilabilecek yerin indeksi: " << distance(ivec.begin(), ip.first) << '\n';
+cout << "ilk ekleme yapilabilecek yerin indeksi: " << distance(ivec.begin(), ip.second) << '\n';
+
+cout << key << " degerinden " << distance(ip.first, ip.second) << "tane var\n';
+}
+
+---------------
+
+//vektöre ekleme yapıcaksın ancak her ekleme yaptığında sıralama bozulmayacak
+
+int main()
+{
+using namespace std;
+
+vcetor<string> svec;
+
+auto fgen = [] {return rname() + ' ' + rfname(); };
+
+for (int i = 0; i < 20; ++i) {
+auto name = fgen();
+std::cout << name << "ekleniyor\n";
+auto iter = lower_bound(svec.begin(), svec.end(), name);
+svec.insert(iter, std::move(name));
+print(svec, "\n");
+(void)getchar();
+system("cls");
+}
+}
+
+-------------
+
+// vektörden herhangi bir öğeyi siliceksin ama constant time'da olucak
+
+son öğe ile swap edip pop_back çağrılır 
+
+-----------
+
+//elimizde bağlı liste var bağlı listeye index ile erişim istiyoruz
+hem bağlı liste özelliği korunacak hemde index ile erişilecek
+
+-----------------------------------------
+
+sorted range algorithms
+------------------------
+
+set_intersection
+set_union
+set_difference
+set_simetrik_difference
+
+int main()
+{
+set_in
+
+}
+
+2.30.58
+
+
+
+
 
 
 
