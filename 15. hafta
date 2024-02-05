@@ -1820,13 +1820,27 @@ set_union
 set_difference
 set_simetrik_difference
 
+---------------
+
 int main()
 {
-set_in
+using namespace std;
 
+vector<string> x;
+vector<string> y;
+
+rfill(x,30, rtown)
+rfill(y,40, rtown)
+sort(x.begin(), x.end());
+sort(y.begin(), y.end());
+
+list<string> slist;
+
+set_intersection(x.begin(), x.end(), y.begin(), y.end(), back_inserter(slist));
+
+print(slist); //ortak olanları yazdırdı
 }
 
-2.30.58
 
 
 
