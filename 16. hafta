@@ -469,11 +469,478 @@ mesela sequence contaniera 17 değeri ekle desek ekler ama nereye ekliyceğini b
 associative contaniers anahtarı ister nereye ekliyceğini bilir (ikili arama ağacı sayesinde), comportör kullanarak karşılaştırma yapa yapa konum bulunur
 
 
+-------
+1. template tutulcak öğe türü, 
+2. template karşılaştırma kriteri
+3. allocator parametre
 
+//2. ve 3. için default kullanılır
 
+#include <set>
 
+int main()
+{
+using namespace std;
 
+set<int, less<int>, allocator<int>>
+set<int, greater<int>>
+}
 
+-----------
+
+int main()
+{
+using namespace std;
+
+set<int> myset {3,1,4,2,8,9,7 };
+
+for (auto iter = myset.begin(); iter != myset.end(); ++iter)
+cout << *iter << '\n';
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+set<int, greater<int>> myset {3,1,4,2,8,9,7 };
+
+for (auto iter = myset.begin(); iter != myset.end(); ++iter)
+cout << *iter << '\n';
+
+for (int ival : myset ) { //range base for loop kullanılabilir 
+cout << ival << " ";
+}
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+set<string> myset; //küçükten büyüğe dolaşır
+set<string, greater<string>> myset; //büyükten küçüğe sıralar
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+cout << "myset.size() = " << myset.size() << '\n';
+
+for (const auto& s : myset) {
+std::cout << s << 
+}
+}
+
+----------
+//bu kısımı tam anlamadım
+
+class scomp {
+public:
+bool operator()(const std::string& s1, const std::string& s2)const //burdaki constluğa dikkat et
+{
+return s1.size() < s2.size() || (s1.size() == s2.size() && s1 < s2);
+}
+
+};
+
+int main()
+{
+using namespace std;
+
+set<string, scomp<string>> myset; //büyükten küçüğe sıralar
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+cout << "myset.size() = " << myset.size() << '\n';
+
+for (const auto& s : myset) {
+std::cout << s << 
+}
+}
+
+------------
+//bu kısımı tam anlamadım
+
+//aşağıdaki şekilde de olabilirdi
+
+bool mycomp(const std::string& s1, const std::string& s2)
+{
+return s1.size() < s2.size() || (s1.size() == s2.size() && s1 < s2);
+}
+};
+
+int main()
+{
+using namespace std;
+
+set<string, decltype(&mycomp)> myset(mycomp); //büyükten küçüğe sıralar
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+cout << "myset.size() = " << myset.size() << '\n';
+
+for (const auto& s : myset) {
+std::cout << s << 
+}
+}
+
+---------------
+//bu kısımı tam anlamadım
+
+int main()
+{
+using namespace std;
+
+auto fcomp = [](const std::string& s1, const std::string& s2)
+{
+return s1.size() < s2.size() || (s1.size() == s2.size() && s1 < s2);
+}
+};
+
+set<string, decltype(fcomp)> myset(fcomp);
+set<string, decltype(fcomp)> myset; //cpp 23 ile bu şekilde yazılabilir
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+cout << "myset.size() = " << myset.size() << '\n';
+
+for (const auto& s : myset) {
+std::cout << s << 
+}
+}
+
+---------------
+
+çok sık yapılan bir hata
+
+bool mycomp(int x, int y)
+{
+
+}
+
+strict weak odering : karşılaştırma kriterimi operatör diyelim
+
+a < b true ise
+b > a false olmalı
+
+a operator b 
+b operator b
+
+a < a false olmalı,
+
+--------------
+
+set multiset farkına bir daha bakıyoruz
+
+int main()
+{
+using namespace std;
+
+set<int> myset; 
+
+rfill(myset, 100, Irand{0 ,200}); //her bir anahtardan bir tane var
+//multiset olsaydı her bir anahtardan birden fazla olabilirdi
+
+for(auto val : myset) {
+cout << val << " ";
+}
+ 
+}
+
+-------------
+//insert fonksiyonu ile sete üye veya üyeler ekleyebiliriz
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset;
+
+myset.
+//fonksiyonları incele
+}
+
+--------------
+// aşağıdaki logoritmik karmaşıklık değildir, linear complexity
+//setin kendi fonksyionu find logoritmik karmaşıklıkta
+
+template <typename InIter, typename T>
+InIter Find(InIter beg, InIter end, const T& val)
+{
+while (beg != end) {
+if ( *beg == val)
+return beg;
+++beg;
+}
+return end;
+}
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset;
+}
+
+---------------
+
+kritik olan üretimde de kullanılan fonksiyonlara bakıyoruz
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+//multiset<string> myset; //mesela 2. bir nalan olabilirdi
+
+vector<string> svec {"derya", "ceyhun", "nalan", "tekin"};
+
+myset.insert("ayse");
+myset.insert({"ali", "zeki", "nuri", "derya"});
+myset.insert(svec.begin(), svec.end());
+
+cout << "size = " << myset.size() << '\n';
+
+for (const auto& s : myset)
+cout << s << ' ';
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+set<string> myset {"derya", "ceyhun", "nalan", "tekin"};
+print(myset);
+
+cout << "eklenecek ismi girin: ";
+string name{};
+
+cin >> name;
+
+cout << "size = " << myset.size() << '\n';
+
+//set olduğu için mesela nalan eklemeye çalışsak eklemez
+
+//sequnce contanier olsaydı iterator döndürücekti eklenmiş öğenin konumunu döndürücekti
+//ancak eklenme grantisi yok bu nedenle iterator bool değeri döndürüyor
+
+//iterator - bool
+//ekleme gerçekleşirse bool değeri true olucak, iteratörde eklenmiş öğeye iteratör olucak
+//eğer ekleme gerçekleşmemişse false,  iteratorüde var olan değeri olucak
+
+//auto p = myset.insert(name); 
+//pair<set<string>::iterator, bool> p = myset.insert(name); //bunlardan herhangi birini kullanabiliriz
+auto [iter, inserted] = myset.insert(name); 
+
+if (p.second) {
+std::cout << "ekleme yapildi...\n";
+cout << "size = " << myset.size() << '\n';
+cout << *p.first << "\n";
+cout << "distance = " << distance(myset.begin(), p.first) << '\n';
+print(myset);
+}
+else {
+std::cout << name << "sette var\n";
+cout << *p.first << "\n";
+cout << "distance = " << distance(myset.begin(), p.first) << '\n';
+}
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+set<string> myset {"derya", "ceyhun", "nalan", "tekin"};
+print(myset);
+
+cout << "eklenecek ismi girin: ";
+string name{};
+
+cin >> name;
+
+cout << "size = " << myset.size() << '\n';
+
+auto iter = myset.insert("deniz").first
+mysert.insert("deniz").first-> //bu şekilde işlemler yapabiliriz
+
+------------
+//eklemeyi aşağıdaki şekilde de yapabiliriz
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+
+for (int i = 0; i < 20; ++i) {
+myset.insert(rname());
+print(myset);
+(void)getchar();
+}
+}
+
+------------
+
+sette sorulan soru, ya var ya yok
+
+multisette sorulan soru, ya yok ya n tane var
+
+--------------
+
+//aramaya yönelik sorulara bakıyoruz
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+
+rfill(myset, 20, rname);
+print(myset);
+}
+
+cout << "arancak isim: ";
+string name{};
+
+cin >> name;
+
+if (auto iter = myset.find(name); iter != myset.end()) {
+std::cout << "bulundu..." << *iter << "\n";
+std::cout << distance : " << distance(myset.begin(), iter) << "\n";
+}
+else {
+std::cout << "bulunamadi\n"
+}
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+
+rfill(myset, 10, rname);
+print(myset);
+
+cout << "aranacak isim: ";
+string name{};
+
+cin >> name;
+
+if (myset.count(name)) { //eskiden böyle bir kullanım vardı, kaç tane olduğu sayılırdı
+
+}
+
+if (myset.contains(name) { //boolen döndürür cpp 20 ile geldi
+
+}
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,2,2,25,6,7,7,7,7,9};
+
+cout << myset.count(7); //geri dönüş değeri 7'den kaç tane var ise o olacak
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,2,2,2,6,7,7,7,7,9};
+
+auto iter = myset.find(7);
+auto n = distance(myset.begin(), iter);
+
+cout << "n = " << n << '\n';
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,2,2,2,6,7,7,7,7,9};
+
+auto iterlower = myset.lower_bound(7); 
+auto iterupper = myset.upper_bound(7); 
+
+cout << distance(myset.begin(), iterlower) << '\n';
+cout << distance(myset.begin(), iterupper) << '\n';
+}
+
+-----------
+
+//setin silme fonksiyonları değerle silme de içeriyor
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,3,4,4,4,7,7,7,7,9};
+
+print(myset);
+
+myset.erase(myset.begin(), next(myset.begin());
+myset.erase(myset.begin(), next(myset.begin(), 4); //bu şekilde de olur
+
+print(myset);
+myset.erase(prev(myset.end()));
+print(myset);
+
+}
+
+----------
+
+//değerle silme de vardır
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,3,4,4,4,7,7,7,7,9};
+
+print(myset);
+
+auto n = myset.erase(myset.begin(), next(myset.begin(), 4));
+
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+multiset<int> myset{2,3,4,4,4,7,7,7,7,9};
+
+print(myset);
+
+auto n = erase(myset, 7); //cpp 20, 23 ile geldi
+print(myset);
+}
 
 
 
