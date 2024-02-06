@@ -152,10 +152,10 @@ contanier adapters / so-called conta
 bu konuyu anlayabilmek için aşağıdakilerin bilmemiz gerekir
 
 -stack : LIFO (son giren ilk çıkar)
-  push
-  pop
-  top
-  empty
+  push = yığının en üstüne ekler.
+  pop = en üstündeki öğeyi kaldırır ve geri döndürür.
+  top = yığının en üstündeki öğeyi geri döndürür, ancak yığından kaldırmaz
+  empty = yığının boş olup olmadığını kontrol eder. Eğer yığın boşsa true, değilse false döndürür.
 
 -queue : ilk giren ilk çıkar
 
@@ -295,8 +295,10 @@ stack<int> mystack{ dvec };
 }
 
 -------------
+
+//mülakatlarda aşağıdaki soru çok sık soruluyor
 //bunu kendin çöz dedi
-// ([{< parantezlerin uyumlu olup olamdığına bakıcak
+// ([{<  parantezlerin uyumlu olup olamdığına bakıcak
 
 bool is_match(const std::string& s)
 {
@@ -305,7 +307,175 @@ bool is_match(const std::string& s)
 
 int main()
 {
-is_match("(a + [2x](val){{neco}})
+is_match("(a + [2x](val){{neco}})") //bu uyumlu mesela hepsi kapanmış
+//is_match bool döndürücek eğer parantezler uyumlu ise true değil ise false
+//yazı dolaşılacak açılanlardan birini görünce stack push edilir 
+//açılan veya kapana değil ise geçicez, eğer açılanı ise copy edicez
+//yazı bitince stack boş olucak
 }
 
-//1. saat
+----------------
+
+bool is_match(const std::string& s);
+
+int main()
+{
+using namespace std;
+
+stack<string> sx;
+
+for (int i = 0; i < 10; ++i) {
+auto name = rname();
+sx.push(name);
+std::cout << name << " eklendi\n";
+}
+
+std::cout << "size = " << sx.size() << '\n';
+while (!sx.empty()) {
+std::cout << sx.top() << '\n';
+sx.pop();
+}
+}
+
+-----------------
+
+queue
+------
+
+//sadece son öğeye değil ilk öğeye de erişebiliriz
+
+#include <queue>
+
+int main()
+{
+using namespace std;
+
+queue<string> names;
+
+names.push("melike");
+names.push("emre");
+names.push("tamer");
+names.push("furkan");
+names.push("selim");
+names.push("yasar");
+
+std::cout << "kurukta" << names.size() << "kisi var\n";
+std::cout << "kuyruk basi : " << names.front() << '\n';
+std::cout << "kuyruk sonu : " << names.back() << '\n';
+
+while (!names.empty()) {
+cout << names.front() << "\n";
+names.pop();
+(void)getchar();
+}
+}
+
+----------------
+
+priority_queue: default template argümanı vector
+---------------
+
+int main()
+{
+using namespace std;
+
+priority_queue<string> x; //default less parametresini alır
+
+for (int i = 0; i < 10; ++i) {
+auto name = rname();
+x.push(name);
+cout << name << " eklendi\n";
+}
+
+while (!x.empty()) {
+std::cout << x.top() << "kuyruktan cikiyor\n"; //max_heap 'e göre çalışır
+x.pop();
+(void)getchar();
+}
+}
+
+------------
+
+template <typename T>
+using minpq = std::priority_queue<T, std::vector<T>, std::greater<T>>;
+
+int main()
+{
+using namespace std;
+
+minpq<Date> x;
+
+for (int i = 0; i < 10; ++i) {
+x.push(Date::random());
+}
+
+while (!x.empty()) {
+std::cout << x.top() << '\n';
+x.pop();
+//(void)getchar();
+}
+}
+
+------------------
+
+yukarıdaki sınıfları implemente etmeye çalış ilerlemini güçelndirir deid necati hoca
+
+-----------------
+
+template <typename T, typename C = std::vector<T>, typename Comp = std::less<typename C::value_type>>
+class PrioritQueu {
+
+};
+
+========================================
+
+associative contaniers
+----------------------
+
+set : sadece key tutulur, keye erişir, önceden seçilmiş değerlede o değerin olup olmamasına bakmak, varsa ona erişmek
+ologn karmalıklıkta, bir anahtardan bir tane olabilir, tc'den tc'ye erişmek
+
+multiset : bir anahtardan birden fazla olabilir, 
+
+map : tutulanlar pair'ler, key value pairleri, anahtar ile bir value'a erişilir, tc'den isime erişir
+
+multimap : bir keyden birden fazla olabilir
+
+hepsi benzer işler yaparlar, 
+
+arka planda binary search tree dediğimiz veri yapısı dediğimiz veri yapısıdır
+
+------------
+
+sette bir karşılaştırma kriterine ihtiyacımız var buradaki arama işlemleri silme işlemleri
+bir comporatör kullanılıyor.
+
+12 45 77 98 343
+
+a == b // equality, 
+
+burada kullanılan terim bu değil . Burada kullanılana equivalance denir
+
+equivalance !(a < b) && (b < a)
+
+--------
+
+associative contanierslar eklenilecek konumu kendileri biliyor değere göre ekleme yapılıyor
+
+öbür contanierslarda konum ile ekleme yapılır
+
+mesela sequence contaniera 17 değeri ekle desek ekler ama nereye ekliyceğini bilmez
+
+associative contaniers anahtarı ister nereye ekliyceğini bilir (ikili arama ağacı sayesinde), comportör kullanarak karşılaştırma yapa yapa konum bulunur
+
+
+
+
+
+
+
+
+
+
+
+
