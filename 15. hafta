@@ -1248,7 +1248,7 @@ vector<string> svec;
 rfill(svec, 20, rname);
 print(svec);
 
-auto ip = minmax_element(svec.begin(), svec.end());
+auto ip = minmax_element(svec.begin(), svec.end()); //iterator döndürür yani öğeye erişmek için direferans etmememiz gerekir
 
 cout << "min = " << *ip.first << '\n';
 cout << "max = " << *ip.second << '\n';
@@ -1270,7 +1270,7 @@ using namespace std;
 
 vector ivec{2,4,6,8,2,20,4,3,7,9,1,101};
 
-auto iter = partition_point(ivec.begin(), ivec.end(), [](int x) {
+auto iter = partition_point(ivec.begin(), ivec.end(), [](int x) { //iterator döndürdüğü için direferans yapmamız gerekir
     return x % 2 == 0;
 });
 
@@ -1285,7 +1285,7 @@ using namespace std;
 
 vector ivec{2,4,6,8,20};
 
-cout << boolalpha << is_sorted(ivec.begin(), ivec.end()); //sıralamı diye balar
+cout << boolalpha << is_sorted(ivec.begin(), ivec.end()); //sıralamı diye bakar
 }
 
 -------------
@@ -1301,17 +1301,18 @@ cout << boolalpha << is_sorted(ivec.begin(), greater{});
 
 ------------
 
-//is_sorted_until()
+//is_sorted_until() : hangi noktaya kadar sıralı olduğunu kontrol eder. Eğer aralıktaki elemanlar sıralı ise, end iterator'ını döndürür. 
+Ancak, sıralama bozulmuşsa, sıralanmış olmayan ilk iki ardışık elemanın iterator'unu döndürür
 
 int main()
 {
 using namespace std;
 
 vector ivec{22,4,18,1,-1};
-
+                                                    //4 ile mesafesine bakar
 cout << distance(ivec.begin(), is_sorted_until(ivec.begin(), ivec.end())) << "\n";
 cout << distance(ivec.begin(), is_sorted_until(ivec.begin(), ivec.end(), greater{})) << "\n";
-
+                                                    //18 ile mesafesine bakar
 }
 
 -------------
@@ -1465,8 +1466,8 @@ bağlı liste contanierları
 çifte bağlı liste : 2 pointer bulunur, ileri ve geri harket edilebilir
 çifte bağlı liste avantajı konumunu bildiğimiz yerden isteğimiz konumdan öğe eklemenin/silmenin maaliyeti constant time
 
-!!vektörde sadece sondan ekleme/silme contant time
-!!deque sadece sondan/baştan ekleme/silme contant time
+!!vektörde sadece sondan ekleme/silme constant time
+!!deque sadece sondan/baştan ekleme/silme constant time
 
 tekli bağlı liste : 1 pointer tutulur sadece tek yönde hareket edilir
 
