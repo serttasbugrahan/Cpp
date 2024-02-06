@@ -1,0 +1,311 @@
+///////////////////////////////////////////////// 1. Ders //////////////////////////////////////////////
+
+forward_list : tekli bağlı liste sınıfı
+
+çifte bağlı listede silinecek öğenin konumunu verirsek o öğeyi destroy etmenin problemi yoktur
+
+tekli bağlı liste : bir düğümü udate etmek istiyorsak bir  önceki düğümdeki pointerı update etmemiz gerekir ancak tekli bağlı listede bu mümkün değildir
+
+bu sıkıntıyı aşmak için tekli bağlı sınıf before begin fonksiyonu bize verir
+
+before begin bize iterator verir ancak o iteratörde bir nesne yoktur
+
+!! back() ,size() ,push_back() fonksiyonu yoktur
+!! push_front(), front() vardır
+
+---------------
+
+tekli bağlı liste sınıfı => forward list,
+çifte bağlı liste => list
+
+---------------
+//mülakatlarda sorulabilir
+
+her öğeden bir tane bırakmak istiyorsak sort + unique yapılabilir
+
+---------------
+#include <forward_list>
+
+int main()
+{
+using namespace std;
+
+forward_list<int> mylist{3, 5, 6, 8, 1, 9};
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+
+mylist.push_front(123); //başa ekler
+mylist.push_front(999); //başa ekler
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+mlist.pop_front(); //baştan 1 öğe siler
+
+}
+
+--------------
+//bu kodları (nutility kullanmadığı) kendin yazmaya çalış
+
+int main()
+{
+using namespace std;
+
+forward_list<int> mylist{3, 5, 6, 8, 1, 9};
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+
+auto iter = next(mylist.begin(), 3); //8'in konumunu verdik ancak 1 sonraki konumu tuttu
+cout << *iter << "\n";
+mylist.insert_after(iter, 7777);
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+forward_list<int> mylist{3, 5, 6, 8, 1, 9};
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+
+auto iter = next(mylist.begin(), 3); //8'in konumunu verdik ancak 1 sonraki konumu tuttu
+cout << *iter << "\n";
+mylist.insert_after(iter, {-7, -8, -9});
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+forward_list<int> mylist{3, 5, 6, 8, 1, 9};
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+
+mylist.insert_after(mylist.before_begin(), {-7, -8 , -9 });
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+}
+
+
+------------
+
+int main()
+{
+using namespace std;
+
+forward_list<int> mylist{3, 5, 6, 8, 1, 9};
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+
+mylist.erase_after(mylist.before_begin(), next(mylist.begin(), 3)); //ilk 3 öğe silinir
+
+copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
+std::cout << "\n";
+}
+
+------------
+
+//mülakatlarda çok çıkan bir sorudur, aranan değeri bulma
+
+//kendin kodunu yaz
+
+//1. yol- 2 iterator kullanarak çözümü
+//2. yol- aranan değeri next'e bakarak bulabiliriz
+
+int main()
+{
+using namespace std;
+
+forward_list mylist{3,6,1,5,9,2,8,13,21 }; //template argümanının bildirmemize rağmen sitacdan dolayı hata vermez (c++17)
+
+
+int ival;
+
+std::cout << "silinecek degeri girin: ";
+
+cin >> ival;
+
+//
+}
+
+==============================================================
+
+contanier adapters / so-called conta
+------------------
+
+3 tane abstrack data type'ı implemente eden onlar için interface sunan sınıflardır
+
+bu konuyu anlayabilmek için aşağıdakilerin bilmemiz gerekir
+
+-stack : LIFO (son giren ilk çıkar)
+  push
+  pop
+  top
+  empty
+
+-queue : ilk giren ilk çıkar
+
+-priority : kuyruğa hangi sırayla girerse girsin önceiği en yüksek olan ilk çıkıyor
+
+
+---------
+
+stl'de contanierın ne olacağını template argümanı belirliyor
+
+mesela stack kullanmak istiyoruz ama contanier olarak vector komposiztion edinmek istiyorum
+fiilen o vectorde tutulsun diyebiliryouz,
+
+ancak default template argümanı da var
+
+stack ve queue default template deque
+priority default template bir vector
+
+------------
+
+#include <stack>
+
+int main()
+{
+using namespace std;
+
+stack<int> mystack; // default görünümü
+stack<int, deque<int>> mystack;
+
+stack<int, vector<int>> mystack; //şimdi vector kullanılır
+
+//bu yapı kalıtım yapısına kullanılır, 
+
+mystack.c // contanier'a erişir protected olduğu için hata alırız
+}
+
+-----------
+
+class NecStack : public std::stack<int> {
+//...
+
+publicÇ
+void foo()
+{
+c.assign
+}
+};
+
+int main()
+{
+using namespace std;
+
+stack<int, vector<int>> mystack;
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+stack<int> mystack;
+
+mystack.push(2);
+mystack.push(3);
+mystack.push(7);
+mystack.push(11);
+
+cout << "size = " << mystack.size() << "\n";
+cout << "mystack.top() = " << mystack.top() << "\n";
+mystack.top()++;
+
+while (!mystack.empty()) {
+cout << mystack.yop() << '\n';
+mystack.pop();
+}
+}
+
+---------------
+
+arka tarafta nasıl işler
+
+template <typename T, typename C = std::deque<T>>
+class Stack {
+
+public:
+void push(const T& val)
+{
+c.push_back(val);
+}
+
+T& top()
+{
+return c.back();
+}
+
+void pop()
+{
+c.pop_back();
+}
+
+bool empty()const
+{
+return c.empty();
+}
+
+auto size()const
+{
+return c.size();
+}
+
+protected:
+C c;
+};
+
+------------
+
+//contanierlarda olan init list yoktur
+
+int main()
+{
+stack<int> mystack{4, 6, 7, 8, 9 };
+}
+
+-------------
+stack bir contanier değil
+------------
+int main()
+{
+using namespace std;
+
+deque dx{3, 5, 7, 9};
+vector dvec{3, 5, 7, 9};
+
+stack<int> mystack{ dvec };
+}
+
+-------------
+//bunu kendin çöz dedi
+// ([{< parantezlerin uyumlu olup olamdığına bakıcak
+
+bool is_match(const std::string& s)
+{
+
+}
+
+int main()
+{
+is_match("(a + [2x](val){{neco}})
+}
+
+//1. saat
