@@ -1409,18 +1409,91 @@ string name{"deniz"};
 
 }
 
+--------
+
+int main()
+{
+using namespace std;
+
+multimap<double, int> mymap;
+
+cout << typeid(mymap.key_comp()).name() << '\n';
+cout << typeid(mymap.value_comp()).name() << '\n';
+
+}
+
 ====================================================
 
-52
+hash table (çırpı tablosu) : bir çırpıda bulutyordan aklına gelsin
+----------------------------
+
+anahtarla arama yaparız ancak setten farklı olarak constant time' a çekmek istiyoruz
+
+sette anahtarla arama logoritmik karmaşıklıkta, hast table'da amorties constant time'da
+
+anahtarı indexe dönüştüren bir fonksiyon var
+
+temel problem farklı anahtarları aynı index değerine hash edebilir
+
+farklı anahtarlar aynı indexe eriştiğinde ikisininde erişmesini sağlamamız lazım
+
+------
+
+vectörde o indexli öğeye eriştiğimizde eğer o anahtarla çakışan başka bir anahtar yok ise bağlı listede 1 tane öğe olucak
+
+eğer o anahtar yok ise bağlı liste boş olucak
+
+eğer anahtar 3 taneye eriştiyse bağlı listede 3 tane olucak
+
+bağlı listeleri tutan öğeler apit deniyo
+
+int, double vs bütün türler için stl sağladığı hash fonksiyonunu kullanmalıyız
+
+------
+
+hash bütün türleri için explicit specilation sağlıyor
+
+------
+//int'leri hash ediceksin mesela
+
+int main()
+{
+using namespace std;
+
+hash<int> hasher;
+
+size_t val = hasher(87562); //87562 hash değeri
+
+cout << val << "\n"; //0 ile size_t max değeri arasında hash değeri üretiyor    
 
 
+}
 
+-------
+//değerler biribiri ile alakasız çıkacaktır
 
+int main()
+{
+using namespace std;
 
+hash<int> hasher;
 
+for (int i = 8'712'651; i < 8'712'690; ++i) {
+print("hash value for {} is {}\n", i, hasher(i));
+}
+}
 
+-------
 
+int main()
+{
+using namespace std;
 
+hash<string> hasher;
 
+cout << hasher("deniz") << '\n';
+cout << hasher("denis") << '\n';
+cout << hasher("denizcan") << '\n';
+cout << hasher("denizhan") << '\n';
 
-
+-------
