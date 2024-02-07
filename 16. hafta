@@ -1497,3 +1497,175 @@ cout << hasher("denizcan") << '\n';
 cout << hasher("denizhan") << '\n';
 
 -------
+
+int main()
+{
+using namespace std;
+
+int ival = 346369723;
+
+cout << hash<int>{}(ival) << '\n';
+}
+
+---------
+
+kendi sınıfımız için hasher oluşturmak istiyoruz
+bunu yapmanın yollaru vardır
+
+//en iyi seçenek boost::hash
+
+struct DateHasher {
+std::size operator()(const Date& dt)
+{
+std::hash<int> hasher;
+
+return hasher(dt.month_day()) + hasher(dt.month()) + hasher(dt.year());
+}
+};
+
+int main()
+{
+using namespace std;
+
+Date mydate{17, 11, 2023 };
+
+cout << DateHasher{}(mydate) << '\n';
+++mydate;
+cout << DateHasher{}(mydate) << '\n';
+}
+
+---------
+
+2. bir yol
+
+template <>
+struct std::hash<Date> {
+std::size operator()(const Date& dt)
+{
+std::hash<int> hasher;
+
+return hasher(dt.month_day()) + hasher(dt.month()) + hasher(dt.year());
+}
+};
+
+int main()
+{
+using namespace std;
+
+Date mydate{17, 11, 2023 };
+
+cout << DateHasher{}(mydate) << '\n';
+++mydate;
+cout << DateHasher{}(mydate) << '\n';
+}
+
+============================================
+
+unordered_set
+
+#include <unordered_set>
+
+int main()
+{
+using namespace std;
+
+unordered_set<int, hash<int>, equal_to<int>
+
+unordered_set<Date> myset; //hata olur hash'in date açılımı yok
+
+}
+
+------------
+
+class DateHasher {
+std::size_t operator()(const Date&)const;
+
+};
+
+struct DateEqual {
+bool operator()(const Date&, const Date&)const;
+};
+
+int main()
+{
+using namespace std;
+
+unordered_set<Date, DateHasher> myset;
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+auto flash = [](const Date&) { //hasher olarak burası
+return 12u;
+};
+
+auto eq = [](const Date&, const Date&) { //karşılaştırma olarak burası kullanılır
+return true;
+};
+
+unordered_set<Date, decltype(fhash), decltype(eq)>
+}
+
+---------------
+
+üye fonksiyonlara bakıyoruz
+
+int main()
+{
+using namespace std;
+
+unordered_set<int> myset(400); //400 tane buget ile başlasın demek
+
+cout << myset.bucket_count() << "\n";
+}
+
+---------
+
+int main()
+{
+using namespace std;
+
+unordered_set<int> myset;
+
+auto x = myset.hash_function();
+
+}
+
+--------
+
+int main()
+{
+using namespace std;
+
+unordered_set<string> myset;
+
+for (int i = 0; i < 10; ++i) {
+myset.insert(rname());
+}
+
+print(myset);
+
+for (int i = 0; i < 10; ++i) {
+string name; //derleyici bunun kolayca implemente edebilir. o yüzden içerde veya dışarda yazmamızım bir önemi yoktur içerde yazınca 10m kere ctor çağrılmaz
+cout << "iism girin: ";
+cin >> name;
+if (auto iter = myset.find(name); iter != myset.end())
+{
+
+}
+}
+}
+
+
+
+
+
+
+
+
+
+
