@@ -76,7 +76,7 @@ std::cout << "\n";
 
 auto iter = next(mylist.begin(), 3); //8'in konumunu verdik ancak 1 sonraki konumu tuttu
 cout << *iter << "\n";
-mylist.insert_after(iter, {-7, -8, -9});
+mylist.insert_after(iter, {-7, -8, -9}); //8 ile 1 arasına yerleştirir
 
 copy(mylist.begin(), mylist.end(), ostream_iterator<int>{cout, " "});
 std::cout << "\n";
@@ -151,13 +151,13 @@ contanier adapters / so-called conta
 
 bu konuyu anlayabilmek için aşağıdakilerin bilmemiz gerekir
 
--stack : LIFO (son giren ilk çıkar)
+-stack : LIFO (son giren ilk çıkar), üst üste tabak koyma
   push = yığının en üstüne ekler.
   pop = en üstündeki öğeyi kaldırır ve geri döndürür.
   top = yığının en üstündeki öğeyi geri döndürür, ancak yığından kaldırmaz
   empty = yığının boş olup olmadığını kontrol eder. Eğer yığın boşsa true, değilse false döndürür.
 
--queue : ilk giren ilk çıkar
+-queue : ilk giren ilk çıkar, bilet sırası
 
 -priority : kuyruğa hangi sırayla girerse girsin önceiği en yüksek olan ilk çıkıyor
 
@@ -197,7 +197,7 @@ mystack.c // contanier'a erişir protected olduğu için hata alırız
 class NecStack : public std::stack<int> {
 //...
 
-publicÇ
+public:
 void foo()
 {
 c.assign
@@ -230,7 +230,7 @@ cout << "mystack.top() = " << mystack.top() << "\n";
 mystack.top()++;
 
 while (!mystack.empty()) {
-cout << mystack.yop() << '\n';
+cout << mystack.top() << '\n';
 mystack.pop();
 }
 }
@@ -274,7 +274,7 @@ C c;
 
 ------------
 
-//contanierlarda olan init list yoktur
+//stack, queue, priority    olan init list yoktur
 
 int main()
 {
@@ -282,8 +282,10 @@ stack<int> mystack{4, 6, 7, 8, 9 };
 }
 
 -------------
+
 stack bir contanier değil
 ------------
+
 int main()
 {
 using namespace std;
@@ -504,7 +506,7 @@ int main()
 {
 using namespace std;
 
-set<int, greater<int>> myset {3,1,4,2,8,9,7 };
+set<int, greater<int>> myset {3,1,4,2,8,9,7 }; //defaultu less'dir
 
 for (auto iter = myset.begin(); iter != myset.end(); ++iter)
 cout << *iter << '\n';
@@ -535,7 +537,7 @@ std::cout << s <<
 }
 
 ----------
-//bu kısımı tam anlamadım
+//class yapısı ile yapımı
 
 class scomp {
 public:
@@ -543,7 +545,6 @@ bool operator()(const std::string& s1, const std::string& s2)const //burdaki con
 {
 return s1.size() < s2.size() || (s1.size() == s2.size() && s1 < s2);
 }
-
 };
 
 int main()
@@ -564,8 +565,7 @@ std::cout << s <<
 }
 
 ------------
-//bu kısımı tam anlamadım
-
+//fonksiyon ile yapımı
 //aşağıdaki şekilde de olabilirdi
 
 bool mycomp(const std::string& s1, const std::string& s2)
@@ -592,7 +592,6 @@ std::cout << s <<
 }
 
 ---------------
-//bu kısımı tam anlamadım
 
 int main()
 {
@@ -635,7 +634,9 @@ b > a false olmalı
 a operator b 
 b operator b
 
-a < a false olmalı,
+a < a false olmalı, 
+
+//yukarıdakilerine dikkaet edilmeli
 
 --------------
 
@@ -699,10 +700,9 @@ int main()
 {
 using namespace std;
 
-set<string> myset;
+set<string> myset; //default olarak less parametresi alır
 //multiset<string> myset; //mesela 2. bir nalan olabilirdi
 
-vector<string> svec {"derya", "ceyhun", "nalan", "tekin"};
 
 myset.insert("ayse");
 myset.insert({"ali", "zeki", "nuri", "derya"});
@@ -743,7 +743,7 @@ cout << "size = " << myset.size() << '\n';
 //pair<set<string>::iterator, bool> p = myset.insert(name); //bunlardan herhangi birini kullanabiliriz
 auto [iter, inserted] = myset.insert(name); 
 
-if (p.second) {
+if (p.second) { //pair olduğu için first iteratör konumunu second true/false değerini tutar
 std::cout << "ekleme yapildi...\n";
 cout << "size = " << myset.size() << '\n';
 cout << *p.first << "\n";
@@ -773,8 +773,8 @@ cin >> name;
 
 cout << "size = " << myset.size() << '\n';
 
-auto iter = myset.insert("deniz").first
-mysert.insert("deniz").first-> //bu şekilde işlemler yapabiliriz
+auto iter = myset.insert("deniz").first;
+myset.insert("deniz").first-> //bu şekilde işlemler yapabiliriz
 
 ------------
 //eklemeyi aşağıdaki şekilde de yapabiliriz
@@ -924,7 +924,7 @@ multiset<int> myset{2,3,4,4,4,7,7,7,7,9};
 
 print(myset);
 
-auto n = myset.erase(myset.begin(), next(myset.begin(), 4));
+auto n = myset.erase(myset.begin(), next(myset.begin(), 4)); //ilk 4 sildi
 
 }
 
@@ -941,6 +941,484 @@ print(myset);
 auto n = erase(myset, 7); //cpp 20, 23 ile geldi
 print(myset);
 }
+
+
+//////////////////////////////////////////// 2. Ders ////////////////////////////////////////
+
+associative contanierslar tipik olarak binary search tree algoritmasını implemente ederler
+
+ikili arama ağacı anahtarla erişimi logoritmik karmaşıklığa çevirir
+
+set'in ağrılıklı uygulaması var mı? yok mu? uygulamasıdır
+
+---------------
+
+associative contanierslar'ın kafa karıştırıcı bir fonksiyonu
+
+insert
+------
+konum ister normalde istememesi lazım ancak hint insert denilen bu yapı ile konum istenerek
+daha iyi performans sağlanır, konum dğru ise gereksiz yere çalışmıycak yanlış ise bildiği konuma koyucak
+
+int main()
+{
+using namespace std;
+
+vector<string> svec {"eda", "naz", "tan" };
+set<string> myset{"ayca", "berna", "derya", "meliha", "saliha" };
+
+myset.insert(myset.begin(), "aliye"); //hint insert
+
+copy(svec.begin(), svec.end(), inserter(myset, myset.begin()));
+
+myset.emplace_hint(myset.begin(), 10, 'A'); //10 ve A argümanlarını perfect forwarding ederek nesneyi oluştur
+}
+
+---------------
+
+modern cpp öncesi çok sorulan bir mülakat sorusu
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+rfill(myset, 10, rname);
+print(myset);
+
+cout << "eski ve yeni ismi giriniz: ";
+string old_name, new_name;
+cin >> old_name >> new_name;
+
+//sette mesela ali gitsin, yerine veli gelsin
+//bu işlemi yaptır
+
+//find ile bulup onu silip insert fonksiyonu ile yeni anahtar ekliyceksiniz
+
+if (auto iter = myset.find(old_name); iter != myset.end()) { //myset end yazdırmayı dene son konum mu sondan bir sonra mı kontrol et
+myset.erase(iter);
+myset.insert(new_name);
+std::cout << "anahtar degistirildi\n";
+print(myset);
+}
+cout << "bulunamadi\n";
+}
+
+-------------------
+
+yukarıdakinin yeni interface'i
+
+//extrack: düğümün çıkarılması işlemini yapar
+  
+int main()
+{
+using namespace std;
+
+set<string> myset;
+rfill(myset, 10, rname);
+print(myset);
+
+cout << "size = " << myset.size() << '\n';
+cout << "eski ve yeni ismi giriniz: ";
+string old_name, new_name;
+cin >> old_name >> new_name;
+
+auto iter = myset.find(old_name);
+auto handle = myset.extract(iter);
+cout << "size = " << myset.size() << '\n';
+(void)getchar();
+
+if (handle.empty()) //handle boş olup olmadığına bu şekilde bakabiliria
+
+handle.value() = new_name; //fonksyionun geri dönüş değerinin l value olduğu görülür, yani düğümdeki datayı döndürür
+myset.insert(move(handle));
+
+}
+
+
+--------------
+
+int main()
+{
+using namespace std;
+
+set<string> myset;
+rfill(myset, 10, rname);
+print(myset);
+
+cout << "size = " << myset.size() << '\n';
+cout << "eski ve yeni ismi giriniz: ";
+string old_name, new_name;
+cin >> old_name >> new_name;
+
+if (auto iter = myset.find(old_name); iter != myset.end()) {
+auto handle = myset.extract(iter);
+cout << "size = " << myset.size() << '\n';
+(void)getchar();
+handle.value() = new_name;
+myset.insert(move(handle));
+cout << "size = " << myset.size() << '\n'
+print(myset);
+}
+else {
+std::cout << "bulunamadi\n";  
+}
+}
+
+----------
+
+int main()
+{
+using namespace std;
+rfill(myset, 20, Irand{0, 5});
+print(myset);
+
+auto iter = myset.lower_bound(3);
+
+auto [iter.first, iter_last] = myset.equal_range(3);
+}
+
+--------------
+
+unavalibel context'te lambda kullanılabiliyordu
+
+int main()
+{
+using namespace std;
+
+auto fcomp = [](int x, int y) {
+return x % 100 < y % 100;
+};
+
+sizeof(decltype([]{})) //bu bir hata değil
+}
+
+
+----------
+//yukarıdaki yapı sayesinde aşşağıdaki kullanılabilir
+
+int main()
+{
+using namespace std;
+
+set<int, decltype([](int x, int y) {
+return x % 100 < y % 100;
+}) > myset;
+}
+
+====================================================
+
+MAP
+----
+
+sete insert ederken insert edilcek öğeyi geçeriz map'e pair geçmemiz lazım
+
+first -> key
+second -> value
+
+map ve multimap seçimini doğru anlamak gerekir
+
+mesela ingilizce türkçe sözlük için multimap kullanırız
+
+-----------
+1. template parametre : anahtarın türü
+2. template parametre : o anahtara karşılık gelicek value türü
+3. template parametre : karşılaştırma kriteri less key açılmını alır
+4. template parametre : allocator'ın key const key açılımı
+
+----------
+
+
+int main()
+{
+using namespace std;
+
+map<int, string> mymap; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
+
+for (int i = 0; i < 10; ++i) {
+mx.insert(pair{rand(), rname() });
+}
+
+for (const auto& p : mx) {
+print("{:<12} {}\n", p.first, p.second);x
+}
+}
+
+------------
+//mülakatlarda sorulur
+
+int main()
+{
+using namespace std;
+
+map<int, string> mymap; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
+
+for (int i = 0; i < 10; ++i) {
+mx.insert(pair{rand(), rname() });
+}
+
+auto iter = mx.begin();
+
+iter->fisrt = "furkanmert"; //hata, key değiştirilemez
+const_cast<string&>(iter->fisrt) = "furkanmert"; //legal ancak ub
+iter->second = 873443;
+
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+map<string, int> mx{ {"deniz", 567}, {"ayca", 812}, {"yilmaz", 313}, {"deniz", 9999 }};
+
+cout << "mx.size() = " << mx.size() << '\n';
+
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+map<string, int> mx{ {"deniz", 567}, {"ayca", 812}, {"yilmaz", 313}, {"bilge", 567 }}; // anahtardan birden fazla olabilir
+
+cout << "mx.size() = " << mx.size() << '\n';
+
+}
+
+----------
+
+mape öğe eklemenin yolları :
+
+mape pair'ler eklenecek
+
+int main()
+{
+using namespace std;
+
+map<string, int> mx;
+
+pair<string, int> p1{"tayfun", 767};
+
+mx.insert(p1);
+mx.insert(pair{"alican", 871});
+mx.insert(pair{"veli", 219});
+mx.insert(make_pair("deniz", 761));
+mx.emplace("damla", 732);
+
+//dolaşırken aşağıdakileri kullanabiliriz
+
+for (auto iter = mx.begin(); iter != mx.end(); ++iter) {
+print("{:<16} {}\n", iter->first, iter->second);
+}
+
+//... forrange
+
+for (const auto& p : mx) {
+print("{:<16} {}\n", p.first, p.second);
+}
+}
+
+//... structure binding C++ 17, en çok bu kuallnılır
+
+for (const auto& [name, grade] : mx) {
+cout << name << " " << grade << '\n';
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+map<string, string> mymap;
+
+for (int i = 0; i < 1000; ++i) {
+mymap.emplace(rname(), rtown());
+}
+
+print(mymap, "\n");
+}
+
+------------
+
+insert ile emplace farkı:
+insert benden pair ister
+emplace pair istemez
+
+--------------
+
+fonksiyonları :
+-------------
+
+int main()
+{
+using namespace std;
+
+map<string, string> mymap;
+
+for (int i = 0; i < 1000; ++i) {
+mymap.emplace(rname(), rtown());
+
+auto handle = mymap.extract("deniz");
+
+handle.key //keye erişir
+handle.mapped //mape erişir
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+map<int, string>< mymap;
+
+for (int i = 0; i < 10; ++i) {
+mymap.emplace(Irand{0,100}(), rname());
+}
+print(mymap, "\n");
+
+int key;
+
+std::cout << "yasi girin: ";
+cin >> key;
+
+mymap[key] = "sadullah";
+//mymap.at(key) = "sadullah"; //anahtar yok ise exception throw eder
+
+print(mymap, "\n");
+}
+
+-----------
+
+yukarıki yapının kullanıldığı idiyomatik bir yapı vardır
+
+mülakatların fovori sorusudur
+
+int main()
+{
+vector<string> svec;
+
+rfill(svec, 10000, rname);
+
+//her bir isimden kaç tane olduğunu bulmammız gerekiror ve bu bilgiyi bir yerde tutucaz
+
+map<string, int> cmap;
+
+for (const auto& name : svec) {
+++cmap[name];
+}
+
+std::ofstream ofs{"out.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturlamadi\n";
+exit(EXIT_FAILURE);
+}
+
+for (const auto& [name, count] : cmap) {
+print(ofs, "{:<18} {}", name, count);
+}
+}
+
+------------
+
+klasik bir mülakat sorusu daha vardır
+
+//değerlerin sırasına göre yazmak istiyoruz
+
+//vectöre taşıyarak yapabliriz
+
+int main()
+{
+vector<string> svec;
+
+rfill(svec, 10000, rname);
+
+//her bir isimden kaç tane olduğunu bulmammız gerekiror ve bu bilgiyi bir yerde tutucaz
+
+map<string, int> cmap;
+
+for (const auto& name : svec) {
+++cmap[name];
+}
+
+vector<pair<string, int>> myvec{cmap.begin(), cmap.end()};
+
+sort(myvec.begin(), myvec.end(), [](const auto &p1, const auto& p2) {
+return p1.second > p2.second;
+});
+
+
+std::ofstream ofs{"out.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturlamadi\n";
+exit(EXIT_FAILURE);
+}
+
+for (const auto& [name, count] : myvec) {
+print(ofs, "{:<18} {}", name, count);
+}
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+map<string,int> mymap;
+
+for (int i = 0; i < 10; ++i) {
+mymap.emplace(Irand{0, 70}(), rname());
+}
+
+print(mymap, "\n");
+
+string old_key, new_key;
+
+cout << "eski ve yeni anahtarları girin: ";
+cin >> old_key >> new_key;
+
+auto handle = mymap.extract(old_key)
+if (handle) {
+handle.key() = new_key;
+cout << "anahtar degistirildi\n";
+print(mymap, "\n");
+
+};
+}
+
+-------------------
+
+ödev:
+
+int main()
+{
+using namespace std;
+
+multimap<string, int> mymap;
+
+string name{"deniz"};
+
+//deniz key'leri icin value'lar birer arttırılıcak
+
+}
+
+====================================================
+
+52
+
+
+
+
+
+
+
 
 
 
