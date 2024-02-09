@@ -1133,7 +1133,7 @@ int main()
 {
 using namespace std;
 
-map<int, string> mymap; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
+map<int, string> mx; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
 
 for (int i = 0; i < 10; ++i) {
 mx.insert(pair{rand(), rname() });
@@ -1151,7 +1151,7 @@ int main()
 {
 using namespace std;
 
-map<int, string> mymap; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
+map<int, string> mx; //int değerlerinin küçükten büyüğe sıralanmasıyla olur
 
 for (int i = 0; i < 10; ++i) {
 mx.insert(pair{rand(), rname() });
@@ -1222,7 +1222,7 @@ print("{:<16} {}\n", p.first, p.second);
 }
 }
 
-//... structure binding C++ 17, en çok bu kuallnılır
+//... structure binding C++ 17, en çok bu kullanılır
 
 for (const auto& [name, grade] : mx) {
 cout << name << " " << grade << '\n';
@@ -1265,8 +1265,8 @@ mymap.emplace(rname(), rtown());
 
 auto handle = mymap.extract("deniz");
 
-handle.key //keye erişir
-handle.mapped //mape erişir
+handle.key; //keye erişir
+handle.mapped; //mape erişir
 
 }
 
@@ -1607,7 +1607,7 @@ auto eq = [](const Date&, const Date&) { //karşılaştırma olarak burası kull
 return true;
 };
 
-unordered_set<Date, decltype(fhash), decltype(eq)>
+unordered_set<Date, decltype(flash), decltype(eq)>
 }
 
 ---------------
@@ -1650,7 +1650,7 @@ myset.insert(rname());
 print(myset);
 
 for (int i = 0; i < 10; ++i) {
-string name; //derleyici bunun kolayca implemente edebilir. o yüzden içerde veya dışarda yazmamızım bir önemi yoktur içerde yazınca 10m kere ctor çağrılmaz
+string name; //derleyici bunun kolayca implemente edebilir. o yüzden içerde veya dışarda yazmamızım bir önemi yoktur içerde yazınca 10 kere ctor çağrılmaz
 cout << "iism girin: ";
 cin >> name;
 if (auto iter = myset.find(name); iter != myset.end())
@@ -1659,6 +1659,30 @@ if (auto iter = myset.find(name); iter != myset.end())
 }
 }
 }
+
+////////////////////////////////////////////// 3. Ders /////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
