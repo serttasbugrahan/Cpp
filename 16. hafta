@@ -1662,32 +1662,837 @@ if (auto iter = myset.find(name); iter != myset.end())
 
 ////////////////////////////////////////////// 3. Ders /////////////////////////////////////////
 
+unordered_set yapıları sıralı değildir çünkü bu yapıların arkasında hash table veri yapısı vardır
+
+hash_table : değerle erişmenin en kısa yoku, vektörel bir veri yapısı var arkada ve anahtarlarımız
+bu anahtarlarımız bir hash fonksiyona ile indexe dönüşütürüyoruz
+veri yapısı ile bu indexe erişim sağlıyoruz.
+
+iyi bir hash fonksiyonu farklı anahtaeları farklı değerlere hash eder. bu çakışmayı azaltır
+
+4 tane ayrı contanier vardır
+
+bucket : her bir veri yapısına denir
+
+yeteri kadar yüklendiği zaman bucket sayısı artıcaktır
+
+--------------------
+
+eğer default template argümanını seçersek o zaman equal to kullanılıyor o da == karşılaştırması yapıyor
+başka bir karşılaştırma yapmak istiyorsak 3. parametre başka bir parametre gelicek
+
+--------------------
+kendi hasherimizi yapmak
+
+struct Point {
+
+Point() = default;
+Point(double, double, double);
+double mx{}, my{}, mz{};
+};
+
+int main()
+{
+using namespace std;
+
+unordered_set<double> myset;
+
+myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+
+}
+
+------------
+
+//yukarıdakin kodun düzeltilmesi
+
+struct Point {
+
+Point() = default;
+Point(double, double, double);
+bool operator == (const Point&)const; //== kısmı
+double mx{}, my{}, mz{};
+};
+
+template<> //hash kısmı
+std::hash<Point> {
+struct std::hash<Point> {
+std::size_t operator()(const Point&)const  
+{
+std::hash<double> hasher;
+return 
+hasher(pt.mx) + hasher(pt.my) + hasher(pt.mz);  
+
+}
+};
+
+
+int main()
+{
+using namespace std;
+
+unordered_set<Point> myset;
+
+myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+
+}
+
+-------------------
+
+yukarıdaki gibi bir specialition oluşturmak istemiyorsak kendi türümüzü kendimiz oluştururuz
+
+struct Point {
+Point() = default;
+Point(double, double, double);
+bool operator == (const Point&)const; //== kısmı
+double mx{}, my{}, mz{};
+};
+
+class PointerHasher {
+std::size_t operator()(const Point&)const  
+{
+std::hash<double> hasher;
+return hasher(pt.mx) + hasher(pt.my) + hasher(pt.mz);  
+}
+};
+
+
+int main()
+{
+using namespace std;
+
+unordered_set<Point, PointHasher> myset;
+
+myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+
+}
+
+------------
+
+//eşitlikte ayrı bir tür olabilir
+
+struct Point {
+Point() = default;
+Point(double, double, double);
+bool operator == (const Point&)const; //== kısmı
+double mx{}, my{}, mz{};
+};
+
+class PointerHasher {
+std::size_t operator()(const Point&)const  
+{
+std::hash<double> hasher;
+return hasher(pt.mx) + hasher(pt.my) + hasher(pt.mz);  
+}
+};
+
+struct PointEqual {
+public:
+bool operator()(const Point &, const Point&)const;
+};
+
+int main()
+{
+using namespace std;
+
+unordered_set<Point, PointHasher, PointEqual> myset; //bu sefer 3. parametreye PointEqual geçilir
+
+myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+
+}
+
+------------------
+
+boost'un hash val fonksiyonunu kullanılması
+
+struct Point {
+Point() = default;
+Point(double, double, double);
+bool operator == (const Point&)const; //== kısmı
+double mx{}, my{}, mz{};
+};
+
+class PointerHasher {
+std::size_t operator()(const Point&)const  
+{
+return hash_val(pt.mx, pt.my, pt.mz);
+}
+};
+
+struct PointEqual {
+public:
+bool operator()(const Point &, const Point&)const;
+};
+
+int main()
+{
+using namespace std;
+
+unordered_set<Point, PointHasher, PointEqual> myset; //bu sefer 3. parametreye PointEqual geçilir
+
+myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+
+}
+
+-----------------
+//belli bir sıraya göre yazmaz
+  
+int main()
+{
+using namespace std;
+
+unordered_set<string> myset;
+
+for (int i = 0; i < 100; ++i)
+{
+myset.insert(rname() + ' ' + rfname())
+}
+
+
+for (const auto& name : myset) {
+ofs << name << '\n'
+}
+
+cout << "aranacak ismi girin: ";
+string name;
+cin >> name;
+
+}
+
+---------------
+aşağıdaki kodlar çok kötü bir kod
+initialation asignment split'den uzak dur
+
+string str;
+
+str = 
+
+////
+
+T tx;
+
+tx =
+
+////
+
+const T tx;
+
+tx = 
+
+/// aşağıdaki şekilde olur
+
+const T tx = 
+--------------
+
+//hoca bir tablo oluşturuyor aşağıda, fonksyionlar daha iyi anlaşılcak
+
+int main()
+{
+using namespace std;
+
+unordered_set<string> myset;
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+//myset.max_load_factor(0.82); //max load değiştirme yeri
+
+std::ofstream ofs{ "out.txt" };
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+ofs << "bucket count = " << myset.bucket_count() << '\n';
+ofs << "size          " << myset.size() << '\n';
+ofs << "load factor = " << static_cast<float>(myset.size() / myset.bucket_count() << '\n';
+ofs << "load factor = " << myset.load_factor() << '\n'; //load factörü veren fonksiyon
+ofs << "max load factor = " << myset.max_load_factor() << '\n'; //degistirebiliceğimiz parametrelerden biridir, düşük olursa daha çabuk rehase yapılır
+
+//bucket'lar dolaşılabiliyor
+
+for (size_t i{}; i < myset.bucket_count(); ++i) {
+print(ofs,"{:<6} {:<4}  ", i, myset.bucket_size(i));
+for (auto iter = myset.begin(i)); iter != myset.end(i);    //her bir buckettaki öğeleri yazdırıyoruz
+print(ofs, "{:18}", *iter);
+}
+ofs << '\n';
+}
+
+// myset.rehash() // bucket rehash eder
+// myset.reserve() // öğe sayısı bu noktaya gelince rehash eder
+
+------------------------
+
+int main()
+{
+using namespace std;
+
+unordered_set<string> myset;
+
+for (int i = 0; i < 100; ++i) {
+myset.insert(rname());
+}
+
+std::cout << "ismi girin: ";
+string name{};
+cin >> name;
+
+if (myset.contains(name)) {
+std::cout <<"bucket: " << myset.bucket(name) << "\n";
+}
+else {
+std::cout << "bulunamadi\n";
+}
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+
+vector <int> ivec;
+rfill(ivec, 100'000, Irand{0, 100});
+
+unordered_map<int, int> cmap;
+
+for (const auto val : ivec)
+++cmap[val];
+vector<pair<int, int>> myvec{cmap.begin(), cmap.end() };
+sort(myvec.begin(), myvec.end());
+
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+for (const auto [value, count] : cmap) {
+print("{:<8}{}\n", value, count); 
+}
+
+}
+
+===================================================
+
+stl'in en önemli ve en zor başlık dosyalarından birini bakıyoruz
+
+functional:
+-----------
+
+function adaptor (fonksiyon uyumlandırıcısı)
+----------------
+
+bizden collable alıp collable verir
+!!pc'de fotosu var
+
+bir çok function kaldırıldı cppref'den kontrol et
+
+kalan fonksiyonlar:
+
+reference_wrapper
+
+std::bind
+mem_fn
+not_fn
+std::invoke
+
+-----------
+
+int main()
+{
+int x = 10;
+int y = 45;
+
+int& r = x; //r ref. x' e bağlandır
+
+r = y; //r ref. y' e bağlanmadı, x = y demektir
+}
+
+-----------
+
+int main()
+{
+int* p[20];
+
+std::vector<int *> myvec;
+}
+
+---------
+
+int main()
+{ 
+int& p[20]; //referans olan dizi olamaz
+
+std::vector<int*> myvec; //legal
+
+std::vector<int&> myvec; //illegal
+
+}
+
+---------
+
+//referans gibi olan bir sınıf oluştursaydım
+
+class ReferenceWrapper {
+  
+};
+
+int main()
+{
+std::vector<ReferenceWrapper> myvec;
+}
+
+----------
+//bu kımı tam anlamadım
+
+template <typename T>
+class ReferenceWrapper {
+public:
+ReferenceWrapper(T &t) : mp{ &t } {};
+
+ReferenceWrapper& operator=(T& t)
+{
+mp = &t;
+}
+
+operator T&()
+{
+return *mp;  
+}
+
+T& get() //örtülü olarak kullanılmadığı yerde bu kullanılır
+{
+return *mp;
+}
+
+private:
+T *mp;
+};
+
+template <typename T>
+void func(T x)
+{
+
+}
+
+template <typename T>
+ReferenceWrapper<T> Ref(T& x) //bunun sayesinde sadece ref yazmak yeterli olacak
+{
+return ReferenceWrapper<T>{x};
+}
+
+int main()
+{
+int x = 12;
+
+ReferenceWrapper<int> r(x);
+
+cout << r;  
+
+//bu kodun legal olmasının sebebi örtülü dönüşüm yapılması
+
+string str(100'000, 'a');
+func(str);
+func<string&> (str) //böyle olmasını nasıl sağlarız 
+func(ReferenceWrapper<string>(str)); 
+
+int x = 79;
+
+ReferenceWrapper r = x; //böyle bir kod yazılabilir mi? cidat ile evet
+
+s
+}
+
+Böyle bir sınıfın avantajları
+-contanierlarda tutulur
+-reindeble yaparım
+
+----------------
+//ReferenceWrapper ile örnek veriyoruz
+
+#include <fuunctional>
+
+template <typename T>
+void foo(T x) //parametre ref değil o yüzden 20 yazar
+{
+x += 100;
+}
+
+int main()
+{
+int ival = 20;
+
+int& r = ival;
+
+foo(r);
+
+cout << "ival = " << ival << '\n';
+}
+
+-----------
+
+template <typename T>
+void foo(T x) 
+x += 100;
+}
+
+int main()
+{
+int ival = 20;
+
+int& r = ival;
+
+foo<int &>(r);
+foo(ReferenceWrapper<int>{ival}); //bu şekilde de yazar
+foo(ReferenceWrapper{ival}); //cidat gerçekleşir
+foo(ref(ival)); //fabrika fonksiyonunu çağırabiliriz  
+
+cout << "ival = " << ival << '\n';
+}
+
+------------
+
+mülakatlarda çok sorulur
+
+//ReferenceWrapper kullanıldığı tipik bir yerdir
+
+struct BigPred {
+bool operator()(int)
+{
+
+return true;
+}
+
+char buf[2 * 4096]{};
+};
 
 
 
+int main()
+{
+using namespace std;
+
+BigPred pred;
+
+vector<int> ivec(100'000);
+vector<int> destvec;
+
+copy_if(ivec.begin(), ivec.end(), back_inserter(destvec), pred); //bellek bloğu kopyalanır 
+
+//code review yapmamız isteniyor
+
+copy_if(ivec.begin(), ivec.end(), back_inserter(destvec), ref(pred)); //yüksek bellek bloğunun kopyalanmsı engellenmiş oldu
 
 
+}
+
+--------------------
+#include <algorithm>
 
 
+int main()
+{
+using namespace std;
+
+vector<int> ivec(100);
+
+generate(ivec.begin(), ivec.end(), [] { return rand() * 2; }); ); //vectorun range'ini foo geri dönüşü ile doldurdu
 
 
+}
 
+----------------
 
+int main()
+{
+using namespace std;
+mt19937 eng;
 
+vector<unsigned int> uvec(10'000);
+std::cout << "sizeof(eng) = " << sizeof(eng) << "\n";
 
+generate(uvec.begin(), uvec.end(), ref(eng)); //kopyalamdan kurtulmuş olduk
 
+}
 
+--------------
+//CTAD
 
+int main()
+{
+using namespace std;
 
+string name{ "necati ergin" };
 
+std::list<string> mylist{"kutay", "tarik", "cemal", "melike", "damla", "tamer", "burak"};
+print(mylist);
 
+vector<string> myvec{mylist.begin(), mylist.end() };
 
+vector<reference_wrapper<string>> myvec{ mylist.begin(), mylist.end() };
 
+sort(myvec.begin(), myvec.end(), [](auto r1, auto r2) {
+return r1.get() < r2.get();
+});
 
+for (const auto & s : myvec) {
+cout << s.get() << " "; 
+}
 
+print(mylist)
+}
 
+----------------
 
+int main()
+{
+using namespace std;
 
+string name{ "necati ergin" };
+
+std::list<string> mylist{"kutay", "tarik", "cemal", "melike", "damla", "tamer", "burak"};
+print(mylist);
+vector<reference_wrapper<string>> myvec{ mylist.begin(), mylist.end() };
+
+mylist.sort();
+
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+int x = 345, y = 469;
+
+pair p(x, y);
+
+p.first *= 10;
+p.second *= 10;
+
+cout << "x = " << x << '\n'; //345
+cout << "y = " << y << '\n'; // 469
+
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+int x = 345, y = 469;
+
+pair<int&, int&> p(x, y); //bu yazım zorluğunu ortadan kaldrımak için aşağıdaki kullanılır
+
+p.first *= 10;
+p.second *= 10;
+
+cout << "x = " << x << '\n'; //3450
+cout << "y = " << y << '\n'; //4690
+
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+int x = 345, y = 469;
+
+pair p(ref(x), ref(y));
+
+p.first *= 10;
+p.second *= 10;
+
+cout << "x = " << x << '\n'; //3450
+cout << "y = " << y << '\n'; //4690
+
+}
+
+---------------
+
+referance wrapper r value bağlanamaz
+
+int foo();
+
+int main()
+{
+using namespace std;
+
+referance_wrapper<int> x = foo(); //r value olduğu iiçn sentax hatası
+}
+
+--------------
+
+//referance_wrapper incomplete içinde kullanılabilir
+
+class Myclass;
+
+void func(std::referance_wrapper<Myclass>);
+
+int main()
+{
+using namespace std;
+
+referance_wrapper<int> x = foo();
+}
+
+--------------
+
+// bazı yerlerde tür dönüştürme otomatik devreye girer
+
+int main()
+{
+using namespace std;
+
+int x = 10;
+int y = 45;
+
+referance_wrapper r{ x };
+
+++r;
+r = y;
+++r;
+
+cout << "x = " << x <<"\n";
+cout << "y = " << y <<"\n";
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 10;
+int y = 45;
+
+referance_wrapper r{ x };
+
+r = y;
+
+r.get() = y; //
+
+cout << "x = " << x << '\n';
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 456;
+
+auto r = cref(x); //const açılımı
+
+r.get() = 6787;
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 456;
+
+referance_wrapper<int> r = x; //ikisi aynı anlamda
+auto r2 = ref(x);
+
+referance_wrapper<const int> r3 = x; //ikisi aynı anlamda
+auto r2 = cref(x);
+
+}
+
+==================================================
+
+//zor bir konu
+
+std::bind
+---------
+
+--------------
+
+int foo(int x, int y, int z)
+{
+std::print("x = {} y = {} z = {}\n", x, y, z);
+}
+
+int main()
+{
+using namespace std;
+
+auto f = bind(foo, 10, 20, 30);
+
+f(); //f'i o şekilde çağırmayı sağlar
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+using namespace placeholders;
+
+auto f = bind(foo, 10, 20, _1);
+
+f(99); 
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+using namespace placeholders;
+
+auto f = bind(foo, 10, _1, 20);
+
+f(99); 
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+using namespace placeholders;
+
+auto f = bind(foo, _1, _1, _1);
+
+f(99); 
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+using namespace placeholders;
+
+auto f = bind(foo, _1, 77, _2);
+
+f(1, 5); 
+}
+
+------------
+
+int main()
+{
+using namespace std;
+using namespace placeholders;
+
+auto f = bind(foo, _3, _1, _2);
+
+f(10, 20, 30); 
+}
 
 
 
