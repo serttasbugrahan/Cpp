@@ -1678,8 +1678,8 @@ yeteri kadar yüklendiği zaman bucket sayısı artıcaktır
 
 --------------------
 
-eğer default template argümanını seçersek o zaman equal to kullanılıyor o da == karşılaştırması yapıyor
-başka bir karşılaştırma yapmak istiyorsak 3. parametre başka bir parametre gelicek
+eğer default template argümanını seçersek o zaman equal to kullanılıyor o da '==' karşılaştırması yapıyor
+başka bir karşılaştırma yapmak istiyorsak 3. parametre başka bir parametre gelicekç.
 
 --------------------
 kendi hasherimizi yapmak
@@ -1732,7 +1732,7 @@ using namespace std;
 
 unordered_set<Point> myset;
 
-myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+myset.insert(Point{2.3, 5.6, 78.9}); 
 
 }
 
@@ -1762,7 +1762,7 @@ using namespace std;
 
 unordered_set<Point, PointHasher> myset;
 
-myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+myset.insert(Point{2.3, 5.6, 78.9}); 
 
 }
 
@@ -1796,7 +1796,7 @@ using namespace std;
 
 unordered_set<Point, PointHasher, PointEqual> myset; //bu sefer 3. parametreye PointEqual geçilir
 
-myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+myset.insert(Point{2.3, 5.6, 78.9}); 
 
 }
 
@@ -1829,7 +1829,7 @@ using namespace std;
 
 unordered_set<Point, PointHasher, PointEqual> myset; //bu sefer 3. parametreye PointEqual geçilir
 
-myset.insert(Point{2.3, 5.6, 78.9}); //sentaxx hatası olur hasher yok equal to ya cevap vermiyor
+myset.insert(Point{2.3, 5.6, 78.9}); 
 
 }
 
@@ -2046,6 +2046,8 @@ std::vector<ReferenceWrapper> myvec;
 
 ----------
 //bu kımı tam anlamadım
+//nesneleri refernasmış gibi bir sınıf oluştursaydım
+//refernas gibi olan nesneler tutuyoruz
 
 template <typename T>
 class ReferenceWrapper {
@@ -2100,9 +2102,9 @@ func(ReferenceWrapper<string>(str));
 
 int x = 79;
 
-ReferenceWrapper r = x; //böyle bir kod yazılabilir mi? cidat ile evet
+ReferenceWrapper r = x; //böyle bir kod yazılabilir mi? CTAD ile evet
 
-s
+
 }
 
 Böyle bir sınıfın avantajları
@@ -2191,7 +2193,6 @@ copy_if(ivec.begin(), ivec.end(), back_inserter(destvec), ref(pred)); //yüksek 
 --------------------
 #include <algorithm>
 
-
 int main()
 {
 using namespace std;
@@ -2199,8 +2200,6 @@ using namespace std;
 vector<int> ivec(100);
 
 generate(ivec.begin(), ivec.end(), [] { return rand() * 2; }); ); //vectorun range'ini foo geri dönüşü ile doldurdu
-
-
 }
 
 ----------------
@@ -2229,7 +2228,7 @@ string name{ "necati ergin" };
 std::list<string> mylist{"kutay", "tarik", "cemal", "melike", "damla", "tamer", "burak"};
 print(mylist);
 
-vector<string> myvec{mylist.begin(), mylist.end() };
+vector<string> myvec{mylist.begin(), mylist.end()};
 
 vector<reference_wrapper<string>> myvec{ mylist.begin(), mylist.end() };
 
@@ -2353,11 +2352,11 @@ using namespace std;
 int x = 10;
 int y = 45;
 
-referance_wrapper r{ x };
+reference_wrapper r{ x };
 
 ++r;
-r = y;
-++r;
+r = y; // x = y demek değildir, atama reindendıble
+++r; //r ve y nin adreslerini tutuyor r artarsa x ve y artar 
 
 cout << "x = " << x <<"\n";
 cout << "y = " << y <<"\n";
@@ -2403,10 +2402,10 @@ using namespace std;
 
 int x = 456;
 
-referance_wrapper<int> r = x; //ikisi aynı anlamda
+reference_wrapper<int> r = x; //ikisi aynı anlamda
 auto r2 = ref(x);
 
-referance_wrapper<const int> r3 = x; //ikisi aynı anlamda
+reference_wrapper<const int> r3 = x; //ikisi aynı anlamda
 auto r2 = cref(x);
 
 }
