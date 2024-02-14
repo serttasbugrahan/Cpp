@@ -65,7 +65,7 @@ class Nec {
 public:
 void func()const 
 {
-std::cout << "Nec::foo()\n";
+std::cout << "Nec::func()\n";
 }
 
 void bar(int a)const 
@@ -78,11 +78,11 @@ std::cout << "Nec::bar(int a) a=  "<< a '\n';
 
 int main()
 {
-using namespace std::placeholders;
+using namespace placeholders;
 
 Nec mynec;
 
-auto f1 = std::bind(&Nec::foo, _1);
+auto f1 = std::bind(&Nec::func, _1);
 
 f1(mynec);
 auto f2 = std::bind(&Nec::bar, _1, 89);
@@ -141,6 +141,7 @@ cout << a << " " << b << " " << c << "\n";
 
 --------------
 //biraz farklı örnekleri inceliyoruz
+
 #include <algorihm>
 #include <csdlib>
 
@@ -194,7 +195,7 @@ cout << "ival = " << ival << '\n';
 //std::function : aldığı argümanlar ile sarmaladığı collable çağırır 
 yani function pointer gibi davranır
 
-std::function nedne kullanılılır, function pointer fonksiyon tutar, std::function herhngi bir collable tutabilir
+std::function neden kullanılır, function pointer fonksiyon tutar, std::function herhngi bir collable tutabilir
 
 
 int foo(int x)
@@ -349,8 +350,6 @@ int main()
 using namespace std;
 
 function f1 = foo();
-
-function f1 = foo();
 //function<int(int)> f1 = foo(); //aynı anlamda
 function f2 = bar();
 //function<double(double)> f2 = bar(); //aynı anlamda
@@ -419,7 +418,7 @@ std::function en tipik kullanım seneryoları
 
 call back : bir fonksiyonun bir fonksiyona çağırmak
 
-void foo(int (*fp)(int)) //bu yapıda sadece fonksyion adresi gönderebiliriz
+void foo(int (*fp)(int)) //bu yapıda sadece fonksiyon adresi gönderebiliriz
 {
 auto val = fp(12); 
 }
