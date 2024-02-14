@@ -2009,11 +2009,202 @@ return x + 5;
 
 //Hangi üye fonksiyonun çağrılacağınıda fonksiyonu çağıran kodun belirlemesini istiyoruz
 
-void gf(Nec& nec, )
+void gf(Nec& nec, int (Nec::*fp)(int))
 {
-nec.foo(1)
+(nec.*fp)(21);
 }
 
+int main()
+{
+Nec mynec;
+
+gf(mynec, &Nec::foo);
+gf(mynec, &Nec::bar);
+
+}
+
+-----------
+
+class Nec {
+public:
+int foo(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+int bar(int x);
+{
+std::cout << "Nec::b(int x) x = " << x << "\n";
+return x *x;
+}
+
+int baz(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+};
+
+//Hangi üye fonksiyonun çağrılacağınıda fonksiyonu çağıran kodun belirlemesini istiyoruz
+
+void gf(std::vector<Nec> nvec, int (Nec::*fp)(int))
+{
+for (auto nec : nvec) {}
+auto val = (nec.*fp)(12);
+}
+
+int main()
+{
+Nec mynec;
+
+gf(mynec, &Nec::bar);
+
+}
+
+-------------
+
+class Nec {
+public:
+int foo(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+int bar(int x);
+{
+std::cout << "Nec::b(int x) x = " << x << "\n";
+return x *x;
+}
+
+int baz(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+};
+
+int main()
+{
+int (Nec::*fp)(int) = &Nec::bar;
+
+Nec* pnec = new Nec;
+
+((*pnec).*fp)(345);
+}
+
+--------------
+2. bir operator daha var
+
+->*
+
+class Nec {
+public:
+int foo(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+int bar(int x);
+{
+std::cout << "Nec::b(int x) x = " << x << "\n";
+return x *x;
+}
+
+int baz(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+};
+
+int main()
+{
+int (Nec::*fp)(int) = &Nec::bar;
+
+Nec* pnec = new Nec;
+
+//((*pnec).*fp)(345);
+(pnec->*fp)(4657);
+
+}
+
+------------------
+
+elimizide sınıf nesnesinin kendisi var ise .*
+elimizide sınıf nesnesinin kendisi değil adresi var ise ->*
+
+--------------------
+
+bunların karmaşıklığından kurtulmak için std::invoke vardır
+
+class Nec {
+public:
+int foo(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+int bar(int x);
+{
+std::cout << "Nec::b(int x) x = " << x << "\n";
+return x *x;
+}
+
+int baz(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+};
+
+int main()
+{
+int (Nec:: * fp)(int) = &Nec::bar;
+
+Nec mynec;
+Nec* necptr = new Nec;
+
+std::invoke(fp, mynec, 345);
+std::invoke(fp, necptr, 345); //pointer içinde kullanılır
+
+// (mynec.*fp)(345) //aynı anlamda
+}
+
+------------------
+
+class Nec {
+public:
+
+void func()
+{
+(this->*mfp)(34);
+}
+
+int foo(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+int bar(int x);
+{
+std::cout << "Nec::b(int x) x = " << x << "\n";
+return x *x;
+}
+
+int baz(int x);
+{
+std::cout << "Nec::foo(int x) x = " << x << "\n";
+return x + 5;
+}
+
+private:
+int (Nec::*mfp)(int) = &Nec::foo;
+};
 
 
 
