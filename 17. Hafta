@@ -552,7 +552,7 @@ function<int(const Myclass*, int)> f2{&Myclass::bar};
 
 mem_fn ve not_fn adaptörleri
 
-memfn : sınıfın üye fonksiyonunu alır ve direk çağrılabilir hale getirir
+mem_fn : sınıfın üye fonksiyonunu alır ve direk çağrılabilir hale getirir
 -------
 
 class Myclass {
@@ -562,12 +562,10 @@ void func()const
 std::cout << "Myclass:func()\n";
 }
 
-
 void foo(int x)const
 {
-std::cout << "Myclass:foo(int x) x = "<< x << \n";
+std::cout << "Myclass:foo(int x) x = "<< x << "\n";
 }
-
 };
 
 int main()
@@ -765,7 +763,7 @@ Array<string, 20> y;
 
 --------------
 
-c++ da aggregate type denilen yapı var ve bu yapıının ilave özellikleri vardır
+c++ da aggregate type denilen yapı var ve bu yapının ilave özellikleri vardır
 
 struct Nec {
 int x, y, z;
@@ -919,7 +917,7 @@ cout << << ax.empty() << "\n";
 
 //temel özellikleri
 
--range base for loop ile kullanılabbilir
+-range base for loop ile kullanılabilir
 
 int main()
 {
@@ -1057,8 +1055,7 @@ array<array<int, 3>, 4> ar {{2,2,2}, {3,3,3}, {5,5,5}, {7,7,7}//bu şekilde yap�
 cout << ar << "\n";
 }
 
-
-
+/////////////////////////////////////////////// 2. Ders ////////////////////////////////////////////
 
 
 
