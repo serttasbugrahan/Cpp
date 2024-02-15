@@ -2249,15 +2249,755 @@ void foo(int, void (Nec::* mfp)(int))
 ----------
 
 class Myclass {
+public:
 Myclass() = default;
 
-void f1(int a)
+int f1(int a)
 {
-std::
+std::cout << "int Myclass::f1(int)\n";
+return a + 10;
 }
+
+int f2(int a)
+{
+std::cout << "int Myclass::f2(int)\n";
+return a + 20;
+}
+
+int f3(int a)
+{
+std::cout << "int Myclass::f3(int)\n";
+return a + 30;
+}
+
+int f3(int a)
+{
+std::cout << "int Myclass::f4(int)\n";
+return a + 40;
+}
+private:
+int mval{};
 
 };
 
+// öyle  bir function pointer array oluşturcağız ki dizimizin elemanları
+//f1 f2 f3 f4 fonksiyonlarının adrelerini tutucak
 
-9.15
+using Mfptr = int (Myclass::*)(int);
+
+int main()
+{
+/*int (Myclass:: *fp[4])(int) = {
+&Myclass::f1,
+&Myclass::f2,
+&Myclass::f3,
+&Myclass::f4, };
+*/
+//bu şekilde de olur
+
+Mftr fpa[] = {
+&Myclass::f1,
+&Myclass::f2,
+&Myclass::f3,
+&Myclass::f4,
+};
+
+Myclass m {35};
+
+for (auto fptr : fpa) {
+//std::cout << (m.*fptr)(10) << '\n';
+cout << std::invoke(fptr, m, 10); //üstteki yerine bu yazılabilir
+}
+}
+
+--------------
+class Myclass {
+public:
+Myclass() = default;
+
+int f1(int a)
+{
+std::cout << "int Myclass::f1(int)\n";
+return a + 10;
+}
+
+int f2(int a)
+{
+std::cout << "int Myclass::f2(int)\n";
+return a + 20;
+}
+
+int f3(int a)
+{
+std::cout << "int Myclass::f3(int)\n";
+return a + 30;
+}
+
+int f3(int a)
+{
+std::cout << "int Myclass::f4(int)\n";
+return a + 40;
+}
+private:
+int mval{};
+};
+
+int main()
+{
+auto fp = &Myclass::f1;
+Myclass m(76);
+Myclass* mptr(&m);
+
+std::cout << (m.*fp)(20) << '\n';
+std::cout << (mptr->fp)(20) << '\n';
+std::cout << std::invoke(fp, m, 20) << '\n';
+std::cout << std::invoke(fp, mptr, 20) << '\n';
+
+}
+
+--------------------------------------
+
+data member pointer
+------------------
+
+programcıların kafalarını karıştıran bir yer
+
+struct Nec {
+int a{3};
+int b{3};
+int c{3};
+
+};
+
+int main()
+{
+Nec mynec;
+&mynec.a //türü int*
+}
+
+----------
+
+struct Nec {
+int a{3};
+int b{3};
+int c{3};
+};
+
+int main()
+{
+//ortada bir nesne yok
+&Nec::a; //bu şekilde data member pointer denir
+//türü int Nec::*
+}
+
+----------
+
+struct Nec {
+int a{3};
+int b{3};
+int c{3};
+};
+
+int main()
+{
+auto ptr1 = &Nec::a;
+int Nec::*ptr2 = &Nec::a;
+
+Nec mynec;
+
+cout << mynec.*ptr << '\n';
+
+mynec.a = 777;
+cout << mynec.*ptr << '\n';
+
+ptr = &Nec::b;
+cout << mynec.*ptr << '\n';
+
+mynec.*ptr = 9999; 
+cout << mynec.b << '\n';
+
+}
+
+---------------------
+
+//burada da invoke kullanılabilir
+
+struct Nec {
+int a{3};
+int b{3};
+int c{3};
+};
+
+int main()
+{
+auto ptr = &Nec::a;
+Nec mynec;
+
+std::invoke(ptr, mynec) = 9999;
+std::cout << mynec.a << '\n';
+}
+
+-----------------
+
+//mülakatlarda bu yapı karşımıza çıktığı zmana bu örneği ver
+
+//open high low close
+//usd try
+
+// 5 dakida
+// 9:00 - 9:05
+//28.88 open fiyatı
+// 28.97 high fiyatı
+// 28.65 low fiyatı
+// 28.89 close fiyatı
+
+struct OHLC {
+double open;
+double high;
+double low;
+double close;
+
+};
+
+double get_moving_avarage(cosnt std::vector<OHLC>& candles, double OHLC::*)
+{
+//yapılacak işlemin seçilmesi, 
+
+double sum{};
+
+for (const auto& candle : candles) {
+sum += candle.*fp;
+//sum += std::invoke(fp, candle);
+}
+
+auto mean = sum / candles.size(); 
+}
+
+int main()
+{
+std::vector<OHLC> myvec;
+
+auto mean = get_moving_avarage(myvec, &OHLC::low)
+mean = get_moving_avarage(myvec, &OHLC::high);
+}
+
+===================================================
+
+bitset
+-------
+
+#include <bitset>
+
+-boolen olarak kullanılabilecek bitleri temsil eder
+-bitse contanier değildir
+-begin, end gibi fonksiyonları yoktur
+- aslında boolen değerlerden oluşan vektör isteriz
+- birbiri ile ilişkili boolen değerlerin bir arada tutulabildiği en ucuz yöntemdir
+
+template <std::size_t n>
+class Bitset{
+
+}
+
+-------
+
+int main()
+{
+using namespace std;
+
+bitset<16> bs1; //16 tane kullanılabilcek bit sağlar
+bitset<24> bs2;
+
+
+}
+
+----------------
+
+arayüzü :
+---------
+
+int main()
+{
+using namespace std;
+
+bitset<16> bx;
+
+cout << bx; // 0 olarak hayata getirir
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+bitset<32> bx;
+
+cout << bx{ 78234u }; 
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+bitset<32> bx{"1010110101011010"};
+
+cout << bx  << '\n'; 
+}
+
+----------------
+
+bite referans olmaz
+
+-----------------
+
+//müalaktlarda sorulur
+
+boolen bir değer olarak kullanılabilir ancak kendisi boolen değil bittir
+
+---------------
+
+int main()
+{
+using namespace std;
+
+bitset<32> bx{"1010110101011010"};
+
+auto b = bx[3];
+
+bx[3] = true;
+bx.operator[](3).operator=(true); //yukarıdaki bu anlama gelir
+}
+
+------------------
+//elimizde bitset var ise aşağıdakiler yazılabilir
+
+int main()
+{
+using namespace std;
+
+bitset<32> bx{"1010110101011010"};
+
+cout << bx[4] << "\n";
+
+bx[4].flip(); //biti ters çevirir
+
+}
+
+----------------
+count : kaç tane bitin 1 olduğunu söyler
+
+int main()
+{
+using namespace std;
+
+bitset<32> bx{"1010110101011010"};
+
+cout << bx.count() << '\n'; 
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+int x;
+
+cout << "bir tam sayi girin: ";
+cin>> x;
+
+cout << bitset<32>(x) << "\n";
+cout << bitset<32>(x).count << "biti 1\n"
+
+---------------
+
+int main()
+{
+using namespace std;
+
+cout << boolalpha;
+
+bitset<32> bs{2'987'451!123u };
+
+cout << "[" << bs << "]\n";
+cout << bs.count() << "biti 1\n";
+
+cout << "bs.any() = " << bs.any() << "\n"; //en az 1 bit set edilmişse true döndürür
+bs = 0u;
+cout << "bs.any() = " << bs.any() << "\n";
+}
+
+------------
+//any : is any bit set
+//none : is none of bit set
+//all : eğer tüm bitler 1 ise
+
+int main()
+{
+using namespace std;
+
+cout << boolalpha;
+
+bitset<32> bs{2'987'451'123u };
+
+cout << "[" << bs << "]\n";
+cout << bs.count() << "biti 1\n";
+
+cout << "bs.none() = " << bs.none() << "\n"; // 
+bs = 0u;
+cout << "bs.any() = " << bs.any() << "\n";
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+cout << boolalpha;
+
+bitset<32> bs{0};
+
+bs.flip();
+
+cout << "[" << bs << "]\n";
+cout << bs.count() << "biti 1\n";
+
+cout << "bs.all() = " << bs.all() << "\n"; // 
+}
+
+----------
+//test
+
+//set get fonksiyonları
+
+int main()
+{
+using namespace std;
+cout << boolalpha;
+
+bitset<32> bs{98435453u};
+cout << bs << "\n";
+size_t idx;
+
+std::cout << "kacinci bit : ";
+cin >> idx;
+
+cout << bs.test(idx) << "\n"; //kaçıncı bit 1
+}
+
+--------------
+//set
+
+int main()
+{
+using namespace std;
+cout << boolalpha;
+
+bitset<32> bs{0};
+cout << bs << "\n";
+
+size_t idx;
+
+std::cout << "kacinci bit : ";
+cin >> idx;
+
+bs.set(idx); //istenilen biti 1 yapar
+
+cout << bs << "\n";
+}
+
+-----------
+//reset
+
+int main()
+{
+using namespace std;
+cout << boolalpha;
+
+bitset<32> bs{-1};
+cout << bs << "\n";
+
+bs.reset(); //tüm bitleri sıfırlar
+bs.reset(5); //5. biti sıfırlar
+
+cout << bs << "\n";
+
+}
+
+------------
+
+//to_ulong
+
+int main()
+{
+using namespace std;
+cout << boolalpha;
+
+bitset<32> bs;
+
+bs[1] = true;
+bs[0] = true;
+bs[2] = true;
+bs[3] = true;
+
+cout << bs << "\n";
+
+cout << bs.to_ulong() << "\n";
+}
+
+------------
+
+int main()
+{
+using namespace std;
+cout << boolalpha;
+
+bitset<32> bs(6734328u);
+
+auto str = bs.to_string();
+
+cout << bs << "\n";
+std::replace(str.begin(), str.end(), '1', 'A'); // 1 yerine A
+std::replace(str.begin(), str.end(), '0', 'B'); // 0 yerine B koyuldu
+cout << str << "\n";
+
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+bitset<32>;
+bs. //incele
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+bitset<32> bs;
+
+bs.set(5, false); //bu şekildde de olur
+
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+bitset<32> bs;
+
+bs.set(4).reset(3).flip(7);
+
+cout << bs << "\n";
+
+}
+
+------------
+
+enum Color {
+White,
+Yellow,
+Red, 
+Brown,
+Magenta,
+Black,
+NoOfColors,
+};
+
+int main()
+{
+using namespace std;
+
+bitset<NoOfColors> myset;
+myset[Magenta] = true;
+myset[Red] = true;
+
+}
+
+-------------
+
+bitset ile kritik bir nokta
+
+int main()
+{
+using namespace std;
+
+bitset<16> x{597u };
+bitset<16> y{512u };
+
+cout << boolalpha;
+
+cout << (x == y) << '\n';
+cout << (x != y) << '\n';
+cout << (x < y) << '\n'; //hata çünkü böyel bir şey yok
+
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<bitse<32>> bsvec;
+bsvec.reserve(1000);
+
+for (int i = 0; i < 1000; ++i) {
+bsvec.emplace_back(i);
+}
+
+for (const auto&bs : bsvec) {
+std::cout << bs << "\n";
+}
+}
+
+----------
+
+#include <set>
+
+int main()
+{
+using namespace std;
+
+set<bitset<32>> bsvec;
+
+for (int i = 0; i < 1000; ++i) {
+bsvec.emplace(i);
+}
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+auto fless = [](const bitset<32>&b1, const bitset<32>& b2) {
+return b1.to_ulong() < b2.to_ulong();
+};
+
+set<bitset<32>, decltype(fless)> bset;
+
+for (int i = 0; i < 1000; ++i) {
+bset.insert(Irand{0, 2'000'000'000}());
+}
+
+for (const auto&bs : bset) {
+cout << bs << '\n';
+}
+}
+
+-----------------
+
+bitset bitsel operatörleri overload ediyor
+
+int main()
+{
+using namespace std;
+
+const bitset<16> x{"01000110001010"};
+const bitset<16> y{"10101010101011"};
+
+// x & y
+
+// operator&(x, y)
+
+cout << x << "\n";
+cout << x << "\n";
+
+cout << (x & y) << "\n"; //bitsel ve işlemi yapar
+cout << (x | y) << "\n";
+cout << (x ^ y) << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+const bitset<16> x{"01000110001010"};
+const bitset<16> y{"10101010101011 "};
+
+x.operator&=(y);
+
+x &= y;
+x |= y;
+x ^= y;
+
+}
+
+-----------
+//bitsel kaydırmada overload edilmiştir
+
+//necati hoca mülakatlarda soruyor
+
+int main()
+{
+using namespace std;
+
+bitset<16> x{ 1u };
+
+cout << (x << 2) << "\n"; //aradaki farka bak
+cout << x << 2 << "\n";
+operator<<(cout, x.operator<<(2));
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+bitset<16> x{ 34151u };
+
+cout << ~x << "\n"; //değişiklik yapmaz
+
+cout << x << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+string str{ "11111111111" };
+
+bitset<32> bsx{str, 5, 3}; //5 indeksiden başlarayark 3 tane
+cout << bsx << "\n";
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+bitset<16> bs{"1111111111111"};
+
+bs[5] = true;
+bs
+
+1.42.25
+
+
+
+
+
+
+
 
