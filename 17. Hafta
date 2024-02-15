@@ -2990,12 +2990,133 @@ using namespace std;
 bitset<16> bs{"1111111111111"};
 
 bs[5] = true;
-bs
+bs[5].operator=(true);
 
-1.42.25
+if (bs[5]) { //aynı anlamda
+
+}
+
+if (bs[5].operator bool()) { //aynı anlamda
+
+}
+
+if (bs.test(5)) { //aynı anlamda
+
+}
+
+bs[5].operator~();
+
+}
+
+====================================================
+
+Dinamik Ömürlü Nesneler
+------------------------
+
+temel bilgileri tekrar
+
+-otomatik storage
+-dinamik storage : program çalışırken elde edilir
+-static storage
+-local storage
 
 
+dinamik olması isteğimiz zaman hayata getirebiliriz demektir
 
+!! stackde veya otomaitk ömürlü nesne oluşturmak iş görüyorsa o şekilde oluştur
+
+---------
+birçok olumsuz yanına rağmen dinamik ömürlü nesnelerin kullanıldığı yerler vardır
+mesela,
+-programın çalışma zamanında nesnenin türünün belli olduğu duurmlarda
+-bazı veri yapılarının implementasyonu 
+-runtime polymorfizi
+
+-----------------------
+
+new operator/expression ifadeleri ile hayata gelir
+
+delete hayatı biter
+
+new ifadeleri
+------------
+
+new T
+new T[n]
+new(s)T
+
+----------------------
+
+
+int main()
+{
+using namespace std;
+
+vector<void*> myvec;
+
+try {
+for (int i = 0; i < 10000; ++i) {
+myvec.push_back(operator new(1024 * 1024);
+
+}
+}
+catch (const std::bad_alloc& ex) {
+//catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+
+cout << "size = " << myvec.size() << "\n";
+
+}
+
+
+------------------
+
+gloabal operator new ile neler yapabilirim
+
+-overload edebiliriz, global operator new yerine bizim overloadınız çalışıcak
+
+-ismi ile çağırabiliriz
+
+-bir sınıf için overload edebiliriz
+
+----------------
+
+new T
+
+operator new(sizeof(T)) : bellek allocate eder
+
+void operator delete(void *) : elde edilen bellek alanını siler
+
+----------------
+
+//my operator new overload
+
+void* operator new(std::size_t n)
+{
+std::cout << "operator new(size_t n) cagrildi\n";
+std::cout << "n = " << n << "\n";
+
+auto vp = std::malloc(n);
+if (!vp) {
+throw std::bad_alloc{};
+}
+std::cout << "the address of the allocated block is " << vp << "\n";
+return vp;
+}
+
+class Neco {
+public:
+
+unsigned char buffer[2048]{};
+};
+
+int main()
+{
+Neco* p = new Neco;
+
+//...
+}
 
 
 
