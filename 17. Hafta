@@ -3094,7 +3094,7 @@ void operator delete(void *) : elde edilen bellek alanını siler
 
 void* operator new(std::size_t n)
 {
-std::cout << "operator new(size_t n) cagrildi\n";
+std::cout << "operator new(size_t n) called\n";
 std::cout << "n = " << n << "\n";
 
 auto vp = std::malloc(n);
@@ -3105,20 +3105,255 @@ std::cout << "the address of the allocated block is " << vp << "\n";
 return vp;
 }
 
+//operatör delete yazılması
+
+void operator delete(void* vp)
+{
+std::cout << "operator delete called! vp " << vp << "\n";
+std::free(vp);
+}
+
+
 class Neco {
 public:
+Neco()
+{
+std::cout << "Neco default ctor this: " << this << << "\n";
+}
 
+~Neco() //delete edilmediği sürece çağrılmaz
+{
+std::cout << "Neco default dtor this: " << this << << "\n";
+}
 unsigned char buffer[2048]{};
 };
 
 int main()
 {
+
 Neco* p = new Neco;
 
 //...
 }
 
+----------------
 
+class Nec {
 
+};
 
+int main()
+{
+Nec* p = new Nec;
+ 
+
+void* praw = operator new(sizeof(Nec));
+
+try {
+p = new(praw)Nec();
+}
+catch (...) {
+operator delete(praw);
+}
+}
+
+-----------
+
+operatör new işleminin başarısız olması durumunda 
+std::bad_alloc sınıfının türünden bir exeption throw ettiğini söylemiştil
+ancak bu tam doğru değildir
+
+using new_handler = void (*)(void);
+
+get_new_handler() //global fonksiyon göstericisini değerini get ediyor
+
+set_new_handler() //new_handler türüden fonksiyon adresi ister, o fonksiyon adresi ile global fonksiyon adresini set ediyor
+
+---------
+using namespace std;
+
+int main()
+{
+cout << (get_new_handler() == nullptr) << "\n"
+}
+
+-----------
+
+using namespace std;
+
+void my_new_handler()
+{
+
+}
+
+int main()
+{
+set_new_handler(&get_new_handler);
+}
+
+--------
+peki ne işe yarar
+
+operator new gerçekte kodu aşağıdaki şekilde
+
+void *operator new(size_t n)
+{
+for (;;) {
+void *vp = std::malloc(n);
+if (vp) {
+return vp;
+}
+auto fptr = get_new_handler();
+if (!fptr) {
+throw std::bad_alloc{};
+}
+
+fptr();
+}
+}
+
+---------
+
+eğer set_new_handler ile kendi fonksiyonumuz kayıt ettirmez isek
+operator new başarısız olduğunda exception throw edicek 
+ama kendi fonksiyonumuz kayıt ettirmiş isek derleyici döngüsel yapıda
+derleyici başarısız oldukça sürekli bizim kayıt ettirilmiş fonksiyonuuzu çağıracak
+
+-----------
+
+void myhandler()
+{
+std::cout << "myhandler called!!!";
+(void)getchar();
+}
+
+int main()
+{
+vector<void*> myvec;
+
+try {
+for (int i = 0; i < 1000; ++i) {
+myvec.push_back(operator new(1024 * 1024));
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+//exception throw edicektir
+
+-------------
+
+void myhandler()
+{
+std::cout << "myhandler called!!!";
+(void)getchar();
+}
+
+int main()
+{
+vector<void*> myvec;
+
+set_new_handler(myhandler);
+//başarısız olduğu zaman, döngüsel yapı içinde sürekli myhandler çağırıca
+try {
+for (int i = 0; i < 1000; ++i) {
+myvec.push_back(operator new(1024 * 1024));
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+----------
+
+operator new başarısız olması durumunda bad alloc throw etmesini istiyorsan bir şey yapmana gerek yok
+
+ama bu mekanizmayı custom etmek istiyorsan
+-geri dönüş değeri olmayan
+-set_new_handlera bunun adresi ile çağrı yapıcaksın
+
+------------
+
+bu handler neler yapabilir
+
+1. daha önce allocate edilmiş bellek bloğunun geri verilmesi
+
+2. nullptr geçer isek bad_alloc throw eder
+
+3. kendi bad_alloc türünden elde edebilriz
+
+-------------
+
+void myhandler()
+{
+static int cnt{}
+
+std::cout << "myhandler called!!!";
+(void)getchar();
+if (++count == 10) {
+std::cout <<" yeterince calıstım ancak basarili olamadim\n";
+set_new_handler(nullptr); 
+}
+}
+
+int main()
+{
+vector<void*> myvec;
+
+set_new_handler(myhandler);
+//başarısız olduğu zaman, döngüsel yapı içinde sürekli myhandler çağırıca
+try {
+for (int i = 0; i < 1000; ++i) {
+myvec.push_back(operator new(1024 * 1024));
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+-------------
+
+void another_handler()
+{
+static int cnt{}
+
+std::cout << "another_handler called!!!";
+(void)getchar();
+if (++count == 5) {
+std::cout <<" yeterince calıstım ancak basarili olamadim\n";
+set_new_handler(nullptr); 
+}
+}
+
+void myhandler()
+{
+static int cnt{}
+
+std::cout << "myhandler called!!!";
+(void)getchar();
+if (++count == 10) {
+std::cout <<" yeterince calıstım ancak basarili olamadim\n";
+set_new_handler(another_handler); 
+}
+}
+
+int main()
+{
+vector<void*> myvec;
+
+set_new_handler(myhandler);
+//başarısız olduğu zaman, döngüsel yapı içinde sürekli myhandler çağırıca
+try {
+for (int i = 0; i < 1000; ++i) {
+myvec.push_back(operator new(1024 * 1024));
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
 
