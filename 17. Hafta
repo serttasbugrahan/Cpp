@@ -1297,9 +1297,9 @@ int main()
 for (int i = 0; i < 10; ++i) {
 auto tp = get_person_data();
 
-cout << get<0>(tp> << '\n';
-cout << get<1>(tp> << '\n';
-cout << get<2>(tp> << '\n';
+cout << get<0>(tp) << '\n';
+cout << get<1>(tp) << '\n';
+cout << get<2>(tp) << '\n';
 (void)getchar;
 }
 }
@@ -1465,9 +1465,9 @@ a *= 100;
 dval = -1;
 name += "can"; //değişiklik olmıycak
 
-cout<< get<0>(tp> << '\n';
-cout<< get<1>(tp> << '\n';
-cout<< get<2>(tp> << '\n';
+cout<< get<0>(tp) << '\n';
+cout<< get<1>(tp) << '\n';
+cout<< get<2>(tp) << '\n';
 
 }
 
@@ -1488,9 +1488,9 @@ tuple<int&, double&, string&> tp{a, dval, name }; //bunlar referans değildir
 a *= 100;
 dval = -1;
 name += "can"; //değişiklik olur
-cout<< get<0>(tp> << '\n';
-cout<< get<1>(tp> << '\n';
-cout<< get<2>(tp> << '\n';
+cout<< get<0>(tp) << '\n';
+cout<< get<1>(tp) << '\n';
+cout<< get<2>(tp) << '\n';
 
 }
 
@@ -1510,9 +1510,9 @@ a *= 100;
 dval = -1;
 name += "can";
 
-cout<< get<0>(tp> << '\n';
-cout<< get<1>(tp> << '\n';
-cout<< get<2>(tp> << '\n';
+cout<< get<0>(tp) << '\n';
+cout<< get<1>(tp) << '\n';
+cout<< get<2>(tp) << '\n';
 
 }
 
@@ -1808,7 +1808,7 @@ int (*fp)(int) = &Nec::foo; //hata, non static tutamaz static olmalı
 
 --------------
 
-non static yapıların pointer değilkeninde tutulması
+non static yapıların pointer değişkende tutulması
 
 class Nec {
 
@@ -2206,15 +2206,58 @@ private:
 int (Nec::*mfp)(int) = &Nec::foo;
 };
 
+//////////////////////////////////////////////////// 3. Ders ////////////////////////////////////////////////
+
+//TEKRAR
+
+sınıfların non-static üye fonksiyonlarının adresi, bilfiğimiz fonksyion adresleri gibi değil
+
+class Nec {
+public:
+void foo(int);
+
+};
+
+int main()
+{
+auto fp = &Nec::foo;
+//void (Nec::*)(int) fp = &Nec::foo; //auto kullanmasaydık bu şekilde olurdu
+
+Nec mynec;
+mynec.*fp)(12); 
+// ((*necptr.*fp)(12);   //225. satır bu şekilde de olur
+
+Nec* necptr = &mynec; //nec nesnesi olsa idi
+(necptr->0fp)(12); //bu şekilde yapaarız
+}
+
+---------
+
+class Nec {
+public:
+void f1(int);
+void f2(int);
+void f3(int);
+void f4(int);
+};
+
+void foo(int, void (Nec::* mfp)(int))
+{
+
+}
+
+----------
+
+class Myclass {
+Myclass() = default;
+
+void f1(int a)
+{
+std::
+}
+
+};
 
 
-
-
-
-
-
-
-
-
-
+9.15
 
