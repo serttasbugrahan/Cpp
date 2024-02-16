@@ -930,7 +930,7 @@ myc.mx = 5;
 
 -----------
 
-!! friend bildirimini public veya friend bildiriminde yapmanın farkı yoktur
+!! friend bildirimini public veya private bildiriminde yapmanın farkı yoktur
 
 -----------
 
@@ -952,7 +952,7 @@ foo(m); //ADL
 
 class Myclass {
 public:
-//hidden firend
+//hidden friend
 friend int bar(Myclass, int x) //istisnai bir durum
 {
 return x * x;
