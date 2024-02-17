@@ -2881,6 +2881,7 @@ bsvec.emplace(i);
 }
 
 -------------
+to_ulong : unsigned long tamsayı değerine dönüştürür.
 
 int main()
 {
@@ -3025,7 +3026,7 @@ temel bilgileri tekrar
 
 dinamik olması isteğimiz zaman hayata getirebiliriz demektir
 
-!! stackde veya otomaitk ömürlü nesne oluşturmak iş görüyorsa o şekilde oluştur
+!! stackde veya otomatik ömürlü nesne oluşturmak iş görüyorsa o şekilde oluştur
 
 ---------
 birçok olumsuz yanına rağmen dinamik ömürlü nesnelerin kullanıldığı yerler vardır
@@ -3162,7 +3163,7 @@ operator delete(praw);
 -----------
 
 operatör new işleminin başarısız olması durumunda 
-std::bad_alloc sınıfının türünden bir exeption throw ettiğini söylemiştil
+std::bad_alloc sınıfının türünden bir exeption throw ettiğini söylemişti
 ancak bu tam doğru değildir
 
 using new_handler = void (*)(void);
@@ -3295,7 +3296,7 @@ static int cnt{}
 
 std::cout << "myhandler called!!!";
 (void)getchar();
-if (++count == 10) {
+if (++cnt == 10) {
 std::cout <<" yeterince calıstım ancak basarili olamadim\n";
 set_new_handler(nullptr); 
 }
@@ -3325,7 +3326,7 @@ static int cnt{}
 
 std::cout << "another_handler called!!!";
 (void)getchar();
-if (++count == 5) {
+if (++cnt == 5) {
 std::cout <<" yeterince calıstım ancak basarili olamadim\n";
 set_new_handler(nullptr); 
 }
