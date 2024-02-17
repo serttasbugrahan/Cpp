@@ -1,0 +1,208 @@
+///////////////////////////////////////////////////// 1. Ders ///////////////////////////////////////////////
+
+tekrar
+
+standart kütüphanenin operatör new fonksiyonu yerine kendi operatör new fonksiyonumu
+yazabiliriz. 2 şekilde yapılır
+
+-overload yazmak (1 tanesi hariç)
+-sınıf için otomatik new ve delete fonksiyonu yazmak
+
+eğer std::bad_alloc etmesini istemessek, fonksiyon yazıp set_new_handler ile kayıt edip, operatör new başarısız olduğunda fonksiyon çağırılacak
+
+
+fonksiyonumuzun yapabiliceği birden fazla şey vardır
+1- operator new başarılı olacağı seneryo oluşturur
+2- başka bir fonksiyona delege eder
+3- daha özel bir bad_alloc türüne exception throw edebilir
+4- set_newhandlera nullptr ile çağrı yapar, operator new bad_alloc throw eder
+
+
+------------------
+
+delete ptr //ne yapar
+
+önce operandı olan sınıf için dtor çağırır
+sonra operator delete'e adresi geçer
+
+-----------------------------------------------
+
+//çok temel mülakat sorusu
+
+malloc çağırılıyorsa free
+new ise delete kullanılır
+
+---------------------
+
+new türleri:
+------------
+
+New T : yalın new
+-----
+
+class Nec {
+public:
+Nec();
+Nec(int);
+Nec(int, int);
+Nec(const char*);
+
+};
+
+int main()
+{
+auto p1 = new Nec;
+auto p2 = new Nec{}; //hepsi kullanılabilir
+auto p3 = new Nec()
+Nec* p4 = new Nec();
+Nec* p4 = new Nec(234);
+auto p5 = new const Nec(234);
+
+}
+
+-------------------
+
+array new
+---------
+!! array new array delete ile delete edilir
+!! array new ile oluşturulan yalın delete ile delete edilmesi ub
+
+class Nec {
+public:
+Nec()
+{
+std::cout << "nec default ctor this = " << this << '\n';
+}
+
+~Nec()
+{
+std::cout << "nec default dctor this = " << this << '\n';
+}
+
+private:
+unsigned char buf[256]{};
+};
+
+int main()
+{
+std::size_t n;
+
+std::cout << "kac nesne : ";
+std::cşn >> n;
+
+Nec* p = new Nec[n]; //dizinin her elemanı için ctor çağrılır
+
+delete[] p; //bu şekilde olur
+//delete p; //ub
+}
+
+---------
+
+!! new ve delete modern c++ da çok nadir kullanılır, smart_pointer yerini almıştır
+
+---------
+
+placement new
+-------------
+// dikkat bu argümanlar operator new fonksiyonuna geçer
+//bu şekilde kullanılan ifadelere placement new denir
+
+new(x, y, z)Myclass
+
+-----------
+
+void* operator new (std::size_t count, void* ptr); //sadece bu overload edilemez
+
+bu fonksiyon ne yapar : bir adres yazarız bu adresi 2. parametreye gönderir, 1. parametrey sizeof gönderir
+
+//kodu aşağıdaki şekilde
+void* operator new(size_t, void* ptr)
+{
+return ptr;
+}
+
+!! sadece fonksiyona geçtiğimiz adresin geri döndürülmesine 
+ve böylece sınıf nesnesinin bizim verdiğimiz adreste hayata getirilmesini sağlar
+
+istediğim bir adreste sınıf nesnesi oluşturabilirim, new ile neseyi hangi adreste oluşturmak istiyorsak o adresi ister
+----------
+
+class Nec {
+public:
+Nec()
+{
+std::cout << "nec default ctor this = " << this << '\n';
+}
+
+~Nec()
+{
+std::cout << "nec default dctor this = " << this << '\n';
+}
+
+private:
+unsigned char buf[256]{};
+};
+
+int main()
+{
+unsigned char buffer[sizeof(Nec)];
+
+std::cout << "buffer dizisinin adresi: " << static_cast<void*>(buffer) <<  '\n';
+
+auto p = new(buffer)Nec
+//Nec* p =
+
+//delete p; //ub
+
+//destructor ismi ile çağrılabilir
+
+p->~Nec();
+}
+}
+
+------------
+
+void* operator new(size_t n, int x, int y)
+{
+std::cout << "my operator new called! n = " << n << "\n";
+std::cout << "x = " << x  << '\n';
+std::cout << "y = << y << '\n';
+
+return std::malloc(n);
+}
+
+class Nec {
+public:
+Nec()
+{
+std::cout << "nec default ctor this = " << this << '\n';
+}
+
+~Nec()
+{
+std::cout << "nec default dctor this = " << this << '\n';
+}
+
+private:
+unsigned char buf[256]{};
+};
+
+int main()
+{
+Nec* ptr = new(10, 20)Nec; //1. parametreye sizeof alır
+}
+
+---------------
+
+
+int main()
+{
+using namespace std;
+
+vector<Date> datevec;
+datevec.emplace_back(12, 5, 1987);
+}
+
+//30.
+
+
