@@ -104,22 +104,20 @@ delete[] p; //bu şekilde olur
 
 placement new
 -------------
-// dikkat bu argümanlar operator new fonksiyonuna geçer
+// dikkat bu argümanlar ctora değil, operator new fonksiyonuna geçer
 //bu şekilde kullanılan ifadelere placement new denir
 
-new(x, y, z)Myclass
+new(x, y, z)Myclass ; //x,y,z argümanlarını gönder myclass sınıfın ctor çağır
 
 -----------
 
-void* operator new (std::size_t count, void* ptr); //sadece bu overload edilemez
+void* operator new(std::size_t count, void* ptr); //bu overload edilemez
 
-bu fonksiyon ne yapar : bir adres yazarız bu adresi 2. parametreye gönderir, 1. parametrey sizeof gönderir
-
-//kodu aşağıdaki şekilde
 void* operator new(size_t, void* ptr)
 {
 return ptr;
 }
+bu fonksiyon ne yapar : bir adres yazarız bu adresi 2. parametreye gönderir, 1. parametrey sizeof gönderir
 
 !! sadece fonksiyona geçtiğimiz adresin geri döndürülmesine 
 ve böylece sınıf nesnesinin bizim verdiğimiz adreste hayata getirilmesini sağlar
@@ -194,15 +192,675 @@ Nec* ptr = new(10, 20)Nec; //1. parametreye sizeof alır
 
 ---------------
 
-
 int main()
 {
 using namespace std;
 
 vector<Date> datevec;
-datevec.emplace_back(12, 5, 1987);
+datevec.emplace_back(12, 5, 1987); //placement new ile ilgili(emplace_back)
+// 
 }
 
-//30.
+---------------
+
+başka bir new operatorü
+-------------
+
+void* operator new(std::size_t count, const std::nothrow_t& tag);
+
+//1 tane argüman alır, size_t argüman almaz
+//başarısızlık durumunda exception throw etmez, nullptr döndürür
+//exception gönderilmesi uygun olmayan kısımlar içindir
+
+int main()
+{
+using namespace std;
+
+//nothrow_t
+auto p = new(nothrow)Date{1,4,1987};
+
+if (!p) {
 
 
+}
+} 
+
+--------------------------------------------
+
+neden new doğrudan kullanmak çok sakıncalı :
+
+// Date *p;
+
+//p
+1- dinamik/ömürlü/statik ömürlü bir nesneyi mi gösteriyor? -bilemeyiz
+2- nulptr değerinde mi? -bilemeyiz
+3- delete etmeli miyim? -bilemeyiz
+4- hangi delete ifadesini kullanmalıyım? -bilemeyiz
+5- sadece delete yeterli mi? -bilemeyiz  
+
+--------------
+
+dinamik ömürlü nesneler için hangi hatalar yapılabilir ?
+
+-dinamik ömürlü nesnenin adresini başka pointerlara kopyalama
+
+Date *p1 = new Date(1, 4, 1987);
+
+Date* p2 = p1;
+//ya biri delete edilirken 2. dangling olucak
+//delete edilmemesi
+
+-----
+
+-delete fonksiyonun exception nedeninden görülmemesi
+
+void func()
+{
+auto p = new vector{2,4,7,9,1};
+
+//foo(); //exception throw edebilir
+//bar(); //exception throw edebilir
+
+delete p;
+}
+
+int main()
+{
+
+}
+
+==========================================================
+
+yukarıdaki sorunların çoğunu akıllı pointer sınıfı ile çözebiliriz
+
+-----------------------
+
+smart pointer nesnelerin veya kaynakların ömrünü kontrol etmeye yarar
+
+smart pointer dinamik ömürlü nesne kullanımını kolaylaştırır ve hata riskini azaltır
+
+extra hiç maaliyeti yoktur
+
+---------------------
+
+eskiden auto_ptr vardı o çok başarısıs bir sınıfmış
+
+------------------
+
+2 tane smart pointer vardır
+
+-unique_ptr
+-shared_ptr
+  -weak_ptr (doğrudan akıllı pointer değildir, shared yardımıcısı gibidir)
+
+----------
+
+unique_ptr : bir kaynağı/nesneyi sadece bir pointer gösterir başka pointer göstermesi yasaklanır
+---------
+
+-kopyalamaya kapalıdır, taşımaya açıktır
+
+-başkasına devredebilir, nesnesin sahibi el değiştirebilir ancak tek sahibi olur her zaman
+
+-unique_ptr kullanma oranı daha yüksektir
+
+----------
+
+shared_ptr : bir nesneyi gösteren birden fazla pointer olabilir
+--------- 
+
+-mesela nesnenin 3 tane pointer sahibi var hepsi hayatı sonlannırken sona kalan nesnenin hayatını bitirir
+
+
+---------
+
+eğer dinamik ömürlü nesnesin tek bir sahibi olmasını istiyorsam unique_ptr sınıfı türünden nesne ile onu yöneticem
+
+farklı farklı kodların o nesneye erişimini sağlamak istiyorsam shared_ptr kullanıcam
+
+-------------------------
+
+#include <memory>
+
+//normalde aşağıdaki gibi olmasını bekleriz ama öyle değildir
+
+template <typename T>
+class UniquePtr {
+public:
+
+~UniquePtr()
+{
+if (mp)
+delete mp; //böyle olsaydı UniquePtr ile hayatlarını kontrol ettiğim nesnelerin hepsinin delete ifadesi ile bitirilmesi gerekirdi
+}
+
+private:
+T* mp;
+};
+
+------------------
+
+//yukarıdaki yapı yerine
+
+template <typename T>
+struct DefaultDelete {
+void operator()(T* p)
+{
+delete p;
+}
+};
+
+//D ==> deleter param
+template <typename T, typename D = defaultDelete<T>>
+//unique_ptr int açılımı aslında int, default_delete int açılımı
+
+class UniquePtr {
+public:
+
+~UniquePtr()
+{
+if (mp) D{}(mp);
+//delete mp; //yukarıdaki ifadeye dönüşür
+}
+private:
+T* mp;
+};
+
+---------------------
+
+//orjinali
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> up1; //Date* sarmalar
+unique_ptr<string> up2; //string* sarmalar
+
+//unique_ptr 2 state'de olabilir
+//1- boş olması, unique_ptr var ancak nesne yok ortada
+//2- dolu olması, hayatı devam etmekte olan nesneyi sarmalar
+
+//boş bir unique_ptr nesnesi 
+//default init olabilir, unique_ptr<string> up2, hiçbir kaynak üstlenmemiş
+//yani up dtor çağırıldığı zmaan hiçbir dtor çağrılmaz
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> up;
+
+//boş mu dolu mu olduğunu operator bool fonksiyonu ile tespit ederiz
+//boş olup olmamsı 3 yolla belirlenir
+//1
+
+if (up) {
+//if (up.operator bool()) yazabilirdik
+std::cout << "dolu\n";
+}
+else {
+std::cout << "bos\n"; 
+}
+}
+
+------------
+
+//cout << (up ? "dolu" : "bos")
+
+int main()
+{
+using namespace std;
+//2
+unique_ptr<Date> up{new Date{1,4, 1987}};
+
+cout << (up ? "dolu" : "bos") << "\n";
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+//2
+unique_ptr<Date> up{new Date{1,4, 1987}};
+
+if (up == nullptr) {}
+if (up != nullptr) {}
+if (up.get()) {}
+if (up.get() == nullptr) {}
+}
+
+-------------
+
+//unique ptr dolu yapıcaz en tipik  yollarından birisi T* ctor yapmak
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> up{new Date{1,4, 1987}};
+
+//unique_ptr pointer gibi kullanılmasını sağlayan 2 tane şey var 
+//1) *up
+
+cout << *up << '\n';
+
+//2) up->
+cout << up->month_day() << "\n";
+
+}
+
+-------------
+
+!! unique_ptr boş ise direferencing operatörünün operandı yapmak exception throw etmez, ub
+
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> up;
+
+try {
+cout << *up << '\n'; //Ub
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+---------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "Myclass default ctor this = " << this << "\n";
+}
+
+~Myclass()
+{
+std::cout << "Myclass destructor this = " << this << "\n";
+}
+};
+
+int main()
+{
+std::cout << "main basladi\n";
+{
+std::unique_ptr<Myclass> uptr{new Myclass};
+} //delete edilecek burada
+std::cout << "main devam ediyor\n";
+}
+
+---------------------------------
+
+unique_ptr ile ilgili çok öenmli noktalar
+
+1- unique_ptr sadece pointer sarmalar
+
+2- unique_ptr exstra maaliyeti yoktur
+
+------------
+
+default ctor
+T* ctor
+
+make_uniqu
+----------
+unique_ptr falanca açılımı yerine MakeUnique çağırıp onun geri dönüş değeri ile argüman alabiliriz
+
+template <typename T, typename ...Args>
+std::unique_ptr <T> MakeUnique(Args&& ...args) //sonsuz parametre alabilir
+{
+return std::unique_ptr<T>(new T(std::forward<Args>(args)...))
+}
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> uptr{new Date{3, 5, 189}};
+auto up = MakeUnique<Date>(3, 5, 1989);
+}
+
+-----------------
+
+//orjinali
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> uptr{new Date{3, 5, 189}};
+auto up = make_unique<Date>(3, 5, 1989);
+}
+
+----------------------------------
+//unique_ptr ile ilgili legal ve illegal yapılar
+
+1) 
+
+void foo(std::unique_ptr<std::string> up);
+
+int main()
+{
+//parametresi unique_ptr olana T* geçemeyiz
+foo(new std::string{"necati"]}); //illegal, ctor explicit, çünkü örtülü dönüşüme izin vermez
+
+}
+
+---
+
+void foo(std::unique_ptr<std::string> up);
+
+std::unique_ptr<std::string> bar()
+{
+return new std::string;
+}
+
+int main()
+{
+foo(new std::string{"necati"]}); //hata ctor explicit
+}
+
+-----------
+2) 
+
+// T* parametreli ctor var ancak T* atama operator fonksiyonu yok
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Date>(2, 3, 1987);
+
+cout << *up << "\n";
+
+up = new Date{ 3, 6, 2003 }; //hata
+}
+
+-----------------------
+
+!! unique ptr move only type, copy ctor veya copy assignment gereken yerlerde sentax hatası olur
+copy olsa idi birden fazla kaynak gösterilebilecekti 
+
+class Neco {
+public:
+Neco()
+{
+std::cout << "neco default ctor this = " << this << '\n';
+}
+
+~Neco()
+{
+std::cout << "neco default dtor this = " << this << '\n';
+}
+
+private:
+unsigned char buffer[2048]{};
+};
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Date> x{new Date{}};
+
+auto y = x; //copy ctor deleted
+//unique_ptr y = x; //bu şekilde de olur
+//unique_ptr<Date>z = x; //bu şekilde de olur
+
+unique_ptr<Date> y{new Date{}};
+unique_ptr<Date> x{new Date{}};
+x = y; //hata
+}
+
+-------------
+
+//çok sık yapılan bir hata
+
+class Tamer {
+public:
+//dikkat sınıfın copy ctor, copy assignment deleted
+
+private:
+std::unique_ptr<Date> uptr;
+};
+
+int main()
+{
+Tamer tx;
+Tamer tx;
+
+tx = ty; //hata 
+tx = std::move(ty); //legal
+
+}
+
+----------------
+
+class Neco {
+public:
+Neco()
+{
+std::cout << "neco default ctor this = " << this << '\n';
+}
+
+~Neco()
+{
+std::cout << "neco default dtor this = " << this << '\n';
+}
+
+private:
+unsigned char buffer[2048]{};
+};
+
+int main()
+{
+using namespace std;
+
+{
+auto up1 = make_unique<Neco>();
+cout << "up1 = " << (up1 ? "dolu" : "bos") << '\n';
+cout << "up2 = " << (up2? "dolu" : "bos") << '\n'; 
+
+auto up2 = move(up1);
+
+cout << "up1 = " << (up1 ? "dolu" : "bos") << '\n'; //up 1 boşa çıkar
+cout << "up2 = " << (up2? "dolu" : "bos") << '\n'; 
+(void)getchar();
+}
+std::cout << "main devam ediyor\n";
+
+}
+
+-----------
+
+class Neco {
+public:
+Neco()
+{
+std::cout << "neco default ctor this = " << this << '\n';
+}
+
+~Neco()
+{
+std::cout << "neco default dtor this = " << this << '\n';
+}
+
+private:
+unsigned char buffer[2048]{};
+};
+
+int main()
+{
+using namespace std;
+
+//hem upx hemde upy dolu ise ne olur?
+- upx önce kendi kaynağını delete eder
+-upy kaynağı upx taşınır
+
+//upx = std::move(upy);
+
+
+}
+
+----------------
+
+taşıma semantiği ile ilgili sorula
+
+std::unique_ptr<int> foo()
+{
+auto up = std::make_unique<int(24);
+
+return up; // legal, otomatik ömürlü nesne return olursa l value to x value olur
+//return move(up) //pesimistik move 
+}
+
+----------
+
+void foo(std::unique_ptr<int>)
+{
+
+}
+
+//r value geçebiliriz
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<int>(345);
+
+foo(up); //hata, copy ctor deleted
+foo(move(up)); //legal
+foo(make_unique<int>(777)); //legal
+foo(unique_ptr<int>(new int)); //legal, geçici nesne oluşturma ifadesi
+}
+
+---------------------------------
+
+banko mülakat soruları
+
+-tanımsız davranış durumlarını tespit etmemiz
+
+int main()
+{
+using namespace std;
+
+auto p = new Date(3,5, 1987);
+
+unique_ptr<Date> upx(p); //ub
+unique_ptr<Date> upx(p); //ub
+
+//2 unique_ptr'de aynı yapıyı sarmaladı tanımsız davranış var
+}
+
+-----
+
+int main()
+{
+using namespace std;
+
+auto p = new Date(3,5, 1987);
+
+unique_ptr<Date> upx(p); 
+{
+unique_ptr<Date> upx(p); 
+}
+}
+
+----------------------------
+
+sınfın  birkaç tane önemli fonksiyonu var 
+bunlardan bir tanesi
+
+dinamik ömürlü nesneyi hayatını sonlandırıyor, unique_ptr dtor çağrılmasını beklemedne yapıyor
+
+bunu yapmanın 3 tane yolu var
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Date>(31,12,2023)
+cout << "up = " << (up ? "dolu" : "bos") << '\n';
+
+//delete edilmesini istiyoruz
+up.reset(); //date için dtor çağrılır
+up.reset(nullptr); //Bu şekilde de olur
+up = nullptr; //Bu şekilde de olur
+up = unique_ptr<Date>{}; //sağa taraf boş olduğu ve r value olduğu için yukarıdaki ile aynı etkiyi yapar
+up = {}; //Bu şekilde de olur
+
+cout << "up = " << (up ? "dolu" : "bos") << '\n';
+}
+
+-------
+
+diğer fonksiyonlara bakıyoruz
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Date>(31,12,2023)
+cout << "up = " << (up ? "dolu" : "bos") << '\n';
+
+up = new Date(1,1,2024); //bu hatayı düzeltmenin yolu vardır
+up.reset(new Date(1,1,2024)); //legal olur
+up = make_unique<Date>(1,1,2024); //aynı
+
+}
+
+-----------
+
+sınıfın 3 tane fonksiyonunu birbiri ile karıştırma
+
+int main()
+{
+using namespace std;
+
+//up.reset();
+//up.release(); //boşa çıkarır delete etmez
+
+}
+
+---------
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Date>(31, 12, 2023);
+cout << "up = " (up ? "dolu" : "bos") << '\n';
+
+Date *p = up.release();
+//dtor çağrılmaz
+//boşa çıkar
+
+cout << "up = 0 << (up ? "dolu" : "bos") << "\n";
+
+delete p; //şimdi delete edildi
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Date>(31, 12, 2023);
+cout << "up = " (up ? "dolu" : "bos") << '\n';
+
+auto x = move(up); //up boşaldı, x doldu, dtor çağrılmadı
+
+unique_ptr<Date> x(up.relase()); //up boşaldı, x doldu, dtor çağrılmadı
+
+}
