@@ -2224,7 +2224,7 @@ auto fp = &Nec::foo;
 //void (Nec::*)(int) fp = &Nec::foo; //auto kullanmasaydık bu şekilde olurdu
 
 Nec mynec;
-mynec.*fp)(12); 
+(mynec.*fp)(12); 
 // ((*necptr.*fp)(12);   //225. satır bu şekilde de olur
 
 Nec* necptr = &mynec; //nec nesnesi olsa idi
@@ -2264,7 +2264,7 @@ std::cout << "int Myclass::f2(int)\n";
 return a + 20;
 }
 
-int f3(int a)
+int f4(int a)
 {
 std::cout << "int Myclass::f3(int)\n";
 return a + 30;
@@ -2295,7 +2295,7 @@ int main()
 */
 //bu şekilde de olur
 
-Mftr fpa[] = {
+Mfptr fpa[] = {
 &Myclass::f1,
 &Myclass::f2,
 &Myclass::f3,
@@ -2314,6 +2314,7 @@ cout << std::invoke(fptr, m, 10); //üstteki yerine bu yazılabilir
 class Myclass {
 public:
 Myclass() = default;
+Myclass(int val) : mval{val}{};
 
 int f1(int a)
 {
@@ -2333,7 +2334,7 @@ std::cout << "int Myclass::f3(int)\n";
 return a + 30;
 }
 
-int f3(int a)
+int f4(int a)
 {
 std::cout << "int Myclass::f4(int)\n";
 return a + 40;
@@ -2400,8 +2401,8 @@ int c{3};
 
 int main()
 {
-auto ptr1 = &Nec::a;
-int Nec::*ptr2 = &Nec::a;
+auto ptr = &Nec::a;
+//int Nec::*ptr = &Nec::a;
 
 Nec mynec;
 
@@ -2489,7 +2490,7 @@ bitset
 #include <bitset>
 
 -boolen olarak kullanılabilecek bitleri temsil eder
--bitse contanier değildir
+-bitset contanier değildir
 -begin, end gibi fonksiyonları yoktur
 - aslında boolen değerlerden oluşan vektör isteriz
 - birbiri ile ilişkili boolen değerlerin bir arada tutulabildiği en ucuz yöntemdir
@@ -2531,9 +2532,9 @@ int main()
 {
 using namespace std;
 
-bitset<32> bx;
+bitset<32> bx{ 78234u };
 
-cout << bx{ 78234u }; 
+cout << bx; 
 }
 
 -------------
@@ -2610,7 +2611,8 @@ cout << "bir tam sayi girin: ";
 cin>> x;
 
 cout << bitset<32>(x) << "\n";
-cout << bitset<32>(x).count << "biti 1\n"
+cout << bitset<32>(x).count()<< "biti 1\n"
+}
 
 ---------------
 
