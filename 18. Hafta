@@ -88,7 +88,7 @@ int main()
 std::size_t n;
 
 std::cout << "kac nesne : ";
-std::cşn >> n;
+std::cin >> n;
 
 Nec* p = new Nec[n]; //dizinin her elemanı için ctor çağrılır
 
@@ -713,7 +713,7 @@ using namespace std;
 
 ----------------
 
-taşıma semantiği ile ilgili sorula
+taşıma semantiği ile ilgili sorular
 
 std::unique_ptr<int> foo()
 {
@@ -746,7 +746,7 @@ foo(unique_ptr<int>(new int)); //legal, geçici nesne oluşturma ifadesi
 
 ---------------------------------
 
-banko mülakat soruları
+banko mülakat sorusu
 
 -tanımsız davranış durumlarını tespit etmemiz
 
@@ -816,7 +816,6 @@ cout << "up = " << (up ? "dolu" : "bos") << '\n';
 up = new Date(1,1,2024); //bu hatayı düzeltmenin yolu vardır
 up.reset(new Date(1,1,2024)); //legal olur
 up = make_unique<Date>(1,1,2024); //aynı
-
 }
 
 -----------
