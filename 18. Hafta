@@ -863,3 +863,346 @@ auto x = move(up); //up boşaldı, x doldu, dtor çağrılmadı
 unique_ptr<Date> x(up.relase()); //up boşaldı, x doldu, dtor çağrılmadı
 
 }
+
+///////////////////////////////////////// 2. Ders //////////////////////////////////////
+
+class Myclass;
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Myclass> //legal
+}
+
+kullanığımız fonksiyonların tekrarı :
+
+uptr.release() //sarmaladığı adresi döndürür mülkiyeti bırakır
+
+auto ptr = uptr.release()
+auto ptr = uptr.get() //sarmaladığı adresi döndürüyor ne mülkiyeti bırakır ne de destroy eder
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<string>("alican korkmaz");
+
+cout << uptr << "\n"; //sarmaladığı adresi çıkış akımına verir
+cout << uptr.get() << "\n"; //aynı adres yazar
+
+if (uptr) {}
+if (uptr != nullptr) {}
+if (uptr.get()) {} //hepsi aynı anlamda
+if (uptr.get() != nullptr) {}
+}
+
+----------------
+
+//hata yapılan bir yer
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<string>("alican korkmaz");
+
+auto p = uptr.get(); //aynı pointerla 2 tane unique_ptr oluştumuş oluruz
+//Bir tanesinin hayatı bittiğinde diğeri dangling pointer olur
+
+//auto p = uptr.release(); //hata olmaz
+unique_ptr<string> upx(p);
+}
+
+-----------------------------------------------------
+
+deleter parametreye bakıyoruz
+
+template <typename T>
+struct DefaultDelete {
+void operator()(T* p)
+{
+delete p;
+}
+};
+//bu default delete yapısını değiştirerek custom edebiliyoruz
+
+
+template <typename T, typename D = std::default_delete<T>>
+class UniquePtr {
+
+public:
+~UniquePtr()
+{
+if (mp)
+D{}(mp); //D sınıfının mp parametresi geçiyoruz
+}
+private:
+T* mp;
+};
+
+-------------
+
+struct SDeleter {
+void operator()(std::string *p)const noexcept
+{
+std::cout << std::quoted(*p) << "delete ediliyor\n"; //daha sonra görüceğiz(quoted)
+delete p;
+}
+};
+
+int main()
+{
+using namespace std;
+{
+unique_ptr<string, SDeleter> uptr{new string{"tamer dundar"}};
+}
+
+std::cout << "main devam ediyor\n";
+}
+
+--------------
+
+struct SDeleter {
+void operator()(std::string *p)const noexcept
+{
+std::cout << std::quoted(*p) << "delete ediliyor\n"; //daha sonra görüceğiz(quoted)
+delete p;
+}
+};
+
+void fdeleter(std::string* p)
+{
+std::cout << std::quoted(*p) << "delete ediliyor\n"; //daha sonra görüceğiz(quoted)
+delete p;
+}
+
+int main()
+{
+using namespace std;
+{
+unique_ptr<string, decltype(&fdeleter)> uptr{new string{"tamer dundar"}, fdeleter};
+                  //-------------------
+                  //direk bu türü de yazabiliriz
+//unique_ptr<string, void(*)(string *)> uptr{new string{"tamer dundar"}, fdeleter};
+
+//lambda expression olabilir
+auto fdel = [](string* p) {
+std::cout << std::quoted(*p) << "delete ediliyor\n"; //daha sonra görüceğiz(quoted)
+delete p;
+};
+unique_ptr<string, decltype(fdel)> uptr{new string{"tamer dundar"}, fdel}; //cp20
+
+}
+
+std::cout << "main devam ediyor\n";
+}
+
+--------------
+
+#include <cstdio>
+
+int main()
+{
+using namespace std;
+
+auto fdel = [](std::FILE* F,f) {
+std::cout << "file is being closed!\n";
+std::fclose(f);
+};
+
+{
+std::unique_ptr<std::FILE, decltype(fdel)> uptr {fopen("melike.txt", "w"), fdel}; //cpp20 ile yazıyorsa fdel yazamaya gerek yok
+fprintf(uptr.get(), "Melike Kaptan");
+}//end scope
+
+}
+
+-----------------------
+
+c++ daki ctor dtor karşılığı c 'de handle'dır
+
+struct Data {
+
+};
+
+Data* createData(void);
+void do_something(Data*);
+void do_this(Data*);
+void do_this(Data*);
+void destroyData(Data*);
+
+int main()
+{
+Data* handle = createData();
+do_something(handle);
+do_this(handle);
+do_that(handle);
+destroyData(handle);
+
+//exception yakalansa da yine kaynak sızıntısı olucak
+//buradaki problem unique_ptr ile çözülür
+//clean up çağıran bir deleter oluşturulur
+}
+
+----------------
+//unique_ptr sadece new ile alakalı değildir herhangi bir kaynağı sarmalayabiliriz, kaynak olmasına bile gerek yoktur
+//buradan o sonuç çıkar
+
+struct Data {
+
+};
+
+Data* createData(void);
+void do_something(Data*);
+void do_this(Data*);
+void do_this(Data*);
+void destroyData(Data*);
+
+int main()
+{
+auto fdel = [](Data* p) {
+destroyData(p);
+};
+
+unique_ptr<Data, decltype(fdel)> uptr(createData());
+do_something(uptr.get());
+
+do_this(uptr.get());
+do_that(uptr.get());
+}
+
+------------------
+
+struct Nec {
+Nec()
+{
+std::cout << Nec default ctor this : " << this << '\n';
+}
+~Nec()
+{
+std::cout << Nec default dtor this : " << this << '\n';
+}
+
+
+char buf[256]{};
+};
+
+int main()
+{
+using namespace std;
+
+unique_ptr<Nec> uptr(new Nec[4]);
+//ub
+//array new kullandıysak array delete kullanmamız lazım
+
+//dilin aracı olmasaydı buunn için custom delete kullanırdık
+
+auto fd = [](Nec* p) {delete[]p; };
+unique_ptr<Nec, decltype(fd)> uptr(new Nec[4]);
+*uptr //var, içerik var
+uptr[2] // yok, index yok
+
+
+//Yukarıdakini yapmaya hiç gerek yok bunun yerine unique_ptr partial spec.
+unique_ptr<Nec[]> uptr(new Nec[4]);
+
+*uptr //yok, içerik yok
+uptr[2] // var, index var
+
+}
+
+-------------
+//bu şekilde kullanılabilir
+
+int main()
+{
+using namespace std;
+unique_ptr<Date[]> uptr(new Date[4]);
+
+for (int i = 0; i < 4; ++i) {
+auto day = uptr[i].month_day();
+}
+}
+
+-------------
+
+//bu şekilde kullanılabilir
+
+int main()
+{
+using namespace std;
+unique_ptr<string[]> upx(new string[5]{"mert", "ali", "veli", "can", "bugra");
+
+for (int i = 0; i < 5; ++i) {
+cout << upx[i] << "\n";
+}
+}
+
+-------------
+
+struct Nec {
+Nec()
+{
+std::cout << Nec default ctor this : " << this << '\n';
+}
+~Nec()
+{
+std::cout << Nec default dtor this : " << this << '\n';
+}
+
+
+char buf[256]{};
+};
+
+int main()
+{
+using namespace std;
+
+auto up = make_unique<Nec[]>(5); //5 ctor, 5 dtor çağrılır
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+Date* p = new Date{4, 7, 1983};
+{
+unique_ptr<Date> upx(p);
+}
+//p = nullptr; //bu gelirse unique_ptr boş olucak
+(void)getchar();
+unique_ptr<Date> upx(p); //dangling point
+
+*upy //dref ettiğimiz için yine ub
+}
+
+---------------
+
+//en çok kullanıcağımız yapılardan birisi unique_ptr contanierlarda tutmak
+//smart pointer olmadan ne kadar zor olucağına dair bir örnek
+int main()
+{
+using namespace std;
+{
+vector<Date*> dvec; //vector pointer açılımını oluşturduk
+dvec.reserve(10); //10 kapasite oluşturduk
+
+for (int i = 1; i <= 10; ++i) {
+dvec.push_back(new Date{i, i, 2000 + i}); //10 tane dinamik ömürlü nesne adresi koyduk vektöre
+}
+
+//buraya gelindiğinde nesne delete olmaz operator delete çağrılmaz, dtor çağrılmaz
+//doğru olması iiçn hayatı bitmeden vektörü dolaşıcak
+for (auto p : dvec)
+delete p;
+}
+dvec.erase(dvec.begin());
+dvec.pop_back();
+}
+
+
+
