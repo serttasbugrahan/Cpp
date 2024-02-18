@@ -1204,5 +1204,497 @@ dvec.erase(dvec.begin());
 dvec.pop_back();
 }
 
+---------------
+
+int main()
+{
+using namespace std;
+{
+vector<unique_ptr<Date>> dvec;
+dvec.reserve(10);
+
+for (int i = 1; i <= 10; ++i) {
+dvec.emplace_back(new Date(i, i, 2010 + i));
+}
+
+for (auto& up : dvec) { //copy ctor delete edildiği için auto up hatalı
+cout << *up << '\n';
+}
+
+(void)getchar();
+}
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+auto uptr = vector<unique_ptr<Date>(1, 5, 2986);
+
+dvec.push_back(uptr); //hata 
+
+dvec.push_back(move(uptr)); //legal
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<unique_ptr<Date>> dvec;
+
+dvec.push_back(make_unique<Date>(1, 5, 1986)); //taşıma semantiği devreye girer
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+vector<unique_ptr<Date>> dvec;
+
+dvec.push_back(unique_ptr<Date>{new Date{5, 5, 1965}}); //legal
+}
+
+-----------
+//bu fonksiyon car* döndürmek yerine unique ptr car açılımı döndürebilir miydi
+//onu yazıcaz alt kısımda
+
+Car *createRandomCar()
+{
+    static std::mt19937 eng{std::random_device{}()};
+    static std::uniform_int_distribution<int> dist{0, 6};
+
+    switch (dist(eng))
+    {
+    case 0:
+        return new Volvo;
+    case 1:
+        return new Audi;
+    case 2:
+        return new Tesla;
+    case 3:
+        return new Renault;
+    case 4:
+        return new Honda;
+    case 5:
+        return new Mercedes;
+    case 6:
+        return new HondaCivic;
+    case 7:
+        return new ModelX;
+    }
+
+    return nullptr;
+}
+
+int main()
+{
+using namespace std;
+
+
+}
+
+---------------
+
+std::unique_ptr<Car> createRandomCar()
+{
+    static std::mt19937 eng{std::random_device{}()};
+    static std::uniform_int_distribution<int> dist{0, 6};
+
+    switch (dist(eng))
+    {
+    case 0:
+        return std::make_unique<Volvo>();
+    case 1:
+        return std::make_unique<Audi>();
+    case 2:
+        return std::make_unique<Tesla>();
+    case 3:
+        return std::make_unique<Renault>();
+    case 4:
+        return std::make_unique<Honda>();
+    case 5:
+        return std::make_unique<Mercedes>();
+    case 6:
+        return std::make_unique<HondaCivic>();
+    case 7:
+        return std::make_unique<ModelX>();
+    }
+
+    return nullptr;
+}
+
+int main()
+{
+using namespace std;
+
+for (int i = 0; i < 100; ++i) {
+auto uptr = createRandomCar();
+cout << *uptr << '\n';
+uptr->start();
+uptr->run();
+uptr->stop();
+(void)getchar();
+}
+}
+
+-------------------
+
+shared_ptr sınıfının unique_ptr parametreli ctoru var
+dolayısıyla unique_ptr shared_ptr'a dönüşütürerek kullanabiliyoruz
+
+------------------
+
+sink : mülkiyeti bir fonksiyona devretmek
+
+void fsink(std::unique_ptr<Date> uptr)
+{
+std::cout << *uptr << '\n';
+
+}
+
+int main()
+{
+using namespace std;
+
+fsink(make_unique<Date>(3, 6, 1987));
+cout << "main devam ediyor\n";
+}
+
+--------------
+//pass-through
+
+std::unique_ptr<Date> fsink(std::unique_ptr<Date> uptr)
+{
+std::cout << *uptr << '\n';
+
+return uptr;
+}
+
+int main()
+{
+using namespace std;
+
+{
+auto cp = fsink(make_unique<Date>(3, 6, 1987));
+cout << "main devam ediyor [1]\n";
+(void)getchar();
+}
+cout << "main devam ediyor [2]\n";
+}
+
+=============================================================
+
+shared_ptr
+-----------
+
+bir nesnenin  birden fazla sahibi olailir, o nesneler o nesneyi paylaşımlı olarak kullanabilir
+ama son shared_ptr sınıfı kaynağı geri vericek
+
+//unique ile karşılaştırma işlemleri yapıyoruz
+
+int main()
+{
+
+std::cout << "sizeof(unique_ptr<string>) = " << sizeof(unique_ptr<string>) << "\n"; //içinde 1 tane pointer tutar
+std::cout << "sizeof(shared_ptr<string>) = " << sizeof(shared_ptr<string>) << "\n"; //içinde 2 tane pointer tutar
+
+}
+ 
+---------------
+
+-control bloğu vardır
+
+-shared ptr koyalamaya ve taşımaya açık
+
+-adres hem shared_ptr nesnesinin içinde hemde control bloğu içinde tutuluyor hemde kontrol bloğu içinde tutuluyor
+
+-kontrol bloğunun ile shared ptr nesnesi oluşturulduğunda control block oluşturulması gerekiyor son shared ptr oluşturulduğundad da control bloğu oluşturulması gerekir
+ve sonlanma işlemleri de aynı şekildedir
+
+-unique ptr'ye göre bu nedenlerden daha maaliyetlidir
+
+--------------
+template <typename T>
+class SharedPtr {
+//deleter sınıfın ctoruna argüman olarak geçiyoruz
+//geçmessek default delete olur
+
+
+};
+
+int main()
+{
+using namespace std;
+{
+shared_ptr<Date> sp1(new Date{1, 2, 1999});
+
+{
+auto sp2 = sp1;
+//dtor çağrılmaz çünkü 2 tane shared ptr vardı 1 tanesi hala hayatta
+}
+
+std::cout << "main devam ediyor [1]\n";
+(void)getchar();
+} //Burada 2. 'nin hayatı biter ve dtor çağrılır
+std::cout << "main devam ediyor [2]\n";
+
+}
+
+----------------
+//use_count : kullanılan sayaç
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp1(new Date{1, 2, 1999});
+cout << "use count = " << sp1.use_count() << '\n';
+auto sp2 = sp1;
+cout << "use count = " << sp1.use_count() << '\n';
+cout << "use count = " << sp2.use_count() << '\n';
+
+{
+auto sp3 = sp2;
+cout << "use count = " << sp1.use_count() << '\n';
+cout << "use count = " << sp2.use_count() << '\n';
+cout << "use count = " << sp3.use_count() << '\n';
+}
+cout << "use count = " << sp1.use_count() << '\n'; //2 ye düşer
+cout << "use count = " << sp2.use_count() << '\n';
+}
+
+-----------------------------
+
+void* operator new(std::size_t n)
+{
+std::cout << "operator new called n = " << n << '\n';
+void *vp = std::malloc(n);
+if (!vp) {
+throw std::bad_alloc{};
+}
+std::cout << "the address of the allocated block is :  << vp << "\n";
+
+return vp;
+}
+
+struct Nec {
+char buf[512]{};
+};
+
+void foo()
+{
+std::cout << "foo cagrildi\n";
+auto pnec = new Nec;
+std::shared_ptr<Nec> sptr(pnec);
+}
+
+int main()
+{
+
+}
+
+---------------
+
+aynı kaynağı gösteren shared_ptr nesneleri için aynı control bloğu kullanılır
+
+--------------
+
+//mülakatlarda çok sorulan bir soru
+
+nasıl make_unique varsa make_shared içinde vardor
+
+make_shared : shared ptr döndürür
+
+void* operator new(std::size_t n)
+{
+std::cout << "operator new called n = " << n << '\n';
+void *vp = std::malloc(n);
+if (!vp) {
+throw std::bad_alloc{};
+}
+std::cout << "the address of the allocated block is :  << vp << "\n";
+
+return vp;
+}
+
+struct Nec {
+char buf[512]{};
+};
+
+void bar()
+{
+std::cout << "bar cagrildi\n";
+auto uptr = std::make_shared<Nec> 
+}
+
+int main()
+{
+bar();
+}
+
+//sadece 1 kere operator new cagrilir, derleyici optimizasyonudur
+
+---------------------
+
+//type erasure
+//tür silme  
+//normalde ileri cpp kursunda anlatıyor
+
+class Myclass{
+public:
+~Myclass()
+{
+std::cout << "Myclass dtor this :" << this << "\n";
+}
+};
+
+class MyclassDeleter {
+void operator()(Myclass *p)const
+{
+std::cout << p << "the object at the address of " << p <
+delete p;
+}
+};
+
+int main()
+{
+using namespace std;
+
+{
+shared_ptr<Myclass> sptr(new Myclass, MyclassDeleter{});
+}
+std::cout << "main devam ediyor\n";
+}
+
+//shared_ptr'de deleter ctor'a argüman olarak gönderiyoruz
+
+---------------
+//shared ptr 
+-default ctoru var
+-move ctoru var
+-copy ctoru var
+
+------------
+//ne zmaan kontrol bloğu oluşturulur
+//shared ptr default ctor edilirse, kontrol bloğuna gerek yok
+//kontrol bloğunun oluşturulması için ya nesne adresi ile share_ptr hayata  gelmeli
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<Date>(1, 1, 2024);
+
+shared_ptr<Date> sptr(move(uptr));
+(void)getchar();
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+{
+shared_ptr<Myclass> sptr(new Date{1, 1, 2024});
+auto sp2 = sp1;
+auto sp3 = sp2;
+
+cout << sp1.get() << "\n";
+cout << sp2.get() << "\n";
+cout << sp3.get() << "\n";
+}
+
+------------------
+
+//boş mu dolu mu kontrolü
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp;
+
+cout << "sp = " << (sp ? "dolu" : "bos") << '\n';
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp(new Date{5,6,1976});
+
+cout << "sp = " << (sp ? "dolu" : "bos") << '\n';
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp(new Date{5,6,1976});
+
+sp. //inceke
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp1(new Date{5,6,1976});
+shared_ptr<Date> sp2 = sp1;
+shared_ptr<Date> sp3 = sp2;
+
+cout << sp1.use_count() << '\n';
+sp1.reset(); //son shared ptr değilse ref. sayacını azaltıyor
+//sp1.reset(new );//bu şekilde de olur
+cout << sp2.use_count() << '\n';
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Date> sp1(new Date{5,6,1976});
+shared_ptr<Date> sp2(new Date{1,1,1994});
+
+cout << "use count for sp1 = " << sp1.use_count() << '\n';
+cout << "use count for sp1 = " << sp2.use_count() << '\n';
+
+sp1 = sp2;
+(void)getchar();
+cout << "use count for sp1 = " << sp2.use_count() << '\n';
+}
+
+
+-------------
+
+void foo(std::unique_ptr<std::string>)
+
+void bar(std::unique_ptr<std::string> & r)
+
+//ikisi birbirinden farklıdır
+
+------------
+
+//shared ptr içinde bu geçerli
+
+void bar(std::shared_ptr<std::string> & r) //ref sayac artaz
+void bar(std::shared_ptr<std::string>  r) //ref sayac artar
+
+
 
 
