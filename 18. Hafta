@@ -877,7 +877,7 @@ unique_ptr<Myclass> //legal
 
 kullanığımız fonksiyonların tekrarı :
 
-uptr.release() //sarmaladığı adresi döndürür mülkiyeti bırakır
+uptr.release() //sarmaladığı adresi döndürür mülkiyeti bırakır, delete etmek gerekir
 
 auto ptr = uptr.release()
 auto ptr = uptr.get() //sarmaladığı adresi döndürüyor ne mülkiyeti bırakır ne de destroy eder
@@ -907,16 +907,16 @@ using namespace std;
 
 auto uptr = make_unique<string>("alican korkmaz");
 
+//auto p = uptr.release(); //hata olmaz
 auto p = uptr.get(); //aynı pointerla 2 tane unique_ptr oluştumuş oluruz
 //Bir tanesinin hayatı bittiğinde diğeri dangling pointer olur
 
-//auto p = uptr.release(); //hata olmaz
 unique_ptr<string> upx(p);
 }
 
 -----------------------------------------------------
 
-deleter parametreye bakıyoruz
+deleter parametreye geçiyoruz
 
 template <typename T>
 struct DefaultDelete {
@@ -992,13 +992,14 @@ std::cout << std::quoted(*p) << "delete ediliyor\n"; //daha sonra görüceğiz(q
 delete p;
 };
 unique_ptr<string, decltype(fdel)> uptr{new string{"tamer dundar"}, fdel}; //cp20
-
 }
 
 std::cout << "main devam ediyor\n";
 }
 
 --------------
+//unique ptr sadece new ifadelerini sonlandırmak için değildir
+herhangi bir kaynağı sonlandırabiliriz
 
 #include <cstdio>
 
@@ -1049,6 +1050,8 @@ destroyData(handle);
 //unique_ptr sadece new ile alakalı değildir herhangi bir kaynağı sarmalayabiliriz, kaynak olmasına bile gerek yoktur
 //buradan o sonuç çıkar
 
+//güvenli şekilde c dizisini sarmaladık
+
 struct Data {
 
 };
@@ -1073,6 +1076,7 @@ do_that(uptr.get());
 }
 
 ------------------
+//burası biraz kafa karıştırıcı
 
 struct Nec {
 Nec()
@@ -1160,7 +1164,7 @@ int main()
 using namespace std;
 
 auto up = make_unique<Nec[]>(5); //5 ctor, 5 dtor çağrılır
-
+//uniqur_ptr<Nec[]> up = make_unique<Nec[]>(5);
 }
 
 ---------------
@@ -1169,10 +1173,11 @@ int main()
 {
 using namespace std;
 
-Date* p = new Date{4, 7, 1983};
+Date* p = new Date{4, 7, 1983}; //dinamik ömürlü nesne oluşturuldu
 {
 unique_ptr<Date> upx(p);
-}
+} //burada p dangling pointer
+//p delete edilir, delete edilmesi demek bu noktadan sonra dangling pointer olması demektir
 //p = nullptr; //bu gelirse unique_ptr boş olucak
 (void)getchar();
 unique_ptr<Date> upx(p); //dangling point
@@ -1184,6 +1189,7 @@ unique_ptr<Date> upx(p); //dangling point
 
 //en çok kullanıcağımız yapılardan birisi unique_ptr contanierlarda tutmak
 //smart pointer olmadan ne kadar zor olucağına dair bir örnek
+
 int main()
 {
 using namespace std;
@@ -1200,11 +1206,12 @@ dvec.push_back(new Date{i, i, 2000 + i}); //10 tane dinamik ömürlü nesne adre
 for (auto p : dvec)
 delete p;
 }
-dvec.erase(dvec.begin());
-dvec.pop_back();
+dvec.erase(dvec.begin()); //vektörden 2 öğe sildik, burada ve aşağıda 
+dvec.pop_back(); //dtor çağrılmadı
 }
 
 ---------------
+//unique_ptr dönüşütürüyoruz yukarıdakini 
 
 int main()
 {
@@ -1214,7 +1221,7 @@ vector<unique_ptr<Date>> dvec;
 dvec.reserve(10);
 
 for (int i = 1; i <= 10; ++i) {
-dvec.emplace_back(new Date(i, i, 2010 + i));
+dvec.emplace_back(new Date(i, i, 2010 + i)); //vectore 10 tane dinamik ömürlü nesne koyduk
 }
 
 for (auto& up : dvec) { //copy ctor delete edildiği için auto up hatalı
@@ -1231,9 +1238,9 @@ int main()
 {
 using namespace std;
 
-auto uptr = vector<unique_ptr<Date>(1, 5, 2986);
+auto uptr = vector<unique_ptr<Date>(1, 5, 1986);
 
-dvec.push_back(uptr); //hata 
+dvec.push_back(uptr); //hata, L value
 
 dvec.push_back(move(uptr)); //legal
 }
@@ -1247,6 +1254,7 @@ using namespace std;
 vector<unique_ptr<Date>> dvec;
 
 dvec.push_back(make_unique<Date>(1, 5, 1986)); //taşıma semantiği devreye girer
+//legal, pr value expr
 }
 
 -----------
@@ -1256,6 +1264,9 @@ int main()
 using namespace std;
 
 vector<unique_ptr<Date>> dvec;
+
+dvec.emplace_back(new Date{5,5,1965}); //legal
+dvec.puch_back(new Date{5,5,1965}); //illegal, push_back'e unique ptr göndermem gerekir
 
 dvec.push_back(unique_ptr<Date>{new Date{5, 5, 1965}}); //legal
 }
@@ -1348,6 +1359,7 @@ uptr->stop();
 shared_ptr sınıfının unique_ptr parametreli ctoru var
 dolayısıyla unique_ptr shared_ptr'a dönüşütürerek kullanabiliyoruz
 
+yukarıdaki yapının geri dönüş değerini share_ptr' a verebiliriz
 ------------------
 
 sink : mülkiyeti bir fonksiyona devretmek
@@ -1367,7 +1379,7 @@ cout << "main devam ediyor\n";
 }
 
 --------------
-//pass-through
+//pass-through : fonksiyona nesneyi taşırızı aynı anda fonksiyonda geri dönüş değeri olarak bize nesneyi geri taşır
 
 std::unique_ptr<Date> fsink(std::unique_ptr<Date> uptr)
 {
@@ -1419,7 +1431,11 @@ ve sonlanma işlemleri de aynı şekildedir
 
 -unique ptr'ye göre bu nedenlerden daha maaliyetlidir
 
+-yeni share_ptr hayata geldiğinde referans sayacı bir artıyor
+
+-control bloğunda genel olarak deleter ve adres tutulur
 --------------
+
 template <typename T>
 class SharedPtr {
 //deleter sınıfın ctoruna argüman olarak geçiyoruz
@@ -1456,8 +1472,8 @@ using namespace std;
 shared_ptr<Date> sp1(new Date{1, 2, 1999});
 cout << "use count = " << sp1.use_count() << '\n';
 auto sp2 = sp1;
-cout << "use count = " << sp1.use_count() << '\n';
-cout << "use count = " << sp2.use_count() << '\n';
+cout << "use count = " << sp1.use_count() << '\n'; //Hangi nesne ile alırsak alalım farketmez
+cout << "use count = " << sp2.use_count() << '\n'; //Hangi nesne ile alırsak alalım farketmez
 
 {
 auto sp3 = sp2;
@@ -1496,7 +1512,7 @@ std::shared_ptr<Nec> sptr(pnec);
 
 int main()
 {
-
+foo(); //source için ve control block için 2 kere operator new çağrılır çağrılır
 }
 
 ---------------
@@ -1510,6 +1526,7 @@ aynı kaynağı gösteren shared_ptr nesneleri için aynı control bloğu kullan
 nasıl make_unique varsa make_shared içinde vardor
 
 make_shared : shared ptr döndürür
+
 
 void* operator new(std::size_t n)
 {
@@ -1539,11 +1556,11 @@ bar();
 }
 
 //sadece 1 kere operator new cagrilir, derleyici optimizasyonudur
+//make_shared sayesinde 2 ayrı blok yerine iksisini bir blok altına alan tek bir bloğunu allocate eder
 
 ---------------------
 
-//type erasure
-//tür silme  
+//type erasure (tür silme)  
 //normalde ileri cpp kursunda anlatıyor
 
 class Myclass{
@@ -1554,10 +1571,10 @@ std::cout << "Myclass dtor this :" << this << "\n";
 }
 };
 
-class MyclassDeleter {
+struct MyclassDeleter {
 void operator()(Myclass *p)const
 {
-std::cout << p << "the object at the address of " << p <
+std::cout << p << "the object at the address of " << p << "is being deleted\n";
 delete p;
 }
 };
@@ -1584,6 +1601,7 @@ std::cout << "main devam ediyor\n";
 //ne zmaan kontrol bloğu oluşturulur
 //shared ptr default ctor edilirse, kontrol bloğuna gerek yok
 //kontrol bloğunun oluşturulması için ya nesne adresi ile share_ptr hayata  gelmeli
+//unique_ptr share_ptr taşınması durumunda
 
 int main()
 {
@@ -1606,7 +1624,7 @@ shared_ptr<Myclass> sptr(new Date{1, 1, 2024});
 auto sp2 = sp1;
 auto sp3 = sp2;
 
-cout << sp1.get() << "\n";
+cout << sp1.get() << "\n"; //get adresi döndürür
 cout << sp2.get() << "\n";
 cout << sp3.get() << "\n";
 }
@@ -1685,6 +1703,10 @@ cout << "use count for sp1 = " << sp2.use_count() << '\n';
 void foo(std::unique_ptr<std::string>)
 
 void bar(std::unique_ptr<std::string> & r)
+{
+r.reset(); //işlemi yapılabilir
+}
+
 
 //ikisi birbirinden farklıdır
 
