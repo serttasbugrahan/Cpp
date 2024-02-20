@@ -1007,7 +1007,7 @@ int main()
 {
 using namespace std;
 
-auto fdel = [](std::FILE* F,f) {
+auto fdel = [](std::FILE* f) {
 std::cout << "file is being closed!\n";
 std::fclose(f);
 };
@@ -1081,11 +1081,11 @@ do_that(uptr.get());
 struct Nec {
 Nec()
 {
-std::cout << Nec default ctor this : " << this << '\n';
+std::cout <<" Nec default ctor this : " << this << '\n';
 }
 ~Nec()
 {
-std::cout << Nec default dtor this : " << this << '\n';
+std::cout <<"Nec default dtor this : " << this << '\n';
 }
 
 
@@ -1164,7 +1164,7 @@ int main()
 using namespace std;
 
 auto up = make_unique<Nec[]>(5); //5 ctor, 5 dtor çağrılır
-//uniqur_ptr<Nec[]> up = make_unique<Nec[]>(5);
+//unique_ptr<Nec[]> up = make_unique<Nec[]>(5);
 }
 
 ---------------
@@ -1405,7 +1405,7 @@ cout << "main devam ediyor [2]\n";
 shared_ptr
 -----------
 
-bir nesnenin  birden fazla sahibi olailir, o nesneler o nesneyi paylaşımlı olarak kullanabilir
+bir nesnenin  birden fazla sahibi olabilir, o nesneler o nesneyi paylaşımlı olarak kullanabilir
 ama son shared_ptr sınıfı kaynağı geri vericek
 
 //unique ile karşılaştırma işlemleri yapıyoruz
@@ -1424,7 +1424,7 @@ std::cout << "sizeof(shared_ptr<string>) = " << sizeof(shared_ptr<string>) << "\
 
 -shared ptr koyalamaya ve taşımaya açık
 
--adres hem shared_ptr nesnesinin içinde hemde control bloğu içinde tutuluyor hemde kontrol bloğu içinde tutuluyor
+-adres hem shared_ptr nesnesinin içinde hemde control bloğu içinde tutuluyor 
 
 -kontrol bloğunun ile shared ptr nesnesi oluşturulduğunda control block oluşturulması gerekiyor son shared ptr oluşturulduğundad da control bloğu oluşturulması gerekir
 ve sonlanma işlemleri de aynı şekildedir
@@ -1527,7 +1527,6 @@ nasıl make_unique varsa make_shared içinde vardor
 
 make_shared : shared ptr döndürür
 
-
 void* operator new(std::size_t n)
 {
 std::cout << "operator new called n = " << n << '\n';
@@ -1535,7 +1534,7 @@ void *vp = std::malloc(n);
 if (!vp) {
 throw std::bad_alloc{};
 }
-std::cout << "the address of the allocated block is :  << vp << "\n";
+std::cout << "the address of the allocated block is : " << vp << "\n";
 
 return vp;
 }
@@ -1547,7 +1546,7 @@ char buf[512]{};
 void bar()
 {
 std::cout << "bar cagrildi\n";
-auto uptr = std::make_shared<Nec> 
+auto uptr = std::make_shared<Nec>;
 }
 
 int main()
@@ -1598,7 +1597,7 @@ std::cout << "main devam ediyor\n";
 -copy ctoru var
 
 ------------
-//ne zmaan kontrol bloğu oluşturulur
+//ne zmaan kontrol bloğu oluşturulur?
 //shared ptr default ctor edilirse, kontrol bloğuna gerek yok
 //kontrol bloğunun oluşturulması için ya nesne adresi ile share_ptr hayata  gelmeli
 //unique_ptr share_ptr taşınması durumunda
@@ -1716,6 +1715,8 @@ r.reset(); //işlemi yapılabilir
 
 void bar(std::shared_ptr<std::string> & r) //ref sayac artaz
 void bar(std::shared_ptr<std::string>  r) //ref sayac artar
+
+////////////////////////////////////////// 3. Ders /////////////////////////////////////////////////////
 
 
 
