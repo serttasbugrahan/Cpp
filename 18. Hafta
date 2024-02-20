@@ -1718,6 +1718,589 @@ void bar(std::shared_ptr<std::string>  r) //ref sayac artar
 
 ////////////////////////////////////////// 3. Ders /////////////////////////////////////////////////////
 
+tekrar
+------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string);
+
+*sptr //gösterdiği nesneye erişiriz
+//boş ise exception throw etmez
+
+sptr.get() //sarmalana pointer get eder
+sptr.reset() //hayatı sonlandırmıyor ancak refereance count 1 ise sonlandırır
+if (sptr) //operator bool kullanılır
+if (sptr.get())//nullptr kontrolü
+}
+
+==============================================
+
+weak(zayıf)
+------------
+
+share_ptr'den weak_ptr nesnesi oluşturabiliyorum
+share_ptr'den weak_ptr oluşturunca weak_ptr share_ptr referans sayacını arttırmıyor
+bundan dolayıı ismi weak_ptr.
+
+
+share_ptr kaynağın sonlanıp sonlanmadığını sınıyabiliyoruz
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+
+weak_ptr wp(sptr);
+//weak_ptr wp = sptr; //bu sınamayla bu ctor explicit olmadığını anlarız
+cout << "sptr.use_count() = " << sptr.use_count() << '\n'; // 1 olur değişmez
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp1 = sptr;
+weak_ptr wp2 = sptr;
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+cout << "sptr.use_count() = " << wp1.use_count() << '\n';
+cout << "sptr.use_count() = " << wp2.use_count() << '\n';
+auto wp3 = wp2;
+cout << "wp3.use_count() = " << wp3.use_count() << '\n';
+auto sptr2 = sptr; //burada ref sayacı artar
+cout << "wp3.use_count() = " << wp3.use_count() << '\n'; 
+}
+
+--------------
+//weak_ptr diref edilemez
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp = sptr;
+
+*wp //sentax hatası
+
+if (we.expired()) { //bool döndürür
+cout << "kaynak sonlandirilmis\n";
+}
+else {
+cout << "kaynak halen hayatta\n";
+}
+
+}
+
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp = sptr;
+
+sptr.reset(); //son kaynak sonlandır
+
+if (we.expired()) { //true döndürür
+cout << "kaynak sonlandirilmis\n";
+}
+else {
+cout << "kaynak halen hayatta\n";
+}
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp = sptr;
+
+wp.lock //shared ptr döndürür
+
+shared_ptr<string> spx = wp.lock();
+auto spx = wp.lock();
+shared_ptr = wp.lock(); //CTAD
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp= sptr;
+
+//spt.reset(); //1 kaynak sonlanır
+
+shared_ptr<string> spx = wp.lock();
+if (spx != nullptr) {
+cout << "kaynak sonlandirilmamis\n";
+cout << spx.use_count() << '\n';  //2 döndürür
+cout << *spx << "\n";
+}
+else {
+cout << "kaynak sonlandirilmis;
+}
+}
+
+weap_ptr diref edilmez ancak lock ile kullanılan 
+shared_ptr diref edilir
+
+---------------
+//aşağıdaki şekilde de olur
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp= sptr;
+
+if (shared_ptr<string> spx = wp.lock()) {
+//auto px = wp.lock()) //kullanılabilir
+cout << "kaynak hayatta\n";
+cout << "use_count " << spx.use_count() << '\n';
+cout << "isim = " << *spx << "\n";
+}
+else {
+cout << "kaynak sonlanmis\n";
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp= sptr;
+
+shared_ptr sp(wp); //kaynak sonlanmışsa exception throw eder
+cout << "use_count = " << sp.use_count() << "\n";  
+cout << "isim = " << *sp << "\n";
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp= sptr;
+
+sptr.reset();
+
+shared_ptr sp(wp); //kaynak sonlanmışsa exception throw eder
+cout << "use_count = " << sp.use_count() << "\n";  
+cout << "isim = " << *sp << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+shared_ptr<string> sptr(new string{"bugrahan serttas"});
+
+cout << "sptr.use_count() = " << sptr.use_count() << '\n';
+weak_ptr wp= sptr;
+
+sptr.reset();
+
+try {
+shared_ptr sp(wp);
+}
+catch (const std::bad_weak_ptr& ex) {
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n'; 
+}
+
+}
+
+--------------------------
+
+cyclic referans
+--------------
+
+
+struct B; //forward decleration
+
+struct A {
+std::shared_ptr<B> bptr;
+//burası weak_ptr olsaydı hata olmazdı
+A() {
+std::cout << "A default ctor this = " << this << "\n";
+}
+~A() {
+std::cout << "A destructor this = " << this << "\n";
+}
+};
+
+struct B {
+std::shared_ptr<B> bptr;
+struct B {
+B() {
+std::cout << "B default ctor this = " << this << "\n";
+}
+~B() {
+std::cout << "B destructor this = " << this << "\n";
+}
+};
+
+int main()
+{
+using namespace std;
+
+shared_ptr<A> spa(new A);
+shared_ptr<B> spb(new B);
+
+spa->bptr = spb;
+spb->aptr = spa;
+//dtor çağrılmaz
+
+}
+
+//saat 1 de köpekler ile ilgili örnek var
+
+
+---------------------------------
+
+shared_ptr önemli bir fonksiyonu daha var
+biraz karışık
+
+SRTP örüntüsünü bilmek gerekir
+
+template <typename Der>
+class Base {
+void func()
+{
+//static_cast<Der*>(this);
+static_cast<Der*>(this).foo(); //taban sınıflar türemiş sınıflara interface enjecte edip
+//türemiş sınıfın fonksiyonlarını kullanabilir
+
+}
+};
+
+class Der : public Base<Der> { //legal, 
+
+};
+
+-----------
+
+bu kısmı hazır bir kod üzerinden anlatıyor
+
+eğer bir sınıfın üye fonksiyonun içinde shared_ptr ile hayatı kontrol edilen * this nesnesini gösteren
+shared_ptr'nin kopyasını çıkartmak isterseniz sınıfınızı 
+CRTP örüntüsü ile kalıtım yoluyla std::enable_shared_from_this
+sınıfından elde etmelisiniz
+
+class Nec {
+
+public:
+void func()
+{
+shared_ptr<Nec> spx(this); //bu şekilde ref artmaz, ub olur
+}
+};
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Nec> sptr(new Nec);
+
+sptr->func();
+}
+
+---------------
+
+class Nec {
+
+public:
+void func()
+{
+shared_ptr<Nec> spx(this); 
+};
+
+int main()
+{
+using namespace std;
+
+Nec* ptr = new Nec;
+shared_ptr<Nec> sp1(ptr);
+shared_ptr<Nec> sp2(ptr); //ub olur
+
+cout << sp1.use_count() << '\n';
+cout << sp2.use_count() << '\n';
+
+(void)getchar();
+}
+
+---------------
+
+class Nec {
+
+public:
+void func()
+{
+shared_ptr<Nec> spx(this); 
+cout << spx.use_count() << "\n"; //2 olmaz, ub olur
+(void)getchar();
+//bu kısmı nasıl yapıcaz peki?? altta kod var
+}
+};
+
+int main()
+{
+using namespace std;
+
+
+//func içinde bu fonksiyon hangi dinamik ömürlü nesne
+için çağrıldıysa o dinamik ömürlü nesneyi gösteren share_ptr'nin 
+kopyasını çıkartmak referance count 2 yapmak
+
+shared_ptr<Nec> sptr(new Nec);
+sptr->func();
+}
+
+------------
+!! BU KISIMLARI TEKRAR İZLE 
+
+using namespace std;
+
+
+class Nec : public std::enable_shared_from_this<Nec>{
+public:
+void func()
+{
+auto spx = shared_from_this();
+cout << "spx.use_count() = " << spx.use_count() << "\n"; //1
+}
+};
+
+int main()
+{
+using namespace std;
+
+shared_ptr<Nec> sptr(new Nec);
+
+cout << "sptr.use_cont() = " << sptr.use_count() << "\n"; //2
+sptr->func();
+cout << "sptr.use_cont() = " << sptr.use_count() << "\n"; //1
+}
+
+----------------
+
+using namespace std;
+
+
+class Nec : public std::enable_shared_from_this<Nec>{
+public:
+void func()
+{
+auto spx = shared_from_this();
+cout << "spx.use_count() = " << spx.use_count() << "\n"; //1
+}
+};
+
+int main()
+{
+auto p = new Nec; //exception throw eder
+
+p->func();
+}
+
+------------------------
+
+aynı nesneyi birden fazla contanierda tutup ayrı işlemler yapabiliyoruz
+
+#include <list>
+#include<memory>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include "date.h"
+
+//vector ve list shared_ptr tutar aynı kaynağı gösterirler
+
+using namespace std;
+
+int main()
+{
+list<shared_ptr<Date>> mylist;
+
+mylist.push_back(make_shared<Date>(2, 5, 1999));
+mylist.push_back(make_shared<Date>(4,9,1993));
+mylist.push_back(make_shared<Date>(22,11,1997));
+mylist.push_back(make_shared<Date>(7,10,2004));
+mylist.push_back(make_shared<Date>(12,12,1991));
+
+vector<shared_ptr<Date>> myvec(mylist.begin(), mylist.end());
+
+sort(myvec.begin(), myvec.end()); //adresleri sınar
+
+sort(myvec.begin(), myvec.end(), [](auto p1, auto p2) {
+return *p1 < *p2;
+});
+
+for (auto sp : myvec)
+cout << *sp << "\n";
+(void)getchar();
+std::system("cls");
+
+cout << "\n";
+
+}
+
+----------------------
+
+programcıların karıştırma ihtimalinin yüksek olduğu nokta
+
+class Myclass {
+
+private:
+std::vector<std::string> myvec; //non statşc member number, herbiri için ayrı olucak
+//static std::vector<std::string> myvec; //bu şekilde hepsi aynı vectorü kullanılır
+};
+
+int main()
+{
+Myclass m1; //static olursa aynı vectörü kullanılır
+Myclass m2;
+Myclass m3;
+
+//n tame myclass nesnesi 1 vektöü, diğerleri başka bir vektörü kullansın
+//alttaki kodda cevabı
+
+}
+
+------------------
+
+class Myclass {
+
+private:
+std::shared_ptr<std::vector<std::string>> myvec; 
+};
+
+int main()
+{
+Myclass m1; 
+Myclass m2;
+Myclass m3;
+
+Myclass m4, m5, m6;
+}
+
+---------------
+
+//kod 1.54. dakikada
+
+
+----------------------------------------------------
+
+operator new fonksiyonu overload edilebilir
+
+overload edersek new çağrılan her yerde biizm fonksiyonumuz çağrılcak
+
+----------
+
+!! sınıfların için oluşturulan operator new fonksiyonlarının
+operator delete fonksiyonların static anahtar sözcüğü kullanılmasa bile
+sınıfın static fonksiyonudur
+
+class Myclass {
+public:
+void* operator new(size_t n); //static
+void operator delete(void *)noexcept; //static
+};
+
+------------
+#include <cstdlib>
+
+class Myclass {
+public:
+Myclass()
+{
+std::cout << "default ctor this : " << this << '\n';
+}
+
+~Myclass()
+{
+std::cout << "dtor this : " << this << '\n';
+}
+
+void* operator new(size_t n)
+{
+std::cout << "Myclass::operator new n : " << n << "\n";
+auto p = std::malloc(n);
+if (!p) {
+throw std::bad_alloc{};
+}
+std::cout << "adress of the allocated block is" << p << '\n';
+return p;
+}
+
+void operator delete(void *)noexcept;
+{
+std::cout << "Myclass::operator delete vp : " << vp << "\n";
+std::free(vp);
+}
+
+void func()
+{
+std::cout << "Myclass func() this " << this << '\n';
+}
+private:
+unsigned char buffer[512]{};
+};
+
+int main()
+{
+auto  p = new Myclass;
+
+p->func()
+
+delete p;
+}
+
+
+
+
 
 
 
