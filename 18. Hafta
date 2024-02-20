@@ -2298,9 +2298,12 @@ p->func()
 delete p;
 }
 
+--------------------
 
+//ders son 20 dk ödev veriyor ona bak
 
+--------------------
 
-
-
+::new //bu şekilde global olan çağrılır
+::delete //bu şekilde global olan çağrılır
 
