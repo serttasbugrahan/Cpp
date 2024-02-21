@@ -1745,7 +1745,6 @@ share_ptr'den weak_ptr nesnesi oluşturabiliyorum
 share_ptr'den weak_ptr oluşturunca weak_ptr share_ptr referans sayacını arttırmıyor
 bundan dolayıı ismi weak_ptr.
 
-
 share_ptr kaynağın sonlanıp sonlanmadığını sınıyabiliyoruz
 
 int main()
@@ -1802,7 +1801,6 @@ cout << "kaynak sonlandirilmis\n";
 else {
 cout << "kaynak halen hayatta\n";
 }
-
 }
 
 
@@ -1904,7 +1902,7 @@ using namespace std;
 shared_ptr<string> sptr(new string{"bugrahan serttas"});
 
 cout << "sptr.use_count() = " << sptr.use_count() << '\n';
-weak_ptr wp= sptr;
+weak_ptr wp = sptr;
 
 shared_ptr sp(wp); //kaynak sonlanmışsa exception throw eder
 cout << "use_count = " << sp.use_count() << "\n";  
@@ -1924,7 +1922,7 @@ weak_ptr wp= sptr;
 
 sptr.reset();
 
-shared_ptr sp(wp); //kaynak sonlanmışsa exception throw eder
+shared_ptr sp(wp); //kaynak sonlanmışsa exception throw eder, = ile olmaz , {} bununla olur
 cout << "use_count = " << sp.use_count() << "\n";  
 cout << "isim = " << *sp << "\n";
 }
@@ -1956,7 +1954,6 @@ std::cout << "exception caught: " << ex.what() << '\n';
 
 cyclic referans
 --------------
-
 
 struct B; //forward decleration
 
