@@ -1959,6 +1959,7 @@ struct B; //forward decleration
 
 struct A {
 std::shared_ptr<B> bptr;
+//B* bptr; //akıllı pointer olmasaydı bu şekilde olurdu
 //burası weak_ptr olsaydı hata olmazdı
 A() {
 std::cout << "A default ctor this = " << this << "\n";
@@ -1969,8 +1970,7 @@ std::cout << "A destructor this = " << this << "\n";
 };
 
 struct B {
-std::shared_ptr<B> bptr;
-struct B {
+std::shared_ptr<A> aptr;
 B() {
 std::cout << "B default ctor this = " << this << "\n";
 }
@@ -1992,8 +1992,62 @@ spb->aptr = spa;
 
 }
 
-//saat 1 de köpekler ile ilgili örnek var
+--------------
 
+using namespace std;
+
+class Dog
+{
+    //shared_ptr<Dog> mp_friend;
+    weak_ptr<Dog> mp_friend; //cyclic referans weak_ptr yaparak düzelir, referans sayacını arttırmadığı için oluşmaz
+    string m_name;
+
+public:
+    Dog(string name) : m_name(move(name))
+    {
+        cout << "kopek " << m_name << " olusturuldu " << '\n';
+    }
+
+    ~Dog()
+    {
+        cout << "kopek " << m_name << " oldu " << '\n';
+    }
+
+    void bark()
+    {
+        cout << m_name << "havliyor " << '\n';
+    }
+
+    void make_friend(shared_ptr<Dog> x)
+    {
+        mp_friend = x;
+        cout << m_name << " " << x->m_name << " ile arkadas oldu " << '\n';
+    }
+
+    void show_friend() const
+    {
+        if (!mp_friend.expired()) {
+            cout << "benim arkadasim : " << mp_friend.lock()->m_name << '\n';
+        }
+        else
+        {
+            cout << "bir arkadasim yok \n";
+        }
+        
+    }
+};
+
+int main()
+{
+    shared_ptr<Dog> sp1(make_shared<Dog>("shiva"));
+    shared_ptr<Dog> sp2(make_shared<Dog>("peggy"));
+
+    sp1->make_friend(sp2);
+    sp2->make_friend(sp1);
+
+    
+    
+}
 
 ---------------------------------
 
@@ -2046,12 +2100,17 @@ sptr->func();
 
 ---------------
 
+CRTP base : kalıtım yoluyla elde edilecek anlamındadır
+
+--------------
+
 class Nec {
 
 public:
 void func()
 {
 shared_ptr<Nec> spx(this); 
+}
 };
 
 int main()
@@ -2096,7 +2155,6 @@ sptr->func();
 }
 
 ------------
-!! BU KISIMLARI TEKRAR İZLE 
 
 using namespace std;
 
@@ -2191,7 +2249,7 @@ programcıların karıştırma ihtimalinin yüksek olduğu nokta
 class Myclass {
 
 private:
-std::vector<std::string> myvec; //non statşc member number, herbiri için ayrı olucak
+std::vector<std::string> myvec; //non statşc member number, herbiri için ayrı olucak, her myclass nesnesinin vektörü var
 //static std::vector<std::string> myvec; //bu şekilde hepsi aynı vectorü kullanılır
 };
 
@@ -2207,11 +2265,16 @@ Myclass m3;
 }
 
 ------------------
+sınıfın veri elemanı :
+-static
+-non-static
+-shared yapılabilir
+------------------
 
 class Myclass {
 
 private:
-std::shared_ptr<std::vector<std::string>> myvec; 
+std::shared_ptr<std::vector<std::string>> myvec; //bu şekilde her nesne
 };
 
 int main()
@@ -2247,57 +2310,81 @@ void operator delete(void *)noexcept; //static
 };
 
 ------------
-#include <cstdlib>
-
-class Myclass {
+class Myclass
+{
 public:
-Myclass()
-{
-std::cout << "default ctor this : " << this << '\n';
-}
+    Myclass()
+    {
+        std::cout << "default ctor this : " << this << '\n';
+    }
 
-~Myclass()
-{
-std::cout << "dtor this : " << this << '\n';
-}
+    ~Myclass()
+    {
+        std::cout << "dtor this : " << this << '\n';
+    }
 
-void* operator new(size_t n)
-{
-std::cout << "Myclass::operator new n : " << n << "\n";
-auto p = std::malloc(n);
-if (!p) {
-throw std::bad_alloc{};
-}
-std::cout << "adress of the allocated block is" << p << '\n';
-return p;
-}
+    void *operator new(size_t n)
+    {
+        std::cout << "Myclass::operator new n : " << n << "\n";
+        auto p = std::malloc(n);
+        if (!p)
+        {
+            throw std::bad_alloc{};
+        }
+        std::cout << "adress of the allocated block is" << p << '\n';
+        return p;
+    }
 
-void operator delete(void *)noexcept;
-{
-std::cout << "Myclass::operator delete vp : " << vp << "\n";
-std::free(vp);
-}
+    void operator delete(void* vp) noexcept
+    {
+        std::cout << "Myclass::operator delete vp : " << vp << "\n";
+        std::free(vp);
+    }
 
-void func()
-{
-std::cout << "Myclass func() this " << this << '\n';
-}
+    void func()
+    {
+        std::cout << "Myclass func() this " << this << '\n';
+    }
+
 private:
-unsigned char buffer[512]{};
+    unsigned char buffer[512]{};
 };
 
 int main()
 {
-auto  p = new Myclass;
+    auto p = new Myclass;
 
-p->func()
+    p->func();
 
-delete p;
+    delete p;
 }
 
---------------------
 
-//ders son 20 dk ödev veriyor ona bak
+--------------------
+//aynı anda hayatı devam eden 100 tane nesne olucak
+
+using Byte = unsigned char;
+
+class Myclass {
+public:
+void* operator new(size_t n)
+{
+
+}
+
+void operator delete(void* vp)
+{
+
+}
+
+private:
+static constexpr std::size_t max_no_of_objects = 100;
+
+static Byte buf[sizeof(Myclass) * max_no_of_objects]; //buffer 100 tane nesneyi tutucak
+
+static Byte mbuf[];
+staic bool mflags[];
+};
 
 --------------------
 
