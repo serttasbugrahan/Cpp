@@ -1,0 +1,894 @@
+//////////////////////////////////////////// 1. Ders //////////////////////////////////////////////////////
+
+giriş/çıkış işlemleri
+---------------------
+
+formatlı giriş çıkış işlemleri ne demektir ?
+
+int x = 3'453'456
+
+0101 0101
+1001 1001
+0010 1001
+1001 1111
+
+-bytları olduğu gibi bir işlem yapmadan alıp verme işlemine formatsız giriş çıkış işlmeleri denir
+
+-bu bytlar insan anlıycağı şekile dönüştürülüyor ise yazı formuna dönüştürülüyor ise formatlı giriş çıkış işlemi demektir
+
+-----------
+
+giriş çıkış işlemlerinin nereye yazılacağı seçilir, dosya yazma, bellekte tutma vb.
+
+giriş çıkış işlemlerini yöneten nesneleri nasıl kullanırız, nasıl işlemler yaparız (cout, cin )
+
+--------------------------
+
+ios_base : ortak interface toplandığı taban sınıf
+
+basic_istream : giriş işlemleri var
+
+basic_ostream : çıkış işlemleri var
+
+basic_iostream : ikisinin toplamı
+
+basic_streambuf : arka plandaki bufferlama işlemini yapar
+
+----------------------
+
+! birkaç önemli ipucu
+
+int main()
+{
+//std::ostream yazınca aşağıdakini yazarız aslında
+
+std::basic_ostream<char, char_traits<char>>
+
+}
+
+-----------
+//mülakatların basic sorusu
+
+int main()
+{
+cout //standart output kontrol eder, sınıf türünden bir nesnedir, fonksiyon ismi değildir
+cin //standart input kontrol eder, sınıf türünden bir nesnedir, fonksiyon ismi değildir
+}
+
+-----------
+
+
+cout : ostream sınıf türünden 
+
+cout ostream sınıf türünden nesne 
+ostream sınfı basic_ios kalıtıım yoluyla edeilir
+basic_ios ios_base sınıfınfan kalıtım yoluyla elde edilir  
+
+-----------
+
+int main()
+{
+using namespace std;
+
+cout. //burada çıkanlar cout, basic_ios ve ios_base sınıfından gelen nesnelerdir
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+cout.operator<< //bunlar ostream sınıfının üueleri
+cin.operator //bunlar istream sınıfının üueleri
+}
+
+-----------
+std::basic_ios<char> //açılımı ios demektir
+
+int main()
+{
+using namespace std;
+ios
+}
+
+------------
+
+                                       ios_base
+                                    
+                              //kalıtım yolyla aşağıdaki elde edilir
+                                    
+                                    basic_ios<c, t>
+                                    
+                              //sanal kalıtım yoluyla aşağıdaki elde edilir
+                                    
+                    basic_istream                            basic_ostream
+                char açılımı istream                        char açlımı ostream
+
+                             //çoklu kalıtım yolyla aşağıdaki elde edilir
+
+                                   
+         basic_istring_strea                              basic_ostring_strem 
+  (bellek üstünde okuma yazma yapmak için)      (bellek üstünde okuma yazma yapmak için)      
+                           
+                                    basic iostream
+                                    basic_stringstream
+
+
+-------------
+
+ilk olarak anlamamız gerekn yerden başlıyoruz
+
+şimdi formatlı giriş çıkış işlemlerine bakıyoruz
+
+bazı fonksiyonlar free bazılar member functiondır
+
+int main()
+{
+using namespace std;
+
+cout << "mert sirakaya\n";
+operator<<(cout, "mert sirakaya\n";
+cout.operator bool("mert sirakaya\n");
+}
+
+--------------
+
+class ostream {
+
+public:
+ostream& operator<<(int);
+ostream& operator<<(double);
+ostream& operator<<(float);
+ostream& operator<<(ostream&(*)(ostream&));
+
+};
+
+-----------
+
+int main()
+{
+using namespace std;
+
+cout << 'A';
+operator<<(cout, 'A'); //burada çağrılan gloabal operator left shift fonksiyonu
+
+cout.operator<< '(A)'; //parametresi int olan karakter kodu
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+cout << endl;
+cout.operator<< (&endl);
+}
+
+------------
+
+//zekice bir hile var
+
+int main()
+{
+using namespace std;
+int val = 5;
+double dval = 4.8761;
+string name{"tamer dundar" };
+
+cout << "necati " << ival << " " << dval << " " << name << endl;  //sonuç olarak aynı işlemleri yapar
+operator<<(operator<<(operator<<(operator<<(cout,  "necati ").operator<< (ival), " ").operator<< (dval),  " "), name).operator<< (endl);
+
+}
+
+--------------
+
+c++'da int ve double yazdıran farklı fonksiyonlardır
+c de aynı fonksiyonlar
+
+---------------
+
+int main()
+{
+using namespace std;
+
+cout << bitset<<32>(76787678u); //global operator fonksiyonudur
+//ancak int double yazdıran üye fonksiyonaldır
+}
+
+--------------
+
+! önemli bir kısıma geçiyouz
+
+istram ve ostream'in bir format state'i var
+
+format state : stream nesnesi bir giriş ya da çıkış işlemi formatlı olarak yapılacağında 
+kendi format state'ine bakarak ne şekilde bir formatalama uygulıycağını seçiyor
+
+cout << 8787878 << '\n'; //neden onluk sistemde yazdı
+//çünkü burada çağrılan format state'ine bakar 10'luk sistemde olucağını seçer
+
+her farklı tür için default format state vardır
+
+ bu format state nasıl set ve get edilir ona bakıyoruz
+
+--------------
+
+boolen (on-off flag)
+
+int main()
+{
+using namespace std;
+
+cout << (10 > 5);
+}
+
+on-off flags:
+-------------
+
+on                off        default
+true-false        1 / 0      off  
+
+0X ABC            0x abc      off 
+
+//bunlar nasıl değiştirilir peki
+
+formatlama state tutan fmtflags vardır
+
+--------------
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::boolalpha); // formta state değiştirir
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+cout.flags() //fmt flag türünden get ediyor
+
+cout.setf(ios::boolalpha);
+cout.setf(cout.flags() | ios::boolalpha);
+}
+
+-----------
+
+//boolalpha 1 0 testi
+
+int main()
+{
+using namespace std;
+
+cout << bitset<32>(cout.flags()) << "\n";
+cout.setf(iso::boolalpha);
+cout << bitset<32>(cout.flags()) << "\n";
+
+if (cout.flags() & ios::boolalpha) {
+cout << "true false olarak yazar\n";
+}
+//defaultu else kısmına girer
+else {
+cout << "1 0 olarak yazar\n";
+}
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+cout << true << false << "\n"; // 1 0  yazar çünkü defaultu böyle
+cout.setf(ios::boolalpha)
+cout << true << false << "\n";
+cout << true << false << "\n";
+}
+
+//peki eski haline nasıl getiriceğiz
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+cout << true << false << "\n"; // 1 0  yazar çünkü defaultu böyle
+cout.setf(ios::boolalpha); //biti set eder
+//cout.flags(cout.flags() & ~ios::boolalpha); //setf açılmış hali
+
+cout << true << false << "\n";
+cout << true << false << "\n";
+
+//cout.unsetf(ios::boolalpha); //Biti reset eder
+//cout.flags(cout.flags() & ~ios::boolalpha); //unsetf açılmış hali
+
+cout << true << false << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+int ival = 567532;
+
+cout.setf(ios::showpos);
+cout << ival << "\n";
+cout.unsetf(ios::showpos);
+cout << ival << "\n";
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+int ival = 567532;
+
+cout.setf(ios::boolalpha | ios::showpos);
+
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+double dval = 4.;
+cout.setf(ios::showpoint);
+cout << dval << "\n";
+
+}
+
+---------------
+
+ios_base::boolalpha
+ios_base::showpos
+ios_base::showpoint
+ios_base::showbase
+ios_base::uppercase
+
+---------------
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::hex, ios::basefield);
+cout.setf(ios::showbase);
+cout.setf(ios::uppercase);
+cout.setf(ios::showbase | ios::uppercase); //bu şekilde ikiside aynı anda yapılabilir
+
+
+cout << 47805;
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::hex, ios::basefield);
+
+--------------
+constexpr std::ios_base::fmtflags necflag{ std::ios::showbase | std::ios::showpoint };
+
+int main()
+{
+using namespace std;
+
+cout.setf(necflags);
+cout.unsetf(necflags);
+}
+
+
+----------------
+
+bazı formatlama birden fazla değer alabiliyro
+
+//sayı sisteminin ne olduğu
+
+dec hex oct
+
+int main()
+{
+using namespace std;
+
+bitset<32>(ios::basefield) << "\n"; //dec hex oct olduğunu gösteren bitler bunlardır
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+cout << bitset<32>(ios::basefield) << "\n";
+cout << bitset<32>(ios::dec) << "\n";
+cout << bitset<32>(ios::oct) << "\n";
+cout << bitset<32>(ios::hex) << "\n";
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+int ival = 54807;
+
+cout << ival << "\n";
+
+cout.setf(ios::hex, iosbasefield); //1.parama göre birle, 2. parama göre sıfırla
+
+cout << ival << "\n";
+
+cout.setf(ios::oct, ios::basefield);
+
+cout << ival << "\n";
+
+cout.setf(ios::dec, ios::basefield);
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+//cout.setf(ios::hex, ios::basefield); //sadece hex biti set edilir
+
+if (cout.flags() & ios::dec) {
+std::cout << "dec biti set edilmis\n";
+}
+if (cout.flags() & ios::hex) {
+std::cout << "hex biti set edilmis\n";
+}
+
+if (cout.flags() & ios::oct) {
+std::cout << "oct biti set edilmis\n";
+
+}
+
+//sadece 10 16 ve 8 lik sayı sisteminde yazma var
+
+-----------
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::uppercase);
+cout.setf(ios::showcase);
+cout.setf(ios::hex, ios::basefield);
+
+for (int i = 13576, i < 14000; ++i)
+cout << i << "\n";
+}
+
+--------------------------------------------
+//bu kısmı ezberlemeye çalışma işin düştüğü zaman cpp ref bak dedi necati hoca
+
+gerçek sayıların formatlama biçimleri
+--------------------
+
+a) fixed : noktalı yazmak
+b) scinetific : 10^ şekilde
+c) büyüklüğüne bağlı : implementasyon yukarıdakilerden birini seçer
+d) precision : nokta gösterilmesi
+
+
+ios::fixed
+ios::scinetific
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::fixed, ios::floatfield);
+//cout.setf(ios::scinetific, ios::floatfield);
+//cout.setf(ios::fixed | ios::floatfield);
+
+
+cout << "ios::fixed : " << (cout.flags() & ios.fixed ? "set" : "unset") << "\n";
+cout << "ios::scinetific  : " << (cout.flags() & ios.scinetific ? "set" : "unset") << "\n";
+
+cout << 7324.72345 << "\n";
+cout << 987678987678.87678 << "\n";
+}
+
+--------------------
+
+outfit (yazma alanı genişliği): yazılan yazıuı belli bir karakter alanına yazmak içinn kullanılır, yazıları hizaya sokmak için yapılır
+
+
+furkan.....434
+damla......3232
+can........34333
+nurattin...232
+giyasettin.232 //sola dayalı
+
+..........furkan //sağa dayalı
+
+//iostream kütüphanesinde ortalama yoktur, std::formatta vardır, necati hoca buna c++ gençlik günahlarından brisi diyor
+
+bunun yerine 'internal' vardır.
+
+tam sayıları söz konusu olduğunda işaret sola gelir
++    45
+-    235
++    
+
+bunları temsil eden
+
+ios::left
+ios::right
+ios::internal  ios::adjustfield
+
+cout.setf(ios::left, ios::adjusfield);
+cout.setf(ios::right, ios::adjusfield);
+cout.setf(ios::internal, ios::adjusfield);
+
+
+------------
+
+int main()
+{
+using namespace std;
+
+auto n = cout.width(); //yazma alanı genişliğini get eder
+
+cout << "n = " << n << '\n';
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+auto c = cout.fill('-');
+
+cout << static_cast<int>(c) << "\n";
+auto c = cout.fill();
+cout << static_cast<int>(c) << "\n";
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+//cout.setf(ios::right, ios::adjustfield); //zaten default sağa dayalı yazmaya gerek yok
+cout.width(24);
+
+cout << "neco" << "furkan";
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::right, ios::adjustfield); 
+cout.fill('.');
+cout.width(24);
+
+cout << "neco" << "furkan";
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+cout setf(ios)
+
+for (int i = 0; i < 20; ++i) {
+cout.width(12);
+cout << rname();
+cout.width(20);
+cout << rfname();
+cout.width(20);
+cout << rtown();
+cout << '\n';
+}
+}
+
+
+-------------------------
+
+bu karmaşık yapı yerine ostream manipülatörü vardır
+
+class ostream {
+
+pubcli:
+ostream& operator<<(int);
+ostream& operator<<(double);
+ostream& operator<<(float);
+ostream& operator<<(ostream&(*fp)(ostream&))
+{
+return fp(*this)
+}
+}
+
+cout << endl
+
+-------------
+//aşağıdakilere ostream manipilatörü deniyor
+
+std::ostream& Boolalpha(ostream& os)
+{
+os.setf(ios::boolalpha);
+return os;
+}
+
+std::ostream& NoBoolalpha(ostream& os)
+{
+os.unsetf(ios::boolalpha);
+return os;
+}
+
+int main()
+{
+using namespace std;
+
+cout << Boolalpha << (10 > 5)  << NoBoolalpha << (10 > 5); 
+}
+
+//bunlar standart olduğu için o şekilde yazmaya gerek yok
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int x = 0xBABA;
+
+cout << x << hex << x << '\n' << oct << x << dec << '\n';
+cout << x;
+
+}
+
+--------------
+//hex manipilatörünü bu şekilde yazabiliriz
+
+std::ostream& Hex(std::ostream& os)
+{
+os.setf(ios::hex, ios::basefield);
+
+return os;
+}
+
+int main()
+{
+using namespace std;
+
+
+}
+
+------------
+//kendi manipilatörümüzü yazabiliriz
+
+std::ostream& nhex(std::ostream& os)
+{
+os.setf(std::ios::uppercase | std::ios::showbase);
+os.setf(std::ios::hex, std::ios::basefield);
+return os;
+}
+
+int main()
+{
+using namespace std;
+
+cout << 47802 << " " << nhex << 47802 << "\n";
+}
+
+------------
+
+endl de bu şekilde bir fonksiyondur
+
+std::ostream& Endl(std::ostream& os)
+{
+os.put('\n');
+os.flush(); //bunun ciddi maaliyeti vardır
+return os;
+}
+
+!! her yerde endl kullanılmaz
+
+----------
+
+//şık bir manipilatör yazıyoruz
+
+std::ostream& dl(std::ostream& os)
+{
+return os << "\n-------------------------------"; 
+}
+
+int main()
+{
+using namespace std;
+
+cout << 12 << dl << "ali" << dl << 23.5 << dl << "furkan";
+}
+
+----------------
+
+void func(std::ostream& os)
+{
+os << boolalpha << hex << uppercase << showcase;
+///.
+}
+
+int main()
+{
+func(cout);
+}
+
+----------------
+
+yukarıda cout manipüle edildi cout bende kullanıyorum ancak onun format statei değişti
+
+fromat state değiştiriceğimiz ancak eski haline de geri getireceğimiz durumda ne yapmamız gerekir
+
+bunun 2 yolu vardır
+-şık yok
+-düz yol
+-pek bilinmeyen yol
+-------------
+-düz yol
+
+void func(std::ostream& os)
+{
+auto flg = os.flags();
+auto width = os.width();
+auto fc = os.fill();
+auto precision = os.precision();
+
+os << boolalpha << hex << uppercase << showcase;
+
+os.flags(flg);
+os.width(width);
+os.fill(fc);
+os.precision(precision);
+}
+
+------------
+
+-şık yol: RAII Kullanmak
+
+RAII : ctor kaynağı edinir ctor kaynağı geri verir
+
+------------
+
+//mülakatta raıı idiomu sorulsa bunu verebilirsin
+
+class FmtGuard {
+public:
+FmtGuard(std::ostream& os) : m_os{os} mflags{os.flags()}, 
+mwidth(os.width()) {}
+
+~FmtGuard()
+{
+os.flags(mflags);
+m_os width(mwidth);
+}
+
+private: 
+std::ostream& m_os;
+std::ios::fmtflags mflags;
+std::size_t mwidth;
+};
+
+void func(std::ostream& os)
+{
+FmtState state { os };
+os << boolalpha << hex << uppercase << showcase;
+
+}
+
+----------------
+
+-pek bilinmeyen yol
+
+int main()
+{
+using namespace std;
+
+ostream mycout(cout.rdbuf());
+
+mycout << uppercase << hex << showbase << boolalpha;
+
+mycout << 47802 << " " << (10 > 5) << "\n";
+cout << 47802 << " " << (10 > 5) << "\n";
+
+}
+
+-----------------
+
+#include <iomanip>
+
+int main()
+{
+using namespace std;
+
+for (int i = 0; i < 10; ++i) {
+cout << setw(12) << rname << setw << 30 << rfname() << rand() << '\n';
+//setw parametreli manipilatör
+ 
+}
+}
+
+---------------
+
+parametreli manipilatörler
+
+-set
+-setprecision
+-setfill
+
+
+---------------
+
+//zor bir sour
+
+//bir mülakata girdik ve bziden parametreli bir manipilatör yazmamız istendi
+//a-yukarıdaki kodu legal yap
+//b- sp manipilatörü 5 için 5 space boşluk
+
+//yasar......ali...........veli...................mert  //nokta yerne space
+
+
+
+int main()
+{
+using namespace std;
+cout << left << "\n";
+
+cout << "yasar" << sp(5) << "ali" << sp(12) << sp(20) << "mert" << '\n';
+}
+
+----------
+
+class sp {
+public:
+sp(std::size_t val) : mval(val) {}
+friend std::ostream& operator<<(std::ostream& os, const sp& x)
+{
+for (int i = 0; i < x.mmval; ++i) {
+os.put(' ');
+}
+return os;
+}
+private:
+std::size_t mval;
+}
+
+int main()
+{
+using namespace std;
+cout << left << "\n";
+
+cout << "yasar" << sp(5) << "ali" << sp(12) << sp(20) << "mert" << '\n';
+}
+
+
+
+
+
