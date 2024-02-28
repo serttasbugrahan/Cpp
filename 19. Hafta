@@ -61,7 +61,7 @@ cin //standart input kontrol eder, sınıf türünden bir nesnedir, fonksiyon is
 cout : ostream sınıf türünden 
 
 cout ostream sınıf türünden nesne 
-ostream sınfı basic_ios kalıtıım yoluyla edeilir
+ostream sınfı basic_ios kalıtım yoluyla edeilir
 basic_ios ios_base sınıfınfan kalıtım yoluyla elde edilir  
 
 -----------
@@ -98,7 +98,7 @@ ios
                                     
                               //kalıtım yolyla aşağıdaki elde edilir
                                     
-                                    basic_ios<c, t>
+                                    basic_ios<c,t>
                                     
                               //sanal kalıtım yoluyla aşağıdaki elde edilir
                                     
@@ -108,7 +108,7 @@ ios
                              //çoklu kalıtım yolyla aşağıdaki elde edilir
 
                                    
-         basic_istring_strea                              basic_ostring_strem 
+         basic_istring_stream                              basic_ostring_stremm
   (bellek üstünde okuma yazma yapmak için)      (bellek üstünde okuma yazma yapmak için)      
                            
                                     basic iostream
@@ -251,7 +251,7 @@ int main()
 {
 using namespace std;
 
-cout.flags() //fmt flag türünden get ediyor
+cout.flags(); //fmt flag türünden get ediyor
 
 cout.setf(ios::boolalpha);
 cout.setf(cout.flags() | ios::boolalpha);
@@ -266,7 +266,7 @@ int main()
 using namespace std;
 
 cout << bitset<32>(cout.flags()) << "\n";
-cout.setf(iso::boolalpha);
+cout.setf(ios::boolalpha);
 cout << bitset<32>(cout.flags()) << "\n";
 
 if (cout.flags() & ios::boolalpha) {
@@ -285,8 +285,7 @@ int main()
 using namespace std;
 
 cout << true << false << "\n"; // 1 0  yazar çünkü defaultu böyle
-cout.setf(ios::boolalpha)
-cout << true << false << "\n";
+cout.setf(ios::boolalpha);
 cout << true << false << "\n";
 }
 
@@ -366,7 +365,6 @@ cout.setf(ios::showbase);
 cout.setf(ios::uppercase);
 cout.setf(ios::showbase | ios::uppercase); //bu şekilde ikiside aynı anda yapılabilir
 
-
 cout << 47805;
 }
 
@@ -385,8 +383,8 @@ int main()
 {
 using namespace std;
 
-cout.setf(necflags);
-cout.unsetf(necflags);
+cout.setf(necflag);
+cout.unsetf(necflag);
 }
 
 
@@ -596,7 +594,7 @@ int main()
 {
 using namespace std;
 
-cout setf(ios)
+cout.setf(ios)
 
 for (int i = 0; i < 20; ++i) {
 cout.width(12);
@@ -846,7 +844,7 @@ parametreli manipilatörler
 
 ---------------
 
-//zor bir sour
+//zor bir soru
 
 //bir mülakata girdik ve bziden parametreli bir manipilatör yazmamız istendi
 //a-yukarıdaki kodu legal yap
@@ -866,28 +864,952 @@ cout << "yasar" << sp(5) << "ali" << sp(12) << sp(20) << "mert" << '\n';
 
 ----------
 
-class sp {
-public:
-sp(std::size_t val) : mval(val) {}
-friend std::ostream& operator<<(std::ostream& os, const sp& x)
+class sp
 {
-for (int i = 0; i < x.mmval; ++i) {
-os.put(' ');
-}
-return os;
-}
+public:
+    sp(std::size_t val) : mval(val) {}
+    friend std::ostream &operator<<(std::ostream &os, const sp &x)
+    {
+        for (int i = 0; i < x.mval; ++i)
+        {
+            os.put(' ');
+        }
+        return os;
+    }
+
 private:
-std::size_t mval;
+    std::size_t mval;
+};
+
+int main()
+{
+    using namespace std;
+    cout << left << "\n";
+
+    cout << "yasar" << sp(5) << "ali" << sp(12) << "mert" << '\n';
+}
+
+/////////////////////////////////////////////////// 2. Ders /////////////////////////////////////////////////
+
+tekrar
+
+bazı özellikler boolen
+
+.setf(ios::boolalpha);
+.unsetf(ios::boolalpha); //eski haline geri döner
+
+ios::showbase
+ios::uppercase
+ios::skipws
+ios::showpoint
+
+cout.setf(ios::hex, ios::basefield);
+cout.setf(ios::left, ios::adjustfield);
+
+cout.setf(ios::fixed, ios::floatfield);
+
+//sadece çıkış akımı için değil giriş akımı içinde geçerlidir
+
+int main()
+{
+using namespace std;
+
+std::cout << "bir tam sayi girin: ";
+int x{};
+
+cin.setf(ios::hex, ios::basefiled);
+cin.setf(ios::oct, ios::basefiled);
+cin >> x;
+
+cout << "x = " << x << '\n';
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+std::cout << "2 tam sayi girin: ";
+int x{}, y{};
+
+cin >> hex >> x >> oct >> y >> dec >> z;
+
+cout << "x = " << x << '\n';
+cout << "y = " << y << '\n';
+cout << "z = " << z << '\n';
+
+}
+
+---------------------
+//hiçbiri yazmaz
+
+int main()
+{
+using namespace std;
+
+if (cin.flags() & ios::hex) { std::cout  << "hex set\n"; }
+if (cin.flags() & ios::dec) { std::cout  << "dec set\n"; }
+if (cin.flags() & ios::oct) { std::cout  << "oct set\n"; }
+
+int x{};
+
+cout << "bir sayi girin: ";
+cin >> x; //012, 10 ,0x10
+
+cout << "x = " << x << "\n";
+}
+
+--------
+
+//ilginç bir özellik daha var
+//hem istream tarafında hem ostream tarafında
+
+//parametreli bir manipilatör bu yzüden <iomanip> ihtiyaç duyar
+
+#include <iomanip>
+
+int main()
+{
+using namespace std;
+int x;
+
+cin >> setbase(ios::hex) >> x;
+
+cin >> hex >> x; //yukarıdaki ile aynı anlamda
+}
+
+------------
+
+unitbuf : bufferlama olmadan yazılmasına denir 
+nounitbuf 
+
+int main()
+{
+using namespace std;
+
+cout.setf(ios::unitbuf);
+cout << unitbuf;
+cout << (cout.flags() & ios::unitbuf ? "set" : "unset") << "\n";
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+unitbuf(std::cout); //sentax hatası olmaz, ADL
+endl(std::cout);//sentax hatası olmaz, ADL
+flush(std::cout);//sentax hatası olmaz, ADL
+
+}
+
+------------
+
+std::ostream& Flush(std::ostream& os)
+{
+return os.flush();
 }
 
 int main()
 {
 using namespace std;
-cout << left << "\n";
 
-cout << "yasar" << sp(5) << "ali" << sp(12) << sp(20) << "mert" << '\n';
+cout << Flush << "\n";
 }
 
+------------
+
+ends : null karakter koyar
+
+-----------
+
+int main()
+{
+using namespace std;
+
+cout << right << setw(12) << setfill('!') << 45
+}
+
+-----------
+
+//geri kalan manipilatörleri https://en.cppreference.com/w/cpp/io/manip sayfasından kontrol et
+
+------------
+
+format kütüphanesini öğren bunlar hantal biraz diyor necati hoca
+ileri cpp kursunda onları anlatıyor
+
+====================================================
+
+                                          ios_base
+                                                                        
+                                        basic_ios (T)
+                                                                        
+                    basic_istream                            basic_ostream
+
+                                          basic_iostream
+                                              |
+                                              |
+                                              |
+                                              |
+      basic_istring_stream                    |                 basic_ostring_stream
+(bellek üsütnde  okuma)                       |           (bellek üsütnde yazma)
+                                      basic_string_stream
+                               (bellek üsütnde hem okuma hem yazma)
+
+
+
+----------------------------
+
+C tekrarı
+---------
+
+#include <csdio>
+
+c dilinde sprintf, sscanf 
+
+int main()
+{
+int x = 5;
+double dval = 4.5;
+char name[] = "melike";
+char buffer[256];
+
+sprint(buffer, "x = %d dval = %f name = %s", x, dval, name); //belleğe yazar
+
+printf("%s\n", buffer);
+}
+
+-----------
+
+scanf ne yapar : bellekten okuma işlemi yapar
+
+int main()
+{
+int x, y, z;
+
+printf("3 sayi giriniz: ");
+scanf("%d%d%d", &x, &y, &z);
+
+printf("x = %d y = %d z = %d\n", x, y, z);
+}
+
+-----------
+
+int main()
+{
+int x, y, z;
+
+char buf[]= "123 456 790";
+sscanf(buf, "%d%d%d", &x, &y, &z); //değerleri bellekten alır
+
+printf("x = %d y = %d z = %d\n", x, y, z);
+}
+
+----------------------------
+
+//bunlar yeriine c++ da 
+
+int main()
+{
+using namespace std;
+
+ostringstream : yazma
+istringstream : okuma
+stringstring : okuma ve yazma
+}
+
+------------
+ostringstream sınıfı ile başlıyoruz
+
+int main()
+{
+using namespace std;
+
+ostringstream 
+basic_ostring_stream<char> //yukarıdaki ile aynı anlamda, typedef sayesinde olur
+}
+
+----------
+//ne işe yarar
+
+int main()
+{
+using namespace std;
+
+ostringstream os;
+int amount = 200'000;
+
+os << "benim" << amount << "dolarim var\n" //os kontrol ettiği bellek alanına yazıldı
+
+//bu ne işe yarar
+
+auto s = os.str();
+reverse(s.begin(), s.end());
+
+cout << s << "\n";
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+ostringstream os;
+
+for (int i = 0; i < 10; ++i) {
+os << i;
+}
+
+cout << os.str(); //bellekten hepsini yazacaktır
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+int day, mon, year;
+
+cout << "tarihi giriniz: ";
+cin >> day >> mon >> year;
+
+//03_05_1987.txt üzerine yazsa idik çok masraflı olurdu
+
+ostringstream oss;
+
+oss.fill('0');
+oss << setfill('0') << setw(2) << day << '_' << setw(2) << mon << '_' << year << ".txt"
+
+cout << "[" << oss.str() << "]\n";
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+ostringstream oss;
+
+for (int i = 1; i < 10; ++i) {
+oss << "necati" << i << ".txt";
+cout << oss.str() << "\n";
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+for (int i = 1; i < 10; ++i) {
+ostringstream oss; //bu şekilde farklı olur
+oss << "necati" << i << ".txt";
+cout << oss.str() << "\n";
+}
+}
+
+---------------
+#include <sstream>
+
+int main()
+{
+using namespace std;
+
+ostringstream oss;
+
+for (int i = 1; i < 10; ++i) {
+oss << "necati" << i << ".txt";
+cout << oss.str() << "\n";
+oss.str(""); //bu şekilde de olur
+}
+
+----------------
+
+//mülakatlarda sorulan bir soru
+
+class date {
+public:
+date(int day, int mon, int year) : day_(day), mon_(mon), year_(year) {}
+friend std::ostream& operator<<(std::ostream&, const Date& dt)
+{
+return os << dt.day_ << "-" << dt.mon_ << "-" << dt.year_;
+}
+
+private:
+int day_, mon_, year_;
+
+};
+
+int main()
+{
+date mydate{11, 12, 2023 };
+
+// cout << mydate << "\n"; //normaalde bu şekilde yazılır
+
+cout << left << setw(40) << mydate << "mustafa\n"; //bu kod beklenildiği gibi çalışır mı? -hayır
+//yazma alanı genişliği sadece ilk öğeyi kapsar
+}
+
+
+------------
+
+//aşağıdaki şekilde çözülür
+
+class date {
+public:
+date(int day, int mon, int year) : day_(day), mon_(mon), year_(year) {}
+friend std::ostream& operator<<(std::ostream&, const Date& dt)
+{
+std::ostringstream ostr;
+ostr << dt.day_ << "-" << dt.mon_ << "-" << dt.year_;
+return os << ostr.str();
+}
+
+private:
+int day_, mon_, year_;
+
+};
+
+int main()
+{
+date mydate{11, 12, 2023 };
+
+
+cout << left << setw(40) << mydate << "mustafa\n"; 
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+ostringstream oss;
+
+oss << hex << uppercase << showbase;
+
+oss << 47802 << " " << 54807;
+
+cout << oss.str() << "\n";
+}
+
+---------------
+//şaşırtıcı bir kod
+//enter basıldığı zaman ekrana yazılan kodları toplar
+
+int main()
+{
+using namespace std;
+
+cout << "toplanacak sayilari girin: ";
+
+string str;
+getline(cin, str)
+cout << "[" << str << "]\n";
+
+istringstream iss{str};
+int ival;
+int sum{};
+while (iss >> ival) {
+sum += ival;
+}
+
+cout << "toplam = " << sum << '\n';
+}
+
+
+----------------------
+#include <sstream>
+
+//girilen sayıları küçükten büyüğe sırala
+
+int main()
+{
+using namespace std;
+
+cout << "sayilar giriniz ";
+
+string str;
+getline(cin, str); //Boşluklar dahil string nesnesini aldı
+
+istringstream iss{str};
+
+int ival;
+
+vector<int> ivec;
+
+while (iss >> ival) {
+ivec.push_back(ival);
+}
+
+sort(ivec.begin(), ivec.end());
+
+for (const auto val : ivec)
+cout << val << " ";
+}
+
+------------------
+#include <sstream>
+
+//tokenızing yapılması (kelimeler ayrıştıma)
+
+int main()
+{
+using namespace std;
+
+cout << "bir cumle girin: ";
+string str;
+
+getline(cin, str);
+istringstream iss{str};
+
+string word;
+
+while (iss >> word) {
+cout << word << '\n';
+}
+}
+
+--------------
+#include <sstream>
+#include <random>
+#include <iterator>
+
+int main()
+{
+using namespace std;
+
+cout << "bir cumle girin: ";
+string str;
+
+getline(cin, str);
+istringstream iss{str};
+
+string word;
+vector<string> svec;
+while (iss >> word) {
+svec.push_back(move(word));
+}
+
+//ilginç bir algoritma
+
+mt19937 eng;
+
+for (int i = 0; i < 20; ++i) {
+(void)getchar();
+system("cls);
+shuffle(svec.begin(), svec.end(), eng);
+copy(svec.begin(), svec.end(), ostream_iterator<string>(cout, " "));
+}
+}
+
+---------------------------------------------
+
+contition state
+
+streamin bir sağlık durumu vardır
+sağlık iyiyse okuma yazma yapar değilse yapamaz
+
+nasıl format state var ise contiton state vardır
+
+//format state ==> fmtflgas var
+//condition state ==> iostate
+
+-------------
+
+int main()
+{
+cout << typeid(ios::base::iostate).name()
+}
+
+-------------
+
+stream sınıflarının bool döndüren fonksiyonları vardır
+
+.good() //true dönerse, streamde hata yok
+.eof() //true dönerse, stream'de karakter olmamasına rağmen okuma işlemi yapınca döner
+.fail() //true dönerse, akımda hata var
+.bad() //true dönerse, ciddi bir hata var stream kullanılmaz durumda
+
+----------
+
+int main()
+{
+using namespace std;
+
+cout << boolalpha;
+
+cout << "cin.good() : " << cin.good() << '\n';
+cout << "cin.eof() : " << cin.eof() << '\n';
+cout << "cin.fail() : " << cin.fail() << '\n';
+cout << "cin.bad() : " << cin.bad() << '\n';
+
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+cout << boolalpha;
+int x{};
+
+cin >> x;
+
+cout << "cin.good()      : " << cin.good() << '\n';
+cout << "cin.eof()       : " << cin.eof() << '\n';
+cout << "cin.fail()      : " << cin.fail() << '\n';
+cout << "cin.bad()       : " << cin.bad() << '\n';
+cout << "operator bool() : " << (cin ? true : false) << "\n";
+cout << "operator!()     : " << (!cin ? true : false) << "\n";
+}
+
+// streamde karakter olmayışı, 'ctrl + z + enter'  ile test yap
+
+--------------
+
+int main()
+{
+using namespace std;
+
+// ios::goodbit
+// ios::eofbit
+// ios::failbit
+// ios::badbit
+
+cout << ios::goodbit;
+cout << ios::failbit;
+cout << ios::badbit;
+cout << ios::failbit;
+
+}
+
+---------------
+
+void print_state(const ios& s)
+{
+const auto stream_state = s.rdstate();
+
+if (stream_state == 0) { cout << "stream is ok no bit set\n";}
+
+if (stream_state & ios::failbit) { cout << "failbit set\n";}
+if (stream_state & ios::eofbit) { cout << "eofbit set\n";}
+if (stream_state & ios::badbit) { cout << "badbit set\n";}
+
+}
+
+int main()
+{
+using namespace std;
+
+int x;
+cin >> x;
+print_state(cin);
+
+cin.clear(); //Hata bayraklarını sıfırlar akımı good durumuna getirir
+print_state(cin);
+}
+
+----------------
+
+void print_state(const ios& s)
+{
+const auto stream_state = s.rdstate();
+
+if (stream_state == 0) { cout << "stream is ok no bit set\n";}
+
+if (stream_state & ios::failbit) { cout << "failbit set\n";}
+if (stream_state & ios::eofbit) { cout << "eofbit set\n";}
+if (stream_state & ios::badbit) { cout << "badbit set\n";}
+
+}
+
+int main()
+{
+using namespace std;
+
+int x;
+
+while (cin >> x) {
+//while(cin.operator>> (x).operator bool()) //aynı anlamda
+cout << x << " * " << x << " = " << x * x << "\n";
+}
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+if (cin) {
+std::cout << "ok\n";
+}
+
+if (cin.operator!() {
+cout << "not ok\n"
+}
+
+if (!cin.good() {
+cout << "not ok\n"
+}
+
+}
+
+-----------------
+#include <iomanip>
+
+void print_state(const ios& s)
+{
+const auto stream_state = s.rdstate();
+
+if (stream_state == 0) { cout << "stream is ok no bit set\n";}
+
+if (stream_state & ios::failbit) { cout << "failbit set\n";}
+if (stream_state & ios::eofbit) { cout << "eofbit set\n";}
+if (stream_state & ios::badbit) { cout << "badbit set\n";}
+}
+
+int main()
+{
+using namespace std;
+
+cout << "bir tam sayi girin: ";
+
+int x{};
+
+while (!(cin >> x)) {
+if (cin.eof()) {
+std::cout << "ama hic giris yapmadiniz ki\n";
+cin.clear();
+cout << "tekrar deneyin\n";
+}
+else {
+cin.clear();  
+string sline;
+getline(cin, sline);
+cout << quoted(sline) <<  "gecerli bir sayi degil... tekrar deneyin\n";
+}
+}
+
+std::cout << "girdiginiz sayi" << x << "\n";
+}
+
+//ctrl z enter ile test yap
+
+--------------------
+
+void print_state(const ios& s)
+{
+const auto stream_state = s.rdstate();
+
+if (stream_state == 0) { cout << "stream is ok no bit set\n";}
+
+if (stream_state & ios::failbit) { cout << "failbit set\n";}
+if (stream_state & ios::eofbit) { cout << "eofbit set\n";}
+if (stream_state & ios::badbit) { cout << "badbit set\n";}
+}
+
+int main()
+{
+cin.clear(ios::failbit | ios::eofbit | ios::badbit); //3 biti birden set etti
+
+print_state(cin);
+}
+
+---------------
+
+int main()
+{
+istringstream iss{"12 45 78"};
+
+int ival;
+
+iss >> hex >> ival;
+
+if (iss) {
+std::cout << "stream iyi durumda\n";
+}
+else {
+std::cout << "stream hata durumda\n";
+}
+}
+
+----------------
+
+exception throw etmezler
+exception throw daha sonra koyulmuştur dile çünkü
+
+---------------
+//exception hale getirebiliyoruz
+//sınıfın exception isimli fonksiyou vardır
+
+int main()
+{
+using namespace std;
+
+auto cstate = cin.exceptions();
+
+cout << cstate << "\n";
+}
+
+---------------
+
+int main()
+{
+cin.exceptions(ios::eofbit); //eofbit set edilirse exception throw edilsin
+cin.exceptions(ios::failbit); //failbit set edilirse exception throw edilsin
+cin.exceptions(ios::failbit); //failbit set edilirse exception throw edilsin
+
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+//cin.exceptions(ios::failbit);
+//cin.exceptions(ios::eofbit);
+
+try
+{
+    std::cout << "bir sayi girin : "; //ali
+    cin >> x;
+}
+catch(const std::exception& e)
+{
+    std::cout << "exceptions caught: " << e.what() << '\n';
+}
+
+-----------------
+
+using namespace std;
+
+void func(std::istream& is)
+{
+auto state = is.exceptions();
+
+//is.exceptions(ios::failbit);
+
+is.exceptions(state);
+}
+
+--------------------------------
+
+int main()
+{
+using namespace std;
+
+istream_iterator<int> iter{cin};
+istream_iterator<int> end{};
+
+}
+
+-----------------
+#include <numeric>
+
+int main()
+{
+using namespace std;
+
+cout << "sayilar giriniz: ";
+cout << accumulate(istream_iterator<int>{cin}, istream_iterator<int>{}, 0) << "\n";
+cout << *max_element(istream_iterator<int>{cin}, istream_iterator<int>{}) << "\n";
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+cout << "sayilar giriniz: ";
+
+vector<int> ivec(istream_iterator<int>{cin}, istream_iterator<int>{});
+
+cout << "toplam " << ivec.size() << "tane sayi girdiniz\n";
+sort(ivec.begin(), ivec.end());
+cout << "girdiğiniz sayilar\n";
+
+for (const auto ival : ivec) {
+std::cout << ival << " ";
+}
+}
+
+-------------------
+
+int main()
+{
+string str{"2.3 5.6 6.7 4.5 1.2 4.4 3.9"};
+istringstream iss(str);
+
+vector<double> dvec {istream_iterator<double>{iss}, istream_iterator<double>{}};
+
+for (auto dval : dvec)
+cout << dval << "\n";
+}
+
+------------------
+
+//çok kullanılan idiyomatik yapı
+
+template <typename T>
+void func(T x, T y)
+{
+std::cout << "x = " << x << "\n";
+std::cout << "y = " << y << "\n";
+}
+
+int main()
+{
+string s1{"alican"}, s2{"tamer"};
+
+func(3.4, 2.3);
+func(s1, s2);
+}
+
+----------------
+
+
+template <typename T>
+void func(T x, T y)
+{
+std::cout << "x = " << x << "\n";
+std::cout << "y = " << y << "\n";
+}
+
+int main()
+{
+func(12, {}); //
+
+string s1{"furkan"};
+func(s1, {});
+
+
+}
+
+------------------
+
+programcılar aşağıdaki idiomu gördüğü zaman şaşırır
+
+int main()
+{
+string str{"2.3 5.6 6.7 4.5 1.2 4.4 3.9"};
+istringstream iss(str);
+
+vector<double> dvec {istream_iterator<double>{iss}, {}}; //default ctor edilmiş stream gözükür
+ 
+}
 
 
 
