@@ -1462,7 +1462,7 @@ int main()
     Mercedes m;
     Bmw b;
     Audi a;
-    Skoda s;e
+    Skoda s;
 
     car_game(&m);
     car_game(&b);
@@ -2206,7 +2206,7 @@ std::cout << Base default ctor\n";
 
 Base(const Base&)
 {
-std::cout << "Base copt ctor\n";
+std::cout << "Base copy ctor\n";
 }
 };
 
