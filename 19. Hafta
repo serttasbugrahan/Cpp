@@ -2291,7 +2291,7 @@ cerr << "dosya olusturulamadi\n";
 return 1;
 }
 
-Irand myrand {0, 300'=00};
+Irand myrand {0, 300'000};
 
 ofs << left;
 
@@ -2299,3 +2299,591 @@ for (int i = 0; i < 10'000; ++i) {
 ofs << setw(12) << myname() << " " << myfname() << " " << rfname() << " " << rtown() << '\n';
 }
 }
+
+---------------
+
+cpp 20 kullanılıyorsa format kütüphanesini kullan
+
+
+
+----------------------------
+
+biraz format kütüphanesine bakıyoruz
+
+int main()
+{
+using namespace std;
+
+int x = 10, y = 20, z = 56;
+
+cout << format("{} {} {}\n", x,y,z);
+cout << format("{2} {0} {1}\n", x,y,z);
+cout << format("{}\n", true); //default format state true durumda
+}
+
+
+--------------------------
+format sıralaması aşağıdaki şekildedir
+
+[fill]align] [sign][#][0][width][.precision][type]
+//doldurma, hizalama, işaret, dies, başını 0 ile besleme, genişliş, precision , tür
+--------------------------
+#include <format>
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //dosya oluşturur
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+Irand myrand {0, 300'000};
+
+ofs << left;
+
+for (int i = 0; i < 10'000; ++i) {
+ofs << format("{:<9} {:<16} {:<20} {}", myrand(), rname(), rfname(), rtown());
+//hizalama ve width seçtik sadece diğerlerini default yaptık
+//cpp 23 ile prrint geldi
+//print(ofs, "{:<9} {:<16} {:<20} {}", myrand(), rname(), rfname(), rtown());
+}
+}
+
+-------------------
+
+ilk 100'000 asal sayıyı primes.txt dosyasina formatli olarak yazin
+
+constexpre int n = 100'000;
+
+int main()
+{
+using namespace std;
+
+std::ofstream ofs{"primes.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+int x{2};
+int prime_count{};
+
+while (prime_count < n) {
+if (isprime(x)) {
+if (prime_count && prime_count % 10 == 0)
+ofs << '\n';
+ofs << std::format("{:<12}", x);
+++prime_count;
+}
+++x;
+}
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+vector<string> svec;
+rfill(svec, 10000, rname);
+
+std::ofstream ofs{"names.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+/*for (const auto& name: svec) {
+ofs << name << '\n';
+}*/
+
+/*size_t len{};
+std::cout << "uzunlugu kac olanlar: ";
+cin >> len;
+
+copy_if(svec.begin(), svec.end(), ostream_iterator<string>{ofs, '\n'}, [len] (const string &s){
+return s.lenght() == len && s.front() == 'a';
+});*/
+
+
+copy(svec.begin(), svec.end(), ostream_iterator<string>{ofs, '\n'});
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+std::ofstream ofs{"names.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+generate_n(ostream_iterator<string>{ofs, "\n"}, 1000, []{return rname() + ' ' + rfname();})
+
+}
+
+-----------------------------------
+
+okuma işlemleri:
+
+formatlı okuma
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"primes.txt"};
+if (!ifs) {
+cerr << "dosya acilamadi\n";
+return 1;
+}
+
+int ival;
+
+//while ((ifs >> ival).operator bool ()
+while (ifs >> ival) {
+cout << ival << ' ';
+}
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"primes.txt"};
+if (!ifs) {
+cerr << "dosya acilamadi\n";
+return 1;
+}
+
+string word;
+
+while (ifs >> ival) {
+cout << word << ' ';
+}
+}
+
+-------------------------
+
+ofstream ifstream kopyalamaya karşı kapalı taşımaya karşı açık
+
+-----------------------
+
+void func(std::ifstream);
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"kutay.txt"};
+if (!İfs) {
+cerr << dosya acilamadi\n";
+return 1;
+}
+
+func(ifs); //Hata
+func(move(ifs); //legal
+}
+
+-----------------------
+nutility.h fonksiyon ekliyourz
+
+
+
+std::ifstream open_text_file(const std::string& filename);
+
+nutility.cpp:
+
+std::ifstream open_text_file(const std::string& filename);
+{
+std::ifstream ifs{filename};
+if (!ifs) {
+throw std::runtime_error{filename + "dosyasi acilamiyor!\n"};
+}
+
+return ifs; //Hata yok
+//return move(ifs) //pesimistik move olur hatalı
+}
+
+----
+.h
+std::ofstream create_text_file(const std::string& filename);
+.cpp
+std::ofstream create_text_file(const std::string& filename)
+{
+std::ofstream ofs{filename};
+if (!ifs) {
+throw std::runtime_error{filename + "dosyasi olusutulamıyor!\n"};
+}
+
+return ofs
+}
+
+int main()
+{
+using namespace std;
+
+try
+{
+    auto ofs = create_text_file("serhat.txt");
+    auto ofs = open_text_file("serhat.txt");
+
+}
+catch(const std::exception& e)
+{
+    std::cerr << e.what() << '\n';
+}
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+int ival = 2345;
+string name {"serhatistin"};
+
+ostringstream oss;
+
+oss << name << '_' << ival << ".txt";
+
+cout << oss.str() << "\n";
+}
+
+------------
+//aşağıdaki şekilde olabilir
+
+int main()
+{
+using namespace std;
+
+int ival = 2345;
+string name {"serhatistin"};
+
+auto filename = (ostringstream{} << name << '_' << ival << ".txt").str
+
+cout << filenmae
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int ival = 2345;
+string name {"serhatistin"};
+
+ofstream{"out.txt"} << "bugun hava cok soguk"; //gecerli
+
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+std::ofstream ofs{"out.txt"};
+if (!ofs)
+{
+std::cerr << "ot.txt dosyasi olusturulamadi\n";
+exit(EXIT_FAILURE);
+}
+
+for (int i = 0; i < 10; ++i) {
+ofs << Date::random() << '\n';
+// cout << //bu şekilde yapssak standart outputa yazar
+}
+}
+
+-----------------
+
+diğer okuma yazmaişlemlerine bakıyoruz
+
+c kodu yazıyoruz
+
+int main()
+{
+using namespace std;
+
+FILE* f = fopen("main.cpp", "r");
+if (!) {
+fprintf(stderr, "dosya acilamadi\n");
+return 1;
+}
+
+int c;
+
+while ((c = fgetc(f)) != EOF) {
+putchar(c);
+}
+fclose(f);
+}
+
+------------
+yukarıdakini c++ kodu yazpıyoruz
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"main.cpp"};
+
+if (!ifs) {
+cerr << "dosya acilamadi\n";
+return 1;
+}
+
+int c;
+
+while ((c = ifs.get()) != EOF) {  
+//cout << c; //bu şekilde karakter kodunu yazar
+cout << static_cast<char>(c);
+//cout.put((char)c); //bu şekilde de olur
+}
+}
+
+-------------------
+yukarıdaki kod bu şekilde de yazılır
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"main.cpp"};
+
+if (!ifs) {
+cerr << "dosya acilamadi\n";
+return 1;
+}
+
+char c;
+
+while (ifs.get(c))
+cout.put(c);
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto ifs open_text_file("kutay.txt");
+
+char c;
+
+while (ifs.get(c))
+cout.put(c);
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto ifs open_text_file("kutay.txt");
+
+char c;
+
+cout << ifs.rdbuf();
+}
+
+-----------------
+
+getline : satır satır okumak için
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("kutay.txt");
+
+string sline;
+
+getline(ifs, sline);
+
+cout << "[" << sline << "]";
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("kutay.txt");
+
+string sline;
+
+while (getline(ifs, sline)) {
+cout << sline;
+(void)getchar();
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("kutay.txt");
+
+string sline;
+
+while (getline(ifs, sline)) {
+reverse(sline.begin(), sline.end());
+cout << sline;
+getchar();
+}
+}
+
+----------------
+//mülakatlarda getline bilinip bilinmediğini öğrenmek için yapılır
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("kutay.txt");
+
+string name;
+
+while (getline(ifs, name, 'i')) { //extract eder stringe almaz yani siler i harfi olan yerleri
+cout << name << '\n';
+}
+}
+
+---------------
+
+//bu sık dosya işlemlerinde ihtiyaç duyulan özellikler
+
+//dosyadaki satırları contaniera atmak
+
+//sıralı olarka yazdırmak : vektöre atanır satır satır, sonra sort ile sıralanır
+
+int main()
+{
+using namespace std;
+
+vector<string> linevec;
+
+linevec.reserve(10'000u);
+
+auto ifs = open_text_file("kutay.txt");
+string sline;
+
+while (getline(ifs, sline)) {
+linevec.push_back(sline);
+}
+
+/*
+while (getline(ifs, sline)) {
+linevec.push_back(move(sline)); //bu şekilde yapılabilir
+}
+*/
+
+sort(linevec.begin(), linevec.end());
+copy(linevec.begin(), linevec.end(), ostream_iterator<string>{cout, "\n"});
+}
+
+-----------------------
+
+//mülakatlarda kod rewiuv yaptırılıyor
+
+-----------------------
+
+//.txt' de k100'000 asal sayıyı primvec isimil vectöre al nasıl yazılır
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("primes.txt");
+
+vector<int> ivec;
+ivec.reserve(100'000);
+
+int ival;
+
+while (ifs >> ival) { //>> bu işareti anlamaya çalış neden kouyuyor, geçen derste ilk defa kullandı sanırım
+ivec.push_back(ival);
+}
+}
+
+---------------
+
+//aşağıdaki şekilde de yapılabilir
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("primes.txt");
+
+
+vector<int> ivec{istream_iterator<int>{ifs}, {}};
+
+cout << "ivec.size() = " << ivec.size() << '\n';
+}
+
+--------------
+//bu şekilde de yapılabilir
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("primes.txt");
+
+vector<int> ivec;
+ivec.reserve(100'000);
+
+ivec.assign(istream_iterator<int>{ifs}, {});
+
+}
+
+-------------------------------------------
+//bunu tekrar et videodan
+
+formatsız okuma yazma
+
+!! formatsız okuma yazma yapılacak ise dosya binary modda açılmalı
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"primes.dat", ios::binary };
+
+int prime_count = 0;
+int x = 2;
+
+while(prime_count < 1'000'000) {
+if (isprime(x)) {
+ofs.write(reinterpret_cast<char*>(&x), sizeof(int))
+++prime_count;
+}
+++x;
+}
+}
+
+
+
+
+
