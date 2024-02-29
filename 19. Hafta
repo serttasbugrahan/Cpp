@@ -1816,6 +1816,486 @@ vector<double> dvec {istream_iterator<double>{iss}, {}}; //default ctor edilmiş
  
 }
 
+/////////////////////////////////////////// 3. Ders ///////////////////////////////////////
+
+#include <iterator>
+
+int main()
+{
+using namespace std;
+
+istream_iterator<int> iter{cin};
+
+int val{};
+
+val = *iter;
+
+cout << "val = " << val << '\n';
+++iter;
+val = *iter;
+++iter;
+cout << "val = " << val << '\n';
+++iter;
+val = *iter;
+cout << "val = " << val << '\n';
+}
+
+--------------
+
+#include <sstream>
+#include <algorithm> //cop algoritması için ekledik
+
+int main()
+{
+using namespace std;
+
+istringstream iss{"burak kose damla kubat furkan mert melike kaplan"};
+
+copy(istream_iterator<string>{iss}, istream_iterator<string>{}, 
+ostream_iterator<string>{cout, "\n"});
+}
+
+---------------
+
+#include <sstream>
+#include <algorithm> //cop algoritması için ekledik
+#include <numeric>
+
+int main()
+{
+using namespace std;
+
+istringstream iss{"12 34 56 78 90 3 876 63 847 24 661 88"};
+
+copy(istream_iterator<int>{iss}, istream_iterator<int>{}, 
+ostream_iterator<int>{cout, "\n"});
+
+// copy(istream_iterator<int>{iss},{}, ostream_iterator<int>{cout, "\n"}); //bu şekilde yazılabilir template argüment detection
+
+auto sum = accumulate(istream_iterator<int>{iss}, istream_iterator<int>{}, 0);
+
+cout << "sum = " << sum << '\n';
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+istringstream iss{"12 34 56 78 90 3 876 63 847 24 661 88"};
+
+auto max = *max_element(istream_iterator<int>{iss}, istream_iterator<int>{});
+cout << "max == " << max << '\n';
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+istringstream iss{"12 34 56 78 90 3 876 63 847 24 661 88"};
+
+copy_if(istream_iterator<int>{iss}, istream_iterator<int>{}, ostream_iterator<int>{cout, "\n"},
+[](int x) {return x % 2 == 0;});
+}
+
+--------------------------
+
+//ilginç bir fonksiyon ile devam ediyoruz
+
+int main()
+{
+using namespace std;
+
+ostream oss{cout.rdbuf()}
+}
+
+---------
+
+int main()
+{
+using namespace std;
+
+ostream os_hex{cout.rdbuf()}};
+ostream os_oct{cout.rdbuf()}};
+
+os_hex << hex << uppercase << showbase;
+os_oct << oct << showbase;
+
+Irand myrand{3455678, 999999};
+
+for (int i = 0; i < 10; ++i) {
+auto val = myrand();
+cout << val << '\n';
+os_hex << val << '\n';
+os_oct << val << '\n';
+(void)getchar();
+
+}
+}
+
+---------------
+
+class Ostream {
+
+public:
+Ostream& operator<<(int);
+Ostream& operator<<(float);
+Ostream& operator<<(std::streambuf *); //bu ne yapar
+
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+ostringstream oss;
+
+for (int i = 0; i < 10; ++i) {
+oss << i << " ";
+}
+
+cout << oss.rdbuf() << "\n";
+
+}
+
+---------------
+
+//mülakatlarda necaati hocanın sorduğu soru
+
+//bir dosyayı standart outputa yazdırmak istiyoruz
+//main.cpp yazdırmak mesela
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"odevler.cpp"};
+
+cout << ifs.rdbuf();
+}
+
+-------------
+
+//dosyanın kopyasını da çıkarabiliriz
+
+int main()
+{
+using namespace std;
+
+ifstream ifs{"odevler.cpp"};
+
+ofstream ifs{"man.cpp"};
+
+ofs << ifs.rdbuf();
+}
+
+============================================================
+
+Dosya işlemleri
+===============
+
+ostream sınıfından kalıtım yoluyla elde edilmiş ofstream sınıfı var
+
+std::ofstream : yazma işlemi yapacağımız dosyaları kontrol etmek istediğimizde kullanırız
+
+-------
+
+istream sınıfından kalıtım yoluyla elde edilmiş ifstream sınıfı var
+
+std::ifstream : dosyaları okuma amaçlı kullanıcaksak
+
+--------
+
+iostream sınıfından kalırım yoluyla elde edilmiş fstream 
+
+std::fstream : hem okuma hem yazma işlemlerini yapar
 
 
+------------------------------
 
+// 2 seçenek vardır
+
+- ya dosya nesnesi oluşturup (ifstream, ofstream nesnesini oluturucağız fakat daha sonra open fonksiyonuna çağrı yaparak fonksiyonu çağırıcağız)
+- ya da ctor doğrudan dosya açmasını sağlıycaz
+
+bu 2 seçenekte bizden 
+açılacak dosya ismi ve açış modu (her zmana default param. alır) ister
+
+------------------------------
+
+modern c++ öncesinde c_str() kullanılıyordu
+
+------------
+
+int main()
+{
+using namespace std;
+
+std::string filename{ "furkanmert.txt" };
+
+// ofstream ofs{filename.c_str()}; //bu kodlar eski
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+std::string filename{ "furkanmert.txt" };
+
+//ios_base::openmode //aşağıdakiler yapılabilir
+//ios_base::in
+//basic_ios<char>::in
+//ios::in 
+
+
+ofstream ofs{ filename};
+}
+
+-----------------------
+dosyanın açıs modunun belirlenmesi:
+//hepsnin default argümanı var
+
+ios::in //eğer in parametresi geçersek okuma amaçlı açma
+ios::out //yazma
+ios::app //append / sona yazma
+ios::trunc //truncate
+ios::ate //at end
+ios::binary //binary olarak açmak için
+
+"r" //read
+"w" //write
+"a" //app
+
+----------------
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"ali.txt", ios::trunc | ios::oust };
+ofstream ofs{"ali.txt"}; //Yukarıdaki ile aynı anlamda
+
+ifstream ofs{"ali.txt"};
+ifstream ofs{"ali.txt", ios::in}; //aynı anlamda
+
+}
+
+---------------------
+
+//c ile karşılaştırma
+
+fopen ios::openmode
+
+in, equivalent of "r"
+
+out, equivalent of "w"
+
+app, equivalent of "a”
+
+out|in, equivalent of "r+" //hem okuma hem yazma
+
+out|in|trunc, equivalent of "w+" //yazma 
+
+out|in|app, equivalent of "a+" //doysa yok ise açılacak 
+
+binary|in, equivalent of "rb" 
+
+binary|out, equivalent of "wb"
+
+binary|app, equivalent of "ab"
+
+binary|out|in, equivalent of "r+b"
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //default olarak yukarıdaki yazıldı
+
+//dosya açılıp açılmadığını kontrol et açılmayabilir
+
+if (!ifs) {
+//if (ifs.fail()) //bu şekilde de olabilir
+//if (!ifs.good()) //bu şekilde de olabilir
+cerr << "cannot open file\n";
+return 1;
+}
+std::cout << "file opened successfully";
+}
+
+----------------
+//karıştırılan bir yer
+
+open //dosya açma
+
+is_open // bool döndürür, açık dosya var mı?
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+ifstream ifs;
+
+boolalpha(cout);
+
+cout << "ifs.is_open() = " << ifs.is_open() << "\n";
+
+ifs.open("main.cpp");
+
+cout << "ifs.is_open() = " << ifs.is_open() << "\n";
+
+ifs.close();
+cout << "ifs.is_open() = " << ifs.is_open() << "\n";
+}
+
+--------------
+//aşağıdaki şekilde de öğrenilebilir
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //default olarak yukarıdaki yazıldı
+
+if (!ifs.is_open()) {
+cerr << "cannot open file\n";
+return 1;
+}
+
+std::cout << "file opened successfully";
+}
+
+---------------
+!! dosya kapatmaya gerek yoktur RAII idiomu sayesinde dtor dosyayi kapatır
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"};
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+for (int i = 0; i < 100; ++i) {
+ofs << i << " ";
+}
+}
+
+-----------
+//daha erken kapatmak istrsek nested scope kullanabiliriz
+
+int main()
+{
+using namespace std;
+
+{
+ofstream ofs{"bugra.txt"};
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+for (int i = 0; i < 100; ++i) {
+ofs << i << " ";
+}
+}
+}
+
+-----------
+
+//close fonksiyonu çağırabilir ya da
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"};
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+for (int i = 0; i < 100; ++i) {
+ofs << i << " ";
+}
+ofs.close();
+}
+
+//Yeni bir dosya açabiliriz ancak good durumda olması gerekir
+
+---------------
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //dosya oluşturur
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+for (int i = 0; i < 100; ++i) {
+ofs << i << '\n';
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //dosya oluşturur
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+Irand myrand {0, 300'=00};
+
+for (int i = 0; i < 10'000; ++i) {
+ofs << myname() << " " << myfname() << " " << rfname() << " " << rtown() << '\n';
+}
+}
+
+---------------
+#include <iomanip>
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{"bugra.txt"}; //dosya oluşturur
+
+if (!ofs) {
+cerr << "dosya olusturulamadi\n";
+return 1;
+}
+
+Irand myrand {0, 300'=00};
+
+ofs << left;
+
+for (int i = 0; i < 10'000; ++i) {
+ofs << setw(12) << myname() << " " << myfname() << " " << rfname() << " " << rtown() << '\n';
+}
+}
