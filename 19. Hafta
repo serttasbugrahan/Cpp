@@ -917,8 +917,8 @@ using namespace std;
 std::cout << "bir tam sayi girin: ";
 int x{};
 
-cin.setf(ios::hex, ios::basefiled);
-cin.setf(ios::oct, ios::basefiled);
+cin.setf(ios::hex, ios::basefield);
+cin.setf(ios::oct, ios::basefield);
 cin >> x;
 
 cout << "x = " << x << '\n';
@@ -1045,7 +1045,7 @@ ileri cpp kursunda onları anlatıyor
 
                                           ios_base
                                                                         
-                                        basic_ios (T)
+                                        basic_ios (Template)
                                                                         
                     basic_istream                            basic_ostream
 
@@ -1055,7 +1055,7 @@ ileri cpp kursunda onları anlatıyor
                                               |
                                               |
       basic_istring_stream                    |                 basic_ostring_stream
-(bellek üsütnde  okuma)                       |           (bellek üsütnde yazma)
+    (bellek üsütnde  okuma)                   |                (bellek üsütnde yazma)
                                       basic_string_stream
                                (bellek üsütnde hem okuma hem yazma)
 
@@ -1077,7 +1077,7 @@ double dval = 4.5;
 char name[] = "melike";
 char buffer[256];
 
-sprint(buffer, "x = %d dval = %f name = %s", x, dval, name); //belleğe yazar
+sprintf(buffer, "x = %d dval = %f name = %s", x, dval, name); //belleğe yazar
 
 printf("%s\n", buffer);
 }
@@ -1110,7 +1110,7 @@ printf("x = %d y = %d z = %d\n", x, y, z);
 
 ----------------------------
 
-//bunlar yeriine c++ da 
+//bunlar yerine c++ da 
 
 int main()
 {
@@ -1122,6 +1122,7 @@ stringstring : okuma ve yazma
 }
 
 ------------
+
 ostringstream sınıfı ile başlıyoruz
 
 int main()
@@ -1142,7 +1143,7 @@ using namespace std;
 ostringstream os;
 int amount = 200'000;
 
-os << "benim" << amount << "dolarim var\n" //os kontrol ettiği bellek alanına yazıldı
+os << "benim" << amount << "dolarim var\n"; //os kontrol ettiği bellek alanına yazıldı
 
 //bu ne işe yarar
 
@@ -1183,7 +1184,7 @@ cin >> day >> mon >> year;
 ostringstream oss;
 
 oss.fill('0');
-oss << setfill('0') << setw(2) << day << '_' << setw(2) << mon << '_' << year << ".txt"
+oss << setfill('0') << setw(2) << day << '_' << setw(2) << mon << '_' << year << ".txt";  
 
 cout << "[" << oss.str() << "]\n";
 
@@ -1266,7 +1267,7 @@ cout << left << setw(40) << mydate << "mustafa\n"; //bu kod beklenildiği gibi �
 class date {
 public:
 date(int day, int mon, int year) : day_(day), mon_(mon), year_(year) {}
-friend std::ostream& operator<<(std::ostream&, const Date& dt)
+friend std::ostream& operator<<(std::ostream& os, const Date& dt)
 {
 std::ostringstream ostr;
 ostr << dt.day_ << "-" << dt.mon_ << "-" << dt.year_;
@@ -1281,7 +1282,6 @@ int day_, mon_, year_;
 int main()
 {
 date mydate{11, 12, 2023 };
-
 
 cout << left << setw(40) << mydate << "mustafa\n"; 
 }
@@ -1302,6 +1302,7 @@ cout << oss.str() << "\n";
 }
 
 ---------------
+
 //şaşırtıcı bir kod
 //enter basıldığı zaman ekrana yazılan kodları toplar
 
@@ -1494,6 +1495,7 @@ cout << ios::failbit;
 }
 
 ---------------
+using namespace std;
 
 void print_state(const ios& s)
 {
@@ -1509,7 +1511,6 @@ if (stream_state & ios::badbit) { cout << "badbit set\n";}
 
 int main()
 {
-using namespace std;
 
 int x;
 cin >> x;
@@ -1772,6 +1773,8 @@ std::cout << "y = " << y << "\n";
 
 int main()
 {
+using namespace std;
+
 string s1{"alican"}, s2{"tamer"};
 
 func(3.4, 2.3);
@@ -1790,6 +1793,8 @@ std::cout << "y = " << y << "\n";
 
 int main()
 {
+using namespace std;
+
 func(12, {}); //
 
 string s1{"furkan"};
