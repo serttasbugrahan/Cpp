@@ -724,16 +724,45 @@ using namespace std;
 
 int age{};
 
-while (( cout << "how old are you ?") && (cin >> age) {
-
+while (( cout << "how old are you ?") && !(cin >> age) {
+cout << "your entry is not a number\n";
+cin.clear();
+cin.ignore(numeric_limts<streamsize>::max(), '\n');
 }
 
 cout << "your age is : "  << age << "\n";
 
-
 }
 
+----------------
 
+int main()
+{
+using namespace std;
+
+istringstream iss{
+"761furkan mert\n"
+"76431dgurkan yenil\n"
+"32761mert sirsakaya\n"
+"23269fbugrahnserttas\n" };
+
+for (;;){
+int ival{};
+iss >> ival;
+
+if (iss.eof() || iss.bad()) {
+break;
+}
+
+if (iss.fail()) {
+iss.clear();
+iss.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+else {
+cout << ival << "\n";
+}
+}
+}
 
 
 
