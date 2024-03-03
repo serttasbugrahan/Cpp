@@ -1,0 +1,743 @@
+////////////////////////////////////////////////////// 1. Ders ///////////////////////////////////////////
+
+
+============================================
+
+en çok yapılan hatalar:
+-----------------------
+
+-değişkenleri const yap
+
+eğer değişken değeri hesaplama sonucu ortaya çıkıyorsa aşağıdaki şekilde yapılabilir
+
+//IIFE
+int main()
+{
+using namespace std;
+
+int a = 5;
+int b = 6;
+int c = 9;
+
+const auto ival = [&]() {
+auto x = a * b + c;
+if (x > 100)
+x += 5;
+else 
+x -= 5;
+
+return x - a - b;
+}();
+}
+
+-------------------
+
+void func(std::vector<std::string> svec) //copy elision olmassa copy ctor çağrılır bu yapıda, bu da çok maaliyetli bir durumdur
+{
+
+}
+
+//onun yerine const ve ref yap
+
+void func(const std::vector<std::string> &svec)
+{
+
+}
+
+-------------------
+//ref gerektirmeyen durumlar
+
+-içerde kopyasını çıkartıcaksak
+-ctor aldığı sınıf nesnesi ile veri elemanın init yapıyorsa
+
+class Frk {
+
+public:
+Frk(std::vector<std::string> vec) : mvec(std::move(vec)) {}
+private:
+std::vector<std::string> mvec
+
+}
+
+
+-------------------
+
+out parametrelerde kaçının 
+
+void func(std::vector<std::string>&); //böyle değil
+std::vector<std::string> func(); //Böyle yap
+
+
+---------------------
+
+her execption yaklamaya çalışma
+
+exception yakalıycaksan handler et, programın  akışını oradan devam ettirme
+
+---------------------
+
+tür eş ismi ve namespace alias kodda kullanmak önemlidir
+
+yoksa aşağıdaki şekilde çirkin kodlar olur
+
+vector<vector<cc::neco<int>>::iterator //bunu kimse anlamaz, onun yerine bunun kulllanımına dair tür eş ismi verirsek ortalığı daha rahatlatmış oluruz
+
+-----------------------
+
+uzun fonksiyonlar yazmak sakıncalı
+
+fonksiyon uzunluğu 20-25 satıdan uzun olmasın,
+
+farklı sorumluluları aynı koda yüklemeyin
+
+-----
+
+void do_something()
+{
+if (expr) { //kodu okuyan bu expr bilmek zorunda değildir
+
+}
+}
+
+//onun yerine aşağıdaki uygulanabilir
+
+if (is_not_valid_state())
+do_this;
+
+------------------------
+
+ananim namespace kullan
+
+//bugra.cpp
+
+namespace {
+int foo(int);
+int g = 46;
+class Helper {
+
+};
+}
+
+============================================
+
+--------------
+
+string_view ve regex mülakatlara girmeden bilinmesi gerekn konular necati hoca sölüyor
+
+---------------
+
+
+dosya işlemlerine devam...
+
+--------------
+
+std::ifstream open_binary_file(const std::string& filename)
+{
+std::ifstream ifs{ filename, std::ios::binary};
+if (!ifs) {
+throw std::runtime_error{ filename + "dosyasi acilamiyor!\n" };
+}
+return ifs;
+}
+
+std::ifstream create_binary_file(const std::string& filename)
+{
+std::ifstream ifs{ filename, std::ios::binary};
+if (!ifs) {
+throw std::runtime_error{ filename + "dosyasi olusturulamiyor!\n" };
+}
+return ifs;
+}
+
+--------------
+
+#include "nutility.h"
+#include <fstream>
+
+int main()
+{
+using namespace std;
+
+auto ofs = create_binary_file("primes10000.dat"); //dosya binary modda açmak için yapılır
+constexpr size_t n = 10'000u;
+int x{};
+int prime_count{};
+
+auto ofs = create_binary_file("primes10000.dat");
+
+while (prime_count < n) {
+if (is_prime(x)) {
+ofs.write(reinterpret_cast<char*>(& x), sizeof(int));
+++prime_count;
+}
+++x;
+}
+
+// ofs.close(); //istediğimiz zaman dosyayı kapatabiliriz
+// ofs.open("ali.txt"); //sonrasında başka bir dosya da açabiliriz
+// { } kullanarak dosyanın daha erkende kapanmasını sağlayabiliriz
+}
+
+----------------
+
+void func()
+{
+//code
+//code
+
+//statement1
+//statement2
+
+//sadece ben statement 1 ve statement 2 yürütülürken hayatta olan bir nesne istiyorum (kritik bölgeyi daraltma)
+
+}
+
+
+----------
+
+#include <mutex>
+
+std::mutex mtx;
+
+void func()
+{
+//code
+//code
+
+lock_guard lock{ mtx }; //aşağıdaki kodlar kilit altında
+//statement1
+//statement2
+//sadece ben statement 1 ve statement 2 yürütülürken hayatta olan bir nesne istiyorum (kritik bölgeyi daraltma)
+
+}
+
+-----------
+
+include <mutex>
+
+std::mutex mtx;
+
+void func()
+{
+//code
+//code
+//code
+
+{
+lock_guard lock{ mtx };
+//statement1
+//statement1
+}
+
+//statement1
+//statement2
+//statement3
+}
+
+-------------------------
+
+//10 000  tane asal sayısı okuyan program
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_binary_file("primes10000.dat");
+
+int x{};
+
+while (ifs.read(reinterpret_cat<char*>(&x), sizeof(x))) {
+cout << x << "\n";
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_binary_file("primes10000.dat");
+
+vector<int> ivec(10000);
+
+//öyle bir kod yazki vector nesnesi ilk1 10'000 asal sayıyı tutsun
+
+ifs.read(reinterpret_cast<char*>(ivec.data()), 10'000 - sizeof(int));
+
+for (const auto val : ivec) {
+cout < val;
+(void)getchar();
+}
+}
+
+----------------
+
+//c kursunda yazılan bir kodu c++ dilinde yazıyoruz
+
+//komut satirindan calistirilacak
+
+//dbol ali.exe 1000 //ali.exe böler
+
+//17500 byte
+//parca001.par 1000
+//parca017.par 1000
+//parca018.par 500
+
+
+//dbir veli.exe //veli.exe bölme
+
+-----------------------------
+
+//saat 1.12 de hızlı tekrar et
+#include <cstdlib>
+
+//komut satırında çalıştırabilmke için main'in parametre değişkenkerine sahip olması gerekiyor
+
+//dbol ali.exe 1000
+
+int main(int argc, char* argv[])
+{
+using namespace std;
+
+if (argc != 3) {
+cerr << "kullanim: <dbol> <dosya ismi> <byte sayisi>\n";
+return 1;
+}
+
+char c;
+int file_count{};
+int byte_count{};
+
+auto ifs = open_binary_file(argv[1]); //dosya açılmassa exception throw gönderir
+
+int chunk = ato(argv[2]);
+ofstream ofs;
+ostringstream ostr;
+//ostr.fill('0');
+
+while (ifs.get(c)) {
+if (!ofs.is_open()) {
+ostr << "parca" << setw(3) << file_count + 1 << ".par";
+ofs.open(ostr.str(), ios::binary);
+if (!ofs) {
+cerr << ostr.str() << " dosya olusturulamadi\n";
+return 1;
+}
+++file_count;
+}
+
+ofs.put(c);
+++byte_count;
+if (byte_count % chunk == 0) {
+ofs.close();
+ostr.str("");
+}
+}
+cout << byte_count << " byte'lik " <<argv[1] << " isimli dosya " << chunk << 
+" byte'lik " << file_count << " parcaya bolundu\n";
+}
+
+----------------------------------
+//1.27 tekrar et
+
+//dosya birleştirme kodunu yazıyoruz
+
+//dbir veli.exe
+
+int main(int argc, char **argv)
+{
+if (argc != 2) {
+cerr << "kullanim: <dbir> <yeni dosya ismi>\n";
+return 1;
+}
+
+auto ofs = create_binary_file(argv[1]);
+int file_count{};
+int byte_count{};
+
+for (;;) {
+ostringstream ostr;
+ostr.fill('0');
+ostr << "parca" << setw(3) << file_count + 1 << ".par";
+ifstream ifs{ostr.str(), ios::binary };
+if (!ifs) {
+break;
+}
+
+char c;
+while (ifs.get(c)) {
+ofs.put(c);
+++byte_count;
+}
+++file_count;
+ifs.close();
+if (remove(ostr.str().c_str())) {
+cerr << "dosya silinemedi\n";
+return 2;
+}
+}
+cout << file_count << " adet dosya " << byte_count << " byte'lik " << argv[1] << 
+" isimli dosya olarak birlestirildi\n";
+}
+
+--------------------------------
+
+five pointer ile ilgili hizmet veren fonksiyonlar
+
+fseek
+rewind
+ftell
+fsetpos
+fgetpos
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+ofstream ofs{ "necati.txt" };
+
+ofs. //bunlara bak
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+fstream fs{ "necati.txt" };
+
+fs. //bunlara bak
+}
+
+---------
+
+int main()
+{
+using namespace std;
+
+ifstream ofs{ "necati.txt" };
+
+ofs.tellp;
+}
+
+--------
+
+okuma tarafı için konumlandırma taradında seekg
+okuma tarafı için konumlandırma taradında seekp
+
+---------
+
+int main()
+{
+using namespace std;
+
+ifstream ifs {"primesmillion.dat", ios::binary };
+
+//ifs.seekg(10'000) //2 overloadu vardır
+
+//ios::beg
+//ios::cur
+//ios::seekg()
+}
+
+----------
+
+int main()
+{
+using namespace std;
+
+istringstream iss{"necati ergin" };
+//                 necatiergin //farkına bak
+string str;
+
+iss >> str;
+//      çift tırnak içinde yazar (quoted)
+cout << str << '\n';  
+iss.seekg(0, ios::beg);
+//iss.seekg(1, ios::cur);
+//iss.seekg(-6, ios::cur);
+//iss.seekg(-6, ios::end);
+
+iss >> str;
+
+cout << str << '\n';
+}
+
+-------------
+
+//yazma tarafı içinde bunlar geçerlidir
+
+int main()
+{
+using namespace std;
+
+ostringstream oss{"furkan mert"};
+
+cout << "[" << oss.str() << "]\n";
+oss.seekp(3);
+os.put('!');
+cout << "[" << oss.str() << "]\n";
+oss.seekp(0);
+os.put('*');
+cout << "[" << oss.str() << "]\n";
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_binary_file("primesmillion.dat");
+
+int n{};
+
+std::cout << "kacinci asal sayi: ";
+cin >> n;
+
+ifs.seekg((n - 1) * sizeof(int), ios::beg);
+int x;
+
+ifs.read(reinterpret_cast<char*>(&x), sizeof(int));
+cout << n << ". asal sayi " << x << "\n";
+}
+
+---------------
+
+void print_file(const std::string& filename, int ntimes)
+{
+auto ifs = open_text_file(filename);
+
+while (ntimes--) {
+std::cout << ifs.rdbuf()
+(void)getchar();
+ifs.seekg(0);
+}
+}
+
+
+int main()
+{
+using namespace std;
+
+print_file("main.cpp", 5);
+}
+
+----------------
+
+//ilginç bir özellik daha var 
+
+read ve write dosyalarının geri dönüş değeri stream nesnesi olduğu için 
+özellikle formatsız okumada kaç byte olduğunu bir şekilde bizim anlayabilmemiz lazım
+bu yüzden gcount olan fonksiyon koymuşlar
+
+//formatsız okuma işlemlerinden biri çağrıldığında okunan byte sayısı için sınıfın
+gcount çağırırız
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_binary_file("primesmillion.dat");
+
+int n{};
+
+std::cout << "kacinci asal sayi: ";
+cin >> n;
+
+ifs.seekg((n - 1) * sizeof(int), ios::beg);
+int x;
+
+ifs.read(reinterpret_cast<char*>(&x), sizeof(int));
+
+cout << "okunana byte sayisi : " << ifsgcount() << '\n';
+
+cout << n << ". asal sayi " << x << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+int *p = new int[20000];
+
+auto ifs = open_binaary_file("primes10000.dat");
+ifs.read(reinterpret_cast<char*>(p), sizeof(int) * 20000);
+
+if (ifs) { //istedeğimiz kadar byte okuyamassa stream fail oluyor
+std::cout << "stream hata durumunda degil\n";
+}
+else {
+std::cout << "stream hata durumunda\n";
+}
+
+std::cout << "okunan byte sayisi: " << ifs.gcount() << "\n"; //dosyaya 10'000 tane asal sayı yazıldığı için 40'000 tane okunur
+}
+
+---------------
+
+//bu özelliği anlaıp anlamadığını bilmek için aşağıdaki zor soru sorulur
+
+//komut satırından çalışıtırlan filecopy isimli programı yazınız
+
+//filecopy ahmet.exe mmehmet.exe //2 ayrı süürm şeklinde yaz bunu
+
+1) byte byte oku byte byte yaz
+
+//filecopy ali.exe veli.exe
+
+int main(int argc, char **argv)
+{
+constexpr std::size_t buffersize{ 1024 };
+
+if (argc != 3) {
+std::cerr << "usage: <filecopy> <source file> <dest file>\n";
+return 1;
+}
+
+auto ifs = open_binary_file(argv[1]);
+auto ofs = create_binary_file(argv[2]);
+
+unsigned char buf[buffersize];
+
+//ifs.read isleviyle buffer'a yazip
+//ofs.read isleviyle buffer'dan dosyaya aktat
+
+}
+
+--------------------
+
+bufferdan bazı karakterleri okumadan geçmek istiyorum
+burada ignore isimli fonksiyonu vardır
+
+int main()
+{
+using namespace std;
+
+cin.ignore(50, '\n') // 50'nin olduğu yere limit başlık dosyasini kullanarak ekleme yapabiliriz
+}
+
+----------------
+#include <limits>
+
+int main()
+{
+using namespace std;
+
+cout << numeric_limits<int>::max() << "\n";
+cout << numeric_limits<int>::min() << "\n";
+
+
+}
+
+----------------
+
+//mesela 8 byte'lık en büyük tam sayı değerini kullanmamız gerekiyor
+
+int main()
+{
+using namespace std;
+
+constexpr auto n = numeric_limits<unsigned int>::max();
+
+
+}
+
+--------------
+
+//newline' a kadar olan bütün karakterleri ignore etmek
+
+int main()
+{
+using namespace std;
+
+cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+istringstream iss {"x987324yz"};
+
+int ival;
+
+iss >> ival; //okuma yapmaz çünkü x okumaya uygun değil ancak x ignore etsek
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+istringstream iss {"x987324yz"};
+
+int ival;
+
+iss.ignore();
+//iss.ignore(1);
+iss >> ival;
+}
+
+------------------
+//m karakteri görene kadar tüm karakterleri ignore etmesini isteyin
+
+int main()
+{
+using namespace std;
+
+istringstream iss {"metin98234"};
+
+int ival;
+
+iss.ignore(numeric_limits<streamsize>::max(), 'n');
+int ival;
+  
+iss >> ival;
+
+cout << "ival = " << ival << '\n';
+}
+
+----------------
+//sürekli kişinin yaşını sorup yaş doğru olmassa dec formatta tekrar tekrar yaşını sorucam
+
+
+// how old are you?
+// ali //geçersiz ise
+//ali is not a number
+//how old are you? //tekrardan
+
+//akım başarısız ise good state e gelmeli clear çağrılmalı
+
+int main()
+{
+using namespace std;
+
+int age{};
+
+while (( cout << "how old are you ?") && (cin >> age) {
+
+}
+
+cout << "your age is : "  << age << "\n";
+
+
+}
+
+
+
+
+
+
+
+
+
