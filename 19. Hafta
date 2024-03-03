@@ -1843,7 +1843,7 @@ cout << "val = " << val << '\n';
 --------------
 
 #include <sstream>
-#include <algorithm> //cop algoritması için ekledik
+#include <algorithm> //copy algoritması için ekledik
 
 int main()
 {
@@ -1858,7 +1858,7 @@ ostream_iterator<string>{cout, "\n"});
 ---------------
 
 #include <sstream>
-#include <algorithm> //cop algoritması için ekledik
+#include <algorithm> 
 #include <numeric>
 
 int main()
@@ -2449,7 +2449,7 @@ return 1;
 int ival;
 
 //while ((ifs >> ival).operator bool ()
-while (ifs >> ival) {
+while (ifs >> ival) { //dosyadan okuyup birer boşlukla standart outputa yazarız
 cout << ival << ' ';
 }
 }
@@ -2468,7 +2468,7 @@ return 1;
 
 string word;
 
-while (ifs >> ival) {
+while (ifs >> word) {
 cout << word << ' ';
 }
 }
