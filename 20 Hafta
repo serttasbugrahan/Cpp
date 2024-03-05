@@ -999,9 +999,456 @@ cout << "x = " << '\n';
 
 }
 
+-----------
+
+int main()
+{
+using namespace std;
+
+int a[10]{};
+
+auto fn = [a] {
+std::cout << typeid(a).name() << '\n'; //sınıfın elemanı 10 elemanlı bir dizi olucaktır
+};
+
+f();
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+int a[10]{};
+
+auto fn = [a = a] {
+std::cout << typeid(a).name() << '\n';  //pointer olur
+
+f();
+}
+
+===================================
+
+şimdiye kadar kullanıdığımız lambda ifadeler globaldı
+ 
+class Nec {
+
+public:
+voif foo()
+{
+auto val = mx + my; //önce foo içinde araır sonra class içinde
+//auto val = this->mx + this->my; //bu çirkiin bir kod
+}
+
+private:
+int mx, my;
+};
+
+---------------
+
+class Nec {
+
+public:
+voif foo()
+{
+int x = 5;
+
+auto fn = [](int a) {return a * a;}; //herhangi  bir sentax hatasu olmaz
+auto fn = [x](int a) {return a * a;};
+
+}
+private:
+int mx, my;
+
+};
+
+--------------
+
+class Nec {
+
+public:
+voif foo() //buranın gizli this pointerı vardır
+{
+
+auto fn = [x](int a) {
+return a * (mx + my); //hata closure type'ın veri elemanıdır bu
+};
+}
+
+private:
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+}
+
+---------------
+
+class Nec {
+
+public:
+voif foo() 
+{
+mx, my //burada kullansak bir problem olmaz
+
+auto fn = [](int a) {
+return a * (mx + my); 
+}
+
+private:
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+}
+
+----------------
+//Bunu yapmak için this capture edilmeli
+
+class Nec {
+
+public:
+voif foo() 
+{
+
+auto fn = [this](int a) {
+//auto fn = [&](int a) { //bu şekilde de olur
+return a * (mx + my);
+};
+}
+
+private:
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+}
+
+---------------------
+
+this copyalama veya ref ile capture edilebilir farkı yoktur
+
+---------------------
+
+capture etme yollarını anlatan tablo var onu inceliyoruz 
+
+------------------------
+
+class Nec {
+
+public:
+voif foo() 
+{
+
+auto fn = [this]() {
+++mx;
+++my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; // 11 yazar
+cout << "mynec.mh = " << mynec.my << '\n'; // 21 yazar
+
+}
+
+---------------
+
+*this yazarsak hata vericek 
+mynec kendisi olmaz mynec kopyası çıkar biz o kopyanın mx ve my arttırmış oluruz
+
+class Nec {
+
+public:
+voif foo() 
+{
+
+auto fn = [*this]() {
+++mx;
+++my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; 
+cout << "mynec.mh = " << mynec.my << '\n'; 
+
+}
+
+--------------------
+
+mutable yapmamız gerekir bu durumu düzeltmek için
+default olarak const yazardır mutable sayesinde non-const yazar
+
+class Nec {
+
+public:
+voif foo() 
+{
+
+auto fn = [*this]()mutable  {
+++mx;
+++my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; // 10 yazar
+cout << "mynec.mh = " << mynec.my << '\n'; // 20 yazar
+//nec'İn x ve my si değildir kopyasıdır artık
+}
+
+---------------
+//Yukarıdaki kod ile ilgili
+
+class Myclass {
+
+public:
+void bar();
+};
+
+class Nec {
+public:
+void foo() const
+{
+m.bar(); //hata olur
+}
+private:
+Myclass m; //burada mutable kullanırsak düzelir
+};
+
+------------------
+& //her şeyi kopyala demektir bu
+
+class Nec {
+
+public:
+voif foo() 
+{
+int a = 67;
+int b;
+auto fn = [&]() {
+return a + b + mx + my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; 
+cout << "mynec.mh = " << mynec.my << '\n'; 
+
+}
+
+----------------
+
+[&, this] ; //& ile farkı yok
+
+------------------
+
+class Nec {
+
+public:
+voif foo() 
+{
+int a = 67;
+int b;
+auto fn = [&, this]() {
+return a + b + mx + my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; 
+cout << "mynec.mh = " << mynec.my << '\n'; 
+
+}
+
+--------------
+
+[&, *this] 
+
+//*this capture edilir yine *this dışındakiler ref ile capture edilir
+class Nec {
+
+public:
+voif foo() 
+{
+int a = 67;
+int b;
+auto fn = [&, *this]() { 
+return a + b + mx + my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; 
+cout << "mynec.mh = " << mynec.my << '\n'; 
+
+}
+
+--------------
+
+[=], bu kaldırılacak riskten dolayı
+
+class Nec {
+
+public:
+voif foo() 
+{
+int a = 67;
+int b;
+auto fn = [=]() { //her rşeyi kopyalama ile capture eder
+return a + b + mx + my;
+};
+fn();
+}
+
+int mx{10}, my{20};
+};
+
+int main()
+{
+Necn mynec;
+mynec.foo();
+
+cout << "mynec.mx = " << mynec.mx << '\n'; 
+cout << "mynec.mh = " << mynec.my << '\n'; 
+
+}
+
+--------------
+
+[=, this]
+
+---------------
+
+[=, *this]
+
+-------------
+
+=========================================================
+
+#include <ratio>
+
+buradaki bütün işlemler compile time'da yapılır
 
 
+int main()
+{
+using namespace std;
 
+ratio<5, 3> //5 bölü 3 demetir
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+ratio<5>
+ratio<5,1> //aynı anlamda
+
+}
+
+----------------
+
+template <int NUM, int Den = 1>
+class Ratio {
+
+};
+
+int main()
+{
+using namespace std;
+
+ratio<2, 5> //2/5 
+}
+
+----------------
+
+template <int NUM, int Den = 1>
+class Ratio {
+public:
+constexpr static int num = NUM;
+constexpr static int num = DEN;
+
+};
+
+int main()
+{
+using namespace std;
+
+Ratio<2, 5>::num;
+}
+
+------------------
+
+orjinali
+
+int main()
+{
+using namespace std;
+
+ratio<2, 3>::num;
+}
 
 
 
