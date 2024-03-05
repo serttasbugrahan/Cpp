@@ -1721,6 +1721,56 @@ cout << typeid(seconds).name() << "\n";
 
 --------
 
+using namaspace std;
+using namaspace chrono;
+
+int main()
+{
+cout << typeid(milliseconds).name() << "\n";
+}
+
+--------------
+
+using namaspace std;
+using namaspace chrono;
+
+int main()
+{
+cout << typeid(minutes).name() << "\n";
+}
+
+-------------
+
+using HalfDay = std::chrono::duration<int, std::ration<12 * 60 * 60>>;
+
+----------
+
+int main()
+{
+milliseconds::rep //1. template 
+milliseconds::period //2. template
+
+}
+
+----------
+
+int main()
+{
+cout << typeid(milliseconds::rep).name //1. template 
+cout << typeid(milliseconds::period).name //2. template
+
+}
+
+---------
+//tam sayıdan duration a örtülü dönüşüm yok
+
+int main()
+{
+duration<int> x(12);
+seconds x {367};
+x = 57; //hata
+}
+
 
 
 
