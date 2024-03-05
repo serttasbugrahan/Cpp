@@ -933,6 +933,78 @@ f();
 cout << (uptr ? "dolu" : "bos") << '\n';
 }
 
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 5;
+
+auto fn = [&x = x] {++x};
+
+cout << "x = " << '\n'; //labmda çağrılmaz ondan değer değişliği olmaz
+}
+
+-----------
+
+int main()
+{
+using namespace std;
+
+int x = 5;
+
+auto fn = [&x = x] {++x};
+
+fn(); //şimdi çağrılır
+
+cout << "x = " << '\n';
+
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+int x = 5;
+
+auto fn = [&x = x] {++x};
+
+fn(); //3 kere çağrılır
+fn();
+fn();
+
+
+cout << "x = " << '\n';
+
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+int x = 5;
+
+auto fn = [&x = x] {++x};
+
+int x = 100;
+fn(); 
+
+
+cout << "x = " << '\n';
+
+}
+
+
+
+
+
+
+
 
 
 
