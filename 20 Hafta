@@ -142,7 +142,7 @@ return ifs;
 
 std::ifstream create_binary_file(const std::string& filename)
 {
-std::ifstream ifs{ filename, std::ios::binary};
+std::ifstream ofs{ filename, std::ios::binary};
 if (!ifs) {
 throw std::runtime_error{ filename + "dosyasi olusturulamiyor!\n" };
 }
@@ -382,7 +382,7 @@ cout << file_count << " adet dosya " << byte_count << " byte'lik " << argv[1] <<
 
 --------------------------------
 
-five pointer ile ilgili hizmet veren fonksiyonlar
+file pointer ile ilgili hizmet veren fonksiyonlar
 
 fseek
 rewind
@@ -764,6 +764,174 @@ cout << ival << "\n";
 }
 }
 
+////////////////////////////////////////////////////// 2. Ders ///////////////////////////////////////////
+
+bir stream'in output stream'e tie(bağlanması) edilmesi
+
+giriş akımını çıkış akımına tie edersek standart input üzerinde bir giriş işlemi yapıldığında
+öncelikle onun bağlandığı output stream flush edilir
+
+
+--------------------
+
+tie
+----
+
+cin.tie() 
+//2 overloadı var 
+//1. overload hangi output stream'e tie edilmiş ise onun stream'i döndürür, tie edilmemişse nullptr döndürür
+
+int main()
+{
+using namespace std;
+
+if (auto osptr = cin.tie()) {
+cout << "cin is tied. the address of the stream cin tied to is : " << osptr << '\n';
+cout << "&cout = " << &cout << '\n';
+}
+else {
+std::cout << "cin is not tied to any output stream\n";
+}
+}
+
+---------------------
+
+//2. overloadu
+
+#include <fstream>
+
+int main()
+{
+using namespace std;
+
+auto ifs = open_text_file("main.cpp");
+
+ifs.tie(&cout);
+}
+
+-----------------------
+
+kime bağlıyorsak bağladığımız ostream (çıkış akımı) olmalı
+
+-----------------------
+
+int main()
+{
+using namespace std;
+
+auto ifs = create_text_file("ali.txt");
+
+ofs.tie();
+}
+
+=============================================================================
+=============================================================================
+
+labmda ile igilili konuşmadığımız kısımlara bakıyoruz
+
+labmda init capture (c++14)
+this capture
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<string>("necati ergin");
+
+//auto f = [uptr]() { //sentax hatası, copt capture çünkü
+auto f = [&uptr]() {
+cout << *uptr << '\n';
+};
+
+f();
+
+cout << (uptr ? "dolu" : "bos") << '\n';
+}
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<string>("necati ergin");
+
+auto upx = move(uptr);
+
+cout << (uptr ? "dolu" : "bos") << '\n'; //bos olur uptr taşındı
+}
+
+---------------------
+
+labmda ifadsinde öyle bir araç olsun ki  uniqe_ptr taşıma yapılsın
+
+int main()
+{
+using namespace std;
+
+int x = 46;
+
+auto fn = [a = x] () {
+return a * 5;
+};
+}
+
+----------
+
+auto fn = [x] () {
+return x * 5; //aynı anlamda, ancak labmda init capture bize herhangi bir sayıyla init edilme şansıın veirir
+};
+
+-----------
+
+int main()
+{
+using namespace std;
+
+int x = 46;
+
+auto fn = [a = x + 5]() {
+cout << a << "\n";
+};
+
+fn();
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+int x = 46;
+
+auto fn = [x = x + 5]() {
+cout << x << "\n";
+};
+
+fn();
+}
+
+-----------
+//bu özellikler aşağıdaki kodda işimize yarıycak
+
+int main()
+{
+using namespace std;
+
+auto uptr = make_unique<string>("necati ergin");
+
+//auto f = [uptr]() { //sentax hatası, copt capture çünkü
+auto f = [&uptr]() {
+cout << *uptr << '\n';
+};
+
+f();
+
+cout << (uptr ? "dolu" : "bos") << '\n';
+}
 
 
 
