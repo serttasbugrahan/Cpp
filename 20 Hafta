@@ -1771,6 +1771,323 @@ seconds x {367};
 x = 57; //hata
 }
 
+////////////////////////////////////////// 3. Ders //////////////////////////////////////
+
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+//üretimde bu kadar bol using bildirimi kullanmam diyor necati hoca
+
+int main()
+{
+millliseconds ms = 54343; //hata ctor explicit
+millliseconds ms1{54343}; //value init edersek hata olmaz
+
+ms1.count()//sarmalanan değeri döndürür
+auto val = ms1.count();
+
+}
+
+-------------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+auto dr = milliseconds{456} + nanoseconds{6'543'129} + seconds{2}
+
+cout << dr.count() << "\n";
+}
+
+--------------------
+// int, double gibi türlerden duratian'a örtülü dönüşüm yok
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+milliseconds ms{4343};
+
+ms = 432; //hata
+int ival = ms; //hata
+}
+
+---------------
+
+önemli bir kural : daha ince türden daha kalın türe örtülü dönüşüm yok
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+milliseconds ms{4343};
+microseconds us{4'513'981};
+
+us = ms; //legal
+ms = us; //hat
+}
+
+----------------
+
+using namespace std;
+using namespace std::chrono;
+
+using halfsec = duration<double, ratio<1, 2>>;
+
+int main()
+{
+milliseconds ms{ 42323 };
+microseconds us{4'322'323};
+
+halfsec hs = ms;
+}
+
+-----------------
+
+eğer temsil türü tam sayı ise daha ince'den kabaya dönüşüm yok
+eğer represantatiton türü gerçek sayı türü ise her türlü dönüşüm var
+
+----------------
+
+using namespace std;
+using namespace std::chrono;
+
+using halfsec = duration<double, ratio<1, 2>>;
+
+struct Data {
+int mx;
+};
+
+int main()
+{
+Data mydata;
+//Data mydata{}; //bu şekilde ub olmaz value init edildiğinde ilk olarak sıfır ile init edilir  
+cout << mydata.mx << '\n'; //tanımısz davranış
+}
+
+----------------
+
+template <typename Rep, typename Per>
+struct Duration {
+
+Rep count()const
+{
+return val;
+}
+Rep val;
+};
+
+int main()
+{
+milliseconds ms;
+milliseconds ms{}; //Bu şekilde yaparsak değişir
+
+
+cout << ms.count() << '\n';  
+}
+
+----------------
+
+yapılan en büyük hatalardan biri
+
+duration nesnesi default init edersek intermit value'da
+
+---------------
+
+duration değeri bir stream'e yazdırılabilir mi?
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+cout << milliseconds {345} << '\n'; // cpp 20'ye kadar hataludı
+}
+
+
+---------------
+//cpp 20 öncesi ise bu şkeilde olur
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+milliseconds {345}; 
+
+cout << ms.count() << "ms"; 
+}
+
+==================================================================
+
+araya konu alıyoruz
+
+UDL (user defined literals)
+----------------------------
+
+aslında operator overloading'in başka bir biçimidir.
+
+823ms
+
+operator""ms(823)
+
+bazı yerlerde sabit gibi kıllanılan değelerin kullanılma imkanını veriyor
+
+---------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+auto dr
+}
+
+----------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+auto dur = 345ms;
+constexpr auto dur1 = 345ms;
+constexpr auto dur2 = operator""ms(345);
+
+}
+
+------------------
+
+
+int main()
+{
+using namespace std::literals; 
+using namespace std::chrono_literals; //bunlar görünür olmalı
+//ancak bunlar inline namepsace olduğu için aşağıdaki yeterli
+
+using namespace std::chrono;
+
+567ms + 3457us + 6767ns //aslında bunlar constexpr fonksiyonlar ben bunlara sırasıyla 567 değerlerini geçmiş oldum
+}
+
+--------------------
+
+using namespace std;
+
+int main()
+{
+operator""s("alican", 6)
+//ikisi arasında fark yok
+"alican"s
+}
+
+-----------------------
+
+//keyfi parametre yapamıyoruz bunları
+
+operator""_x(long long double)
+operator""_y(unsigned long long)
+operator""_z(char)
+operator""_z(const char*, size_t);
+
+//bu listeyi daha sonra görüceğiz
+
+-----------------------
+
+bu user defined literaller 
+cooked ya da uncooke olabiliyor
+
+cooked: ben bu karakterleri göndermiyorum değeri gönderiyorum
+
+int main()
+{
+using namespace std::chrono;
+
+operator""s
+567s
+"mustafa"s //direk argüman olarak gönderiyorum cooked
+
+678768x //elimizce sadece bir yazı var ondan elde ediceksek uncooked 
+}
+
+-----------------------
+
+int main()
+{
+using namespace std::chrono;
+
+78787kg; //gönül isterdi ki böyle sabitlerde oluşturalım fakat bu yasaklanmış
+67867_kg //ancak bu şekilde olabilir
+}
+
+----------------------
+!! programcının tanımladığı literal operatorler _ ile başlamalı
+-----------------------
+
+literal operatorlerimizi oluşturuyoruz
+
+constexpr double operator""_m(long double val)
+{
+return static_cast<double>(val);
+}
+
+int main()
+{
+4.5_m //geçerli, ifadenin türü double, constant expression
+contexor auto x = 4.5_m; //Hata olmaz
+
+}
+
+------------------------
+constexpr double operator""_m(long double val)
+{
+return static_cast<double>(val);
+}
+
+constexpr double operator""_cm(long double val)
+{
+return static_cast<doble>(val / 100);
+}
+
+constexpr double operator""_mm(long double val)
+{
+return static_cast<doble>(val / 1000);
+}
+
+constexpr double operator""_km(long double val)
+{
+return static_cast<doble>(val * 1000);
+}
+
+int main()
+{
+constexpr auto distance = 3.5_m + 876.45_cm + 1221.322_mm + 0.033232_km
+
+cout << distance << " metre\n";
+}
+
+-----------------
+
+constexpr std::size_t operator""_KB(unsigned long long size)
+{
+return static_cast<std::size_t(size * 1'024);
+}
+
+constexpr std::size_t operator""_MB(unsigned long long size)
+{
+return static_cast<std::size_t(size * 1'024 * 1'024);
+}
+
+constexpr std::size_t operator""_GB(unsigned long long size)
+{
+return static_cast<std::size_t(size * 1'024 * 1'024 * 1'024);
+}
+
+
 
 
 
