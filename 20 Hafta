@@ -2071,6 +2071,7 @@ cout << distance << " metre\n";
 }
 
 -----------------
+#include <array>
 
 constexpr std::size_t operator""_KB(unsigned long long size)
 {
@@ -2086,6 +2087,591 @@ constexpr std::size_t operator""_GB(unsigned long long size)
 {
 return static_cast<std::size_t(size * 1'024 * 1'024 * 1'024);
 }
+
+int main()
+{
+std::array<char, 12_KB> buf{}; //12kb lık buffer
+std::array<char, 1_MB> buf{}; //1MB lık buffer
+
+}
+---------------------
+
+ilginç bir cooked yapısı daha var
+
+using salise = std::chrono::duration<long long, std::ratio<1, 60>>;
+
+contexpr salise operator""_sls(unsigned long long val)
+{
+return salise{val};
+}
+
+int main()
+{
+using namespace std::chrono;
+
+234_sls
+}
+
+----------------------
+
+std::string operator""_str(const char* p, std::size_t n)
+{
+std::cout << "p adresindeki yazi: " << p << "\n";
+std::cout << "n = " << n << '\n';
+
+return "";
+}
+
+int main()
+{
+using namespace std::chrono;
+
+"gurkan"_str;
+}
+
+------------------
+
+std::string operator""_str(const char* p, std::size_t)
+{
+return std::string{ p };
+}
+
+int main()
+{
+using namespace std::chrono;
+
+"gurkan"_str;
+}
+
+---------------
+
+std::string operator""_s2(const char* p, std::size_t)
+{
+return std::string{ p } + p;
+}
+
+std::string operator""_s3(const char* p, std::size_t)
+{
+return std::string{ p } + p + p;
+}
+
+int main()
+{
+using namespace std::chrono;
+
+cout << "ali"_s2 << "\n";
+cout << "ali"_s3 << "\n";
+
+}
+
+----------------------
+
+#include "date.h"
+
+operator""_dt(const char *p, std::size_t)
+{
+return Daye{p};
+}
+
+int main()
+{
+using namespace std;
+
+cout << "21-05-1992"_dt + 56 << '\n';
+}
+
+-----------------
+
+constexpr int operator""_i(char c)
+{
+return c;
+}
+
+int main()
+{
+using namespace std;
+
+cout << 'A' << "\n";
+cout << 'A'_i << "\n";
+
+}
+
+---------------------
+
+uncooked mantığına bakıyoruz
+
+void operator""_x(const char* p, size_t);
+void operator""_y(const char* p);
+
+int main()
+{
+"alican"_x;
+
+65423_y; //ikisi aynı anlamdadır
+operator""_y("32223"); //ikisi aynı anlamdadır
+}
+
+----------------
+
+void operator""_y(const char* p)
+{
+for (int i = 0; p[i] != '\0'; ++i) {
+std::cout << p[i] << '\n';
+}
+}
+
+int main()
+{
+654435_y;
+//operator""_y("87887");
+}
+
+----------------
+
+unsigned int operator""_b(const char* p)
+{
+unsigned result{};
+
+using namespace std::literals;
+
+while (*p) {
+char digit = *p;
+if (digit != '1'&& digit != '0') {
+throw std::runtime_error{"invalid character : "s }
+}
+result = result * 2 + (digit - '0');
+++p;
+}
+return result;
+}
+
+int main()
+{
+using namespace std;
+
+try
+{
+    constexpr auto val = 100201010_b;
+cout << val << "\n";
+}
+catch(const std::exception& e)
+{
+    std::cerr << e.what() << '\n';
+}
+
+
+}
+
+-------------------
+geri dönüş değeri operatorde olabilir
+
+#include <iomanip>
+
+void operator""pr(const char* p)
+{
+std::cout << std::quoted(p) << '\n';
+}
+
+int main()
+{
+6786.89_pr;
+43432_pr;
+
+operator""_pr("898997");
+}
+
+------------------
+
+neden chrono kütüphanesinde duration türü var çünkü ana amaç sn, ms, doğrudan tam sayı primitif 
+türler ile ifade etmmek yerine kendisini bir tür yapmaktır
+
+------------------
+//Bazı yasaklamalar yapmak istiyorum bunun için ctor explicit yapılabilir
+
+class Kilogram {
+public:
+explicit Kilogram(double val);
+
+private:
+double mwieght;
+};
+
+void foo(Kilogram);
+
+int main()
+{
+Kilogram x = 5.4332; //explicit yaparak burayı sentax hatası yaptık
+Kilogram x(3.2233); //
+
+}
+
+----------------
+
+class Kilogram {
+public:
+class prevent_usage {};
+Kilogram(prevent_usage, double val) : mweight{val} {}
+
+friend constexpr Kilogram operator+(const Kilogram& x, const Kilogram& y)
+{
+return Kilogram{Kilogram::prevent_usage{}, x.mweight + y.mweight};
+}
+
+private:
+double mweight;
+};
+
+constexpr Kilogram operator""_kg(long double x)
+{
+return Kilogram{Kilogram::prevent_usage{}, static_cast<double>(x) };
+}
+
+constexpr Kilogram operator""_gr(long double x)
+{
+return Kilogram{Kilogram::prevent_usage{}, static_cast<double>(x / 1000.) };
+}
+
+constexpr Kilogram operator""_mg(long double x)
+{
+return Kilogram{Kilogram::prevent_usage{}, static_cast<double>(x / 1000. / 1000.) };
+}
+
+
+int main()
+{
+constexpr auto weighr = 4.5_kg + 1234.87_gr + 365'32_mg
+
+}
+
+----------------------
+
+//chrono kütüphanesi bu dönüşümleri hallediyor
+int main()
+{
+using namespace std::chrono;
+
+35s + 3567ms
+}
+
+//bu tarz işlemlerde veri kaybını önlemek için tür dönüştürme kullanılır
+
+------------------
+
+int main()
+{
+using namespace std::chrono;
+
+auto ms = 67767ms;
+
+seconds s(ms.count() / 1000);
+
+cout << s;
+}
+
+--------------
+
+int main()
+{
+using namespace std::chrono;
+
+auto ms = 67767ms;
+
+auto sec = duration_cast<seconds>(ms);
+
+cout << sec.count() << " saniye\n";
+}
+
+--------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+long long val;
+std::cout << "milisaniye olarak degeri girin : ";
+//bu degeri sn ms saat olarak yadırın
+cin >> val;
+
+miliseconds ms{ val };
+hours hrs = duration_cast<hours>(ms);
+minutes mins = duration_cast<minutes>(ms % 1h);
+seconds sec = duration_cast<seconds>(ms % 1min);
+milliseconds msx(ms % 1s);
+
+if (hrs.count())
+cout << hrs.count() << " saat \n";
+
+if (mins.count())
+cout << mins.count() << " dakika\n";
+
+if (sec.count())
+cout << sec.count() << " saniye\n";
+}
+
+if (msx.count())
+cout << mins.count() << " mili saniye\n";
+}
+
+}
+
+----------------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+auto ms = 678'678ms;
+
+cout << duration_cast<seconds>(ms) << "\n";
+cout << floor<seconds>(ms) << "\n";
+cout << ceil<seconds>(ms) << "\n";
+cout << round<seconds>(ms) << "\n";
+}
+
+-------------------
+//önemli bir kod
+
+
+template <typename Rep, typename Period>
+std::ostream& operator<<(std::ostream& os, const std::chrono::duration<Rep, Period>& dur)
+{
+return os << dur.count() << " * ("" << Period::num << " / " << Period::den << ")";
+}
+
+using tensec = std::chrono::duration<int, std::ratio<10>>;
+using halfsec = std::chrono::duration<int, std::ratio<1, 2>>;
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+cout << 34.54ms;
+cout << 3454ms;
+
+cout << tensec{ 6512 } << "\n";
+}
+
+--------------------
+
+template <typename Rep, typename Period>
+std::ostream& operator<<(std::ostream& os, const std::chrono::duration<Rep, Period>& dur)
+{
+return os << dur.count() << " * ("" << Period::num << " / " << Period::den << ")";
+}
+
+using tensec = std::chrono::duration<int, std::ratio<10>>;
+using halfsec = std::chrono::duration<int, std::ratio<1, 2>>;
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+milliseconds ms{ 4544 };
+
+cout << ms << "\n";
+ms += 12min;
+cout << ms << "\n";
+}
+
+---------------------------------------
+
+time_point bakıyoruz
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+//system_clock
+//high_resolution_clock
+//steady_clcok
+
+//cpp 23 öncesinde sadece 3 tane saat türü var
+}
+
+---------------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+//system_clock::time_point
+
+time_point<system_clock, system_clock::duration>
+time_point<system_clock> //aynı anlamda
+
+
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+is_same_v<system_clock::time_point, time_pint<system_clock> //true olucak
+}
+
+-----------------
+
+time_point ile neler yapabilirim
+
+saatin now değerini çağırmak
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+auto tp1 = system_clock::now();
+auto tp2 = system_clock::now();
+
+tp2 - tp1
+
+}
+
+----------------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+cout << typeid(system_clock::time_point).name() << "\n";
+cout << typeid(high_resolution_clock::time_point).name() << "\n";
+cout << typeid(steady_clock::time_point).name() << "\n";
+
+}
+
+
+-------------------------
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+cout << typeid(system_clock::time_point).name() << "\n";
+
+system_clock::duration
+system_clock::time_point
+system_clock::period
+system_clock::rep
+
+
+}
+
+-------------------
+//stady olmaması saatin ayarlanabilir olmaması demektir
+//yani aynı count değerini birkaç kez alabiliriz
+
+using namespace std;
+using namespace std::chrono;
+
+int main()
+{
+stady_clock::is_steady //true olur
+}
+
+-----------------------
+
+mülakatların temel ihtiyaç kodlarından biridir ==> süre ölçümü
+
+----------------------
+//bir kaç kez yazmak gerekiyor 
+
+std::vector<size_t> get_soreted_vector(std::size_t n)
+{
+std::vector<size_t> vec(n);
+
+std::generate_n(vec.begin(), n, rand);
+std::sort(vec.begin(), vec.end());
+
+return vec;
+}
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+
+auto tp_start = steday_clock::now();
+
+auto vec = get_sorted_vector(2'450'000);
+
+auto tp_end = steday_clock::now();
+
+cout << duration_cast<milliseconds>(tp_end - tp_start).count() << " milisaniye\n";
+
+cout << duration<double, milli>(tp_end - tp_start).count() << " saniye\n";
+//cout << duration<double, micro>(tp_end - tp_start).count() << " saniye\n";
+
+cout << "vec.size() = " << vec.size() << '\n';
+}
+
+----------------
+
+std::vector<size_t> get_soreted_vector(std::size_t n)
+{
+std::vector<size_t> vec(n);
+
+std::generate_n(vec.begin(), n, rand);
+std::sort(vec.begin(), vec.end());
+
+return vec;
+}
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+auto tp = system_clock::now();
+
+time_t ct_time = system_clock::to_time_t(tp);
+
+cout << ctime(&ct_time) << "\n"; //time kütüphanesi ile yapılacak işlemleri burada yapabiliriz
+}
+
+--------------------
+
+from_time_t : time_t time pointe dönüşebilir
+
+----------------------
+
+std::vector<size_t> get_soreted_vector(std::size_t n)
+{
+std::vector<size_t> vec(n);
+
+std::generate_n(vec.begin(), n, rand);
+std::sort(vec.begin(), vec.end());
+
+return vec;
+}
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+auto tp = system_clock::now();
+
+cout << duration_cast<int, ratio<60 * 60 *24>(tp.time_since_epoch().count() << "\n";
+
+}
+
+------------------------
+
+tekrar 
+
+auto tp = system_clock::now()
 
 
 
