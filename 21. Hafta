@@ -1,0 +1,120 @@
+///////////////////////////////////////////////// 1. Ders ////////////////////////////////////////////////
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+system_clock::now(); //time point döndürü
+
+system:clock::now().time_since_epoch(); //duration döndürür
+
+system:clock::now().time_since_epoch().count; //representatation türünden olur
+
+duration_cast<milliseconds>(system_clokc::now().time_since_epoch()).count()  
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+system_clock::to_time_t(); //time point ister bunu c'deki time pointe dönüştürür
+system_clock::from_time_t(); //
+
+}
+
+----------------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+time_t tx{1'600'000'000 };
+auto tp = system_clock::from_time_t(tx);
+}
+
+-----------------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+auto tp = system_clock::now;
+
+time_t tx = system_clock::to_time_t(tp);
+
+cout << ctime(&tx) << '\n';
+}
+
+------------------------
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
+
+days ondeay{ 1 };
+
+auto tp_today = system_clock::now();
+
+auto tp_tomorrow = tp_today + oneday;
+
+time_t t1 = system_clock::to_time_t(tp_today);
+time_t t2 = system_clock::to_time_t(tp_tomorrow);
+cout << ctime(&t1) << "\n";
+cout << ctime(&t2) << "\n";
+ 
+}
+
+------------------------
+
+print_time kodunu incele kod visual stdiooda
+
+------------------------
+
+=======================================================================
+
+Vocabulary Types 
+----------------
+
+std::optional 
+std::variant
+std::any
+
+hepsi c++ 17 ile geldi
+
+------------------------
+
+std::optional
+--------------
+Belirli bir türden ya bir değere sahip ya da değil, 
+bir optional nesnesi 2 state'den birinde olabilir
+
+A - bir değeri var
+B - bir değeri yok
+
+
+std::variant
+------------
+Bir union
+Ya int tutucak ya string tutucak vs.
+n tane farklı türden değer tutmak istersek variant kullanırız
+
+
+std::any
+--------
+herhangi bir türden değer tutmak için yapılır
+
+
+
+
+
+
+
+
+
