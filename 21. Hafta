@@ -497,7 +497,7 @@ cout << "gecersiz tam sayi";
 
 ------------------
 
-//tuttupu değerlerin detroy edildiği duurumlarda var
+// tuttupu değerlerin detroy edildiği duurumlarda var
 
 class A {
 ~A() {std::cout << "~A() this: " << this << '\n'; }
@@ -512,8 +512,423 @@ int main()
 using namespace std;
 
 optional<A> ox;
-ox.emplace(); //default ctor çağrılır
+ox.emplace(45, 67); //default ctor çağrılır
+ox.emplace(78,98);
+ox.emplace(45.5);
+ox.emplace("furkan");
+}
+
+-----------------------
+
+class A {
+~A() {std::cout << "~A() this: " << this << '\n'; }
+A() {std::cout << "A() this: " << this << '\n'; }
+A(int) {std::cout << "A(int) this: " << this << '\n'; }
+A(int, int) {std::cout << "A(int, int) this: " << this << '\n'; }
+A(std::string) {std::cout << "A(string) this: " << this << '\n'; }
+};
+
+int main()
+{
+using namespace std;
+
+optional<A> x;
+
+x = 5; //legal
+
+for (int i = 0; i < 10; ++i) {
+x.emplace(i);
+}
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+Date mydate{3, 6, 1981};
+
+optional<Date> ox(mydate); //copy ctor çağrılacak, move aparsam move ctor
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+optional<Date> ox(4,5 1987); //böyle bir sey yok bu temlate'ler ile ilgili temel bir problem
+
+//bunu aşmak için aşağıdaki hile yapılır
 
 }
+
+--------------
+
+int main()
+{
+using namespace std;
+
+optional<Date> ox(in_place, 4, 5, 1987);
+
+cout << *ox << "\n";
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+optional<Date> ox{ in_place, 10, 'A' };
+
+cout << *ox << "\n";
+ox.emplace(20, 'b');
+cout << *ox << "\n";
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+optional<string> o1(in_place, 20, 'X');
+auto o2 = make_optional<string>(10, 'Y');
+auto o3 = make_optional<Date>(2,5,1995);
+
+cout << *o1 << "\n";
+cout << *o2 << "\n";
+cout << *o3 << "\n";
+
+}
+
+-------------------
+
+class Myclass {
+public:
+Myclass();
+Myclass(int);
+Myclass(int, int);
+Myclass(const Myclass&) = delete;
+Myclass& operator=(const Myclass&) = delete;
+};
+
+int main()
+{
+using namespace std;
+
+Myclass m1; //legal
+Myclass m2(12); //legal
+Myclass m3(12, 57); //lwgal
+
+auto m4 = m1; //hata
+auto m4 = move(m1); //hata
+}
+
+--------------------
+
+class Myclass {
+public:
+Myclass();
+Myclass(int);
+Myclass(int, int);
+Myclass(const Myclass&) = delete;
+Myclass& operator=(const Myclass&) = delete;
+};
+
+int main()
+{
+using namespace std;
+
+Myclass m1;
+Myclass m2(12);
+
+optional<Myclass> ox(in_place, 3, 5); //legal
+optional<Myclass> ox(in_place); //legal
+
+ox.emplace(34);
+ox.emplace();
+}
+
+------------------------
+
+optional<Myclass> x(in_place,1,4,5); //buradaki implace back fonksiyonunu functionu ayırıcı olarak kullanıp bundan sondan gelenleri ilgili fonksiyona koyabilirim
+
+make_optional<Myclass>(1,4,5); //bu şekilde de yapılabilir
+
+-----------------------
+
+class Myclass {
+int x{};
+int y{};
+
+};
+
+int main()
+{
+std::cout << "sizeof(Myclass) = " << sizeof(Myclass) << "\n";
+std::cout << "sizeof(optional<Myclass>) = " << sizeof(optional<Myclass>) << "\n";
+
+}
+
+----------------
+
+template <std::size_t n>
+struct Myclass {
+
+char buf[n]{};
+};
+
+template <size_t n>
+using otype = optional<Myclass<n>>; //alias template
+
+int main()
+{
+otype<10>
+std::optional<Myclass<10> //aynı anlamda alias template sayesind
+
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+string name{"mustafa"};
+
+optional x = name;
+optional x = ref(name);
+
+(*x).get() = "salih";
+x->get() = "tunahan"; //aynı anlamda
+
+cout << "name = " << name << '\n';
+}
+
+----------------------
+
+optional nesnelerini karşılaştırma operatörünün operandı yapabiliyoruz
+
+int main()
+{
+using namespace std;
+
+optional x = 5;
+optional y = 123;
+
+boolalpha(cout);
+
+cout << (x == y) << "\n";
+cout << (x != y) << "\n";
+cout << (x < y) << "\n";
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+optional<int> x;
+optional y = 123;
+
+boolalpha(cout);
+
+cout << (x < y) << "\n";
+cout << (x != y) << "\n";
+}
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+optional<bool> x;
+optional<bool> y(false);
+
+cout << boolalpha;
+
+cout << (x == true) << "\n";
+cout << (x == false) << "\n";
+cout << (x == nullopt) << "\n";
+cout << (x < false) << "\n";
+}
+
+
+=================================================================
+
+variant : aslında bellek alanı var o bellekte nesneyi tutacak ancak compile time'da o bellek alanında hangi argümanların tutulabileceği template argümanlarıyla belirlenecek
+---------
+
+#include <variant>
+
+union Nec {
+int x;
+double dval;
+//
+};
+
+int main()
+{
+
+}
+
+---------------
+
+using namespace std;
+
+int main()
+{
+variant<int, double, long, char> x;
+}
+
+------------------
+
+default init edilebiliyor
+
+using namespace std;
+
+int main()
+{
+variant<int, double, long, char> x;
+
+// x'İ kullansak türü int olucak, ilk alternatifi tutar
+}
+
+----------------------
+using namespace std;
+
+int main()
+{
+variant<int, double, long, char> x;
+
+cout << x.index() << "\n"; //tutuğı indexi tutar
+}
+
+-------------------
+
+int main()
+{
+variant<string, double, long, char> x(4.5);
+
+cout << x.index() << "\n"; //1 olucak
+}
+
+-------------------
+
+int main()
+{
+variant<string, double, long, char> x(4.5);
+
+x = 3.4;
+
+cout << x.index() << "\n"; 
+
+x = 34;
+
+cout << x.index() << "\n"; 
+}
+
+-----------------
+
+bir yolu daha vardır
+
+int main()
+{
+variant<string, double, long, char> x;
+
+cout << x.index() << "\n"; 
+
+if (holds_alternative<int>(x)) { //if tutuyorsa doğru kısma giricek
+
+}
+}
+
+------------------
+
+int main()
+{
+variant<string, double, long, char> x{57}; //double yapıp dene
+
+cout << x.index() << "\n"; 
+
+if (holds_alternative<int>(x)) { 
+cout << "evet int tutuyor\n";
+}
+if (x.index() == 2) { 
+cout << "evet int tutuyor\n";
+}
+}
+
+------------------
+
+using namespace std;
+
+int main()
+{
+using namespace std;
+
+variant<int, double, int> x;
+
+cout << get<0>(x) << "\n";
+
+variant<string, double, int> y;
+}
+
+----------------------
+
+int main()
+{
+variant<string, double, int> x{3.47};
+
+cout << get<1>(x) << "\n";
+get<1>(x) = 965.46;
+
+x = "mustafa";
+
+x += "mustafa; //hatalı
+
+get<0>(x) += " can"; //bu şekilde olur
+}
+
+----------------------
+
+int main()
+{
+variant<string, double, int> x{3.47};
+
+get<double>(x);
+}
+
+----------------
+
+özetlersek
+
+variant tuttuğu değere 2 şekilde erişebilirim
+
+get fonksiyon şablonu ama nontype parametre ile
+get<0>(x)
+
+get fonksiyon şablonu ama tür parametresi ile
+get<double>(x)
+
+----------------
+
+int main()
+{
+variant<string, double, int> x{3.47}; 
+
+get<3> x; //sentax hatası
+get<long> x; //hata
+}
+
+-----------------
+
+
+
 
 
