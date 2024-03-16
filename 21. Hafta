@@ -110,11 +110,410 @@ std::any
 --------
 herhangi bir türden değer tutmak için yapılır
 
+---------------------
 
+#include <optional>
+#include <string>
+#include "date.h"
 
+using namespace std;
 
+int main()
+{
 
+optional<int> x;
 
+if (x) {
+std::cout << "dolu bir degere sahip\n";
+}
+else {
+std::cout << "bos bir degere sahip degil\n";
+}
+}
 
+----------------
+
+using namespace std;
+
+int main()
+{
+optional<int> x{ 678 };
+
+if (x) {
+std::cout << "dolu bir degere sahip\n";
+}
+else {
+std::cout << "bos bir degere sahip degil\n";
+}
+}
+
+---------------
+
+using namespace std;
+
+int main()
+{
+optional<int> x{ 678 };
+
+cout << "x= " << (x ? "dolu" : "bos") << "\n";
+}
+
+--------------
+
+bir contructor daha var, nullopt
+
+int main()
+{
+optional<int> x{nullopt};
+
+cout << "x = " << (x ? "dolu" : "bos") << "\n";
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+optional<int> x = 10;
+optional y = 10; //ikisi arasında fark yok ctad
+}
+
+---------------
+//mülakatlarda gelir
+
+int main()
+{
+using namespace std;
+
+optional<int> x1; //bos
+optional<int> x2{}; //bos
+optional<int> x3{nullopt}; //bos
+optional<int> x4(); //x4 optinol nesnesi değil fonksiyon bildirimi
+
+if (!(x1 && x2 && x3)) {
+std::cout << "hepimiz bombosuz\n";
+}
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+optional<int> x;
+
+if (x){} //aynı anlamda
+if (x.operator bool ()){} //aynı anlamda
+if (x.has_value){} //aynı anlamda
+
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+optional x(3456);
+
+cout << *x << "\n";
+*x = 6787;
+cout << *x << "\n";
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+optional<string> osx{ "naci cemal" };
+
+cout << *osx << '\n';
+
+cout << "uzunluk = " << osx->lenght() << '\n';
+
+*osx += " dagdalen";
+
+cout << *osx << "\n";
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+optional<string> os;
+
+try {
+cout << *os << "\n";
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n'; //ub döndürür kod boş
+}
+}
+
+---------------------
+
+//yukarıdaki durumun önüne geçmek için
+
+int main()
+{
+using namespace std;
+
+optional<string> os;
+
+if (os != nullopt) { //yapılır
+cout << *os << "\n";
+}
+}
+
+-------------------
+
+//value fonksiyonu da kullanılabilir
+
+int main()
+{
+using namespace std;
+
+optional<string> os;
+
+try {
+cout << os.value() << "\n";
+}
+catch (const std::bad_optional_access& ex) {
+std::cout << "exception caught: " << ex.what() << '\n'; //ub döndürür kod boş
+}
+}
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+optional<string> os{"bugra"};
+
+cout << *os << "\n";
+cout << os.value() << "\n";
+
+os.value() += "sentoregil";
+}
+
+------------------
+3 fonksiyonu vardır optional'ın
+
+ox.operator*
+
+ox.value
+
+ox.value_or
+
+---------------------
+
+ilginç ve karmaşık bir fonksiyon daha var
+ox.value_or
+
+int main()
+{
+using namespace std;
+
+optional<string> os{ "furkan mert" };
+
+cout << os.value_or("noname") << "\n"; 
+
+os = {}; //optional boş hale geldi
+
+cout << os.value_or("noname") << "\n";  //noname yazar
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+optional<int> os(456);
+
+os.value_or(457) = //hata
+
+}
+
+--------------------
+
+void print_e_mail(const std::optional<std::string>& op)
+{
+
+}
+
+int main()
+{
+print_e_mail("necati ergin");
+
+print_e_mail(std::nullopt);
+print_e_mail({});
+print_e_mail(optinal<string>{}; //hepsi  ben bir değer göndermiyorum anlamında
+}
+
+------------------
+
+class Person {
+
+private:
+
+std::optional<string> m_middle_name;
+};
+
+void print_e_mail(const std::optional<std::string>& op)
+{
+
+}
+
+int main()
+{
+
+}
+
+---------------
+//value or olmasaydı aşağıdaki yapı kulllanırdık
+
+void print_e_mail(const std::optional<std::string>& op)
+{
+if (op) {
+
+}
+else {
+
+}
+}
+
+int main()
+{
+
+}
+
+----------------
+
+void print_e_mail(const std::optional<std::string>& op)
+{
+std::cout < "e-posta adresi : " << op.value_or("yok") << "\n";
+}
+
+int main()
+{
+
+}
+
+------------
+
+class Record {
+public:
+Record(const std::string& nmake, std::optional<string>nick, std::optional<int> age) :
+m_name(name), m_nick(nick), m_age(age) {}
+
+private:
+std::string m_name;
+std::optional<std::string> mnic;
+std::optinal<int> m_age;
+};
+
+int main()
+{
+Record r1{ "bugra serttas", "speedy coder", 23};
+Record r1{ "bugra serttas", {}, nullopt}; //bu şekilde de olur
+}
+
+-------------
+
+optional şöyle tarif ediyorlar 
+
+sana bir bardak veriyorum bu bardağı boşda verebiliriim doluda
+
+--------------
+//string'İn inte dönüştürücek
+
+stoi(s) //aldığı stringi inte dönüştürür, ancak string geçerli değil ise exception döndürür ancak ben bunu istemiyorum
+//return std::nullopt;
+//return {}; //bu da olur
+
+std::optional<int>
+to_int(const std::string& s)
+{
+try {
+return stoi(s);
+}
+catch(...) {
+return {};
+}
+}
+
+--------------
+
+//aşağıdaki şekilde de olabilirdi
+
+std::optional<int>
+to_int(const std::string& s)
+{
+std::optional<int> ret;
+
+try {
+return stoi(s);
+}
+catch(...) {
+return std::nullopt;
+}
+}
+
+----------------
+
+//aşağıdaki şekilde de olabilirdi
+
+std::optional<int>
+to_int(const std::string& s)
+{
+std::optional<int> ret;
+
+try {
+return stoi(s);
+}
+catch(...) {
+return ret;
+}
+
+int main()
+{
+using namespace std;
+
+auto op = to_int("78788");
+
+if (op)
+cout << *op << "\n";
+else 
+cout << "gecersiz tam sayi";
+}
+
+------------------
+
+//tuttupu değerlerin detroy edildiği duurumlarda var
+
+class A {
+~A() {std::cout << "~A() this: " << this << '\n'; }
+A() {std::cout << "A() this: " << this << '\n'; }
+A(int) {std::cout << "A(int) this: " << this << '\n'; }
+A(int, int) {std::cout << "A(int, int) this: " << this << '\n'; }
+A(std::string) {std::cout << "A(string) this: " << this << '\n'; }
+};
+
+int main()
+{
+using namespace std;
+
+optional<A> ox;
+ox.emplace(); //default ctor çağrılır
+
+}
 
 
