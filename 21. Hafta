@@ -928,6 +928,90 @@ get<long> x; //hata
 
 -----------------
 
+int main()
+{
+variant<string, double, int> x{3.47};  //default etmezsek seçim yapıyor
+
+try {
+auto val = get<2>(x);
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+-------------------
+
+int main()
+{
+variant<int, double, long> x('A'); //hata yok char'dan inte dönüşüm var
+
+cout << "x.index() " << x.index() << '\n';
+
+}
+
+----------------
+
+int main()
+{
+variant<int, Date, string> x{12, 5, 1987};  //burada fonksiyo date nesnesine erişiceğini anlamaz
+//bunun yerine tag nesnesi kullanmamız lazım
+
+variant<int, Date, string> x(in_place_type<Date>, 2,5,1987);
+
+cout << get<1>(x) << "\n";
+
+x.emplace<string>(10, 'a');
+cout << get<2>(x) << "\n";
+}
+
+---------------
+
+class A {
+public:
+A(int);
+};
+
+class B {
+public:
+B(double);
+};
+
+class C {
+public:
+C(int);
+};
+
+int main()
+{
+using namespace std;
+
+variant<A, B, C> vx;
+
+//bazen variant'I hiçbir değer tutmuyor durumunda tutmak istiyouz
+//bunu aşmak için monostate kullanırız
+
+variant<monostate, int, double, long> x
+
+cout << x.index() < "\n";
+
+cout << boolalpha << hold_alternative<monostate> << "\n";
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+variant<int, double, long> x(2.3);
+
+get_if<int>(&x) //geri dönüş değeri adres ancak get tutmuyorsa nullptr
+
+if (int *ptr = get_if<int>(&x)) {
+cout << ğptr << "\n";
+}
+}
 
 
 
