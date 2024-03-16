@@ -1790,6 +1790,7 @@ auto val = ms1.count();
 }
 
 -------------------
+//duration işlemleri ile neler yapılabilir
 
 using namespace std;
 using namespace std::chrono;
@@ -1828,7 +1829,9 @@ milliseconds ms{4343};
 microseconds us{4'513'981};
 
 us = ms; //legal
-ms = us; //hat
+ms = us; //hata 
+
+//örtülü dönüşüm yapabilriiz
 }
 
 ----------------
@@ -1884,28 +1887,29 @@ Rep val;
 int main()
 {
 milliseconds ms;
-milliseconds ms{}; //Bu şekilde yaparsak değişir
+//milliseconds ms{}; //Bu şekilde yaparsak değişir
 
 
-cout << ms.count() << '\n';  
+cout << ms.count() << '\n';  //ub 
 }
 
 ----------------
 
 yapılan en büyük hatalardan biri
 
-duration nesnesi default init edersek intermit value'da
+duration nesnesi default init edersek intermit value'da olması
 
 ---------------
 
 duration değeri bir stream'e yazdırılabilir mi?
+//c++20 ile c++17 arasında büyük fark var
 
 using namespace std;
 using namespace std::chrono;
 
 int main()
 {
-cout << milliseconds {345} << '\n'; // cpp 20'ye kadar hataludı
+cout << milliseconds {345} << '\n'; // cpp 20'ye kadar hatalıydı
 }
 
 
@@ -1917,7 +1921,7 @@ using namespace std::chrono;
 
 int main()
 {
-milliseconds {345}; 
+milliseconds ms{345}; 
 
 cout << ms.count() << "ms"; 
 }
@@ -1935,7 +1939,7 @@ aslında operator overloading'in başka bir biçimidir.
 
 operator""ms(823)
 
-bazı yerlerde sabit gibi kıllanılan değelerin kullanılma imkanını veriyor
+bazı yerlerde sabit gibi kullanılan değelerin kullanılma imkanını veriyor
 
 ---------------
 
@@ -1944,7 +1948,10 @@ using namespace std::chrono;
 
 int main()
 {
-auto dr
+auto dur = 345ms; //legal
+constexpr auto dur1 = 345ms; //legal
+constexpr auto dur2 = operator""ms(345); //legal, ismi ms olan fonksiyona gönderiyoruz
+
 }
 
 ----------------
@@ -2001,7 +2008,7 @@ operator""_z(const char*, size_t);
 bu user defined literaller 
 cooked ya da uncooke olabiliyor
 
-cooked: ben bu karakterleri göndermiyorum değeri gönderiyorum
+cooked: ben bu karakterleri göndermiyorum bu değeri gönderiyorum
 
 int main()
 {
@@ -2029,6 +2036,7 @@ using namespace std::chrono;
 -----------------------
 
 literal operatorlerimizi oluşturuyoruz
+---------------------------------------
 
 constexpr double operator""_m(long double val)
 {
@@ -2038,8 +2046,9 @@ return static_cast<double>(val);
 int main()
 {
 4.5_m //geçerli, ifadenin türü double, constant expression
-contexor auto x = 4.5_m; //Hata olmaz
+constexpr auto x = 4.5_m; //Hata olmaz
 
+constexpr double y = operator""_m(4.576);
 }
 
 ------------------------
@@ -2091,9 +2100,11 @@ return static_cast<std::size_t(size * 1'024 * 1'024 * 1'024);
 int main()
 {
 std::array<char, 12_KB> buf{}; //12kb lık buffer
-std::array<char, 1_MB> buf{}; //1MB lık buffer
+std::array<char, 1_MB> buf1{}; //1MB lık buffer
 
 }
+
+
 ---------------------
 
 ilginç bir cooked yapısı daha var
@@ -2126,7 +2137,8 @@ int main()
 {
 using namespace std::chrono;
 
-"gurkan"_str;
+auto s = "gurkan"_str;
+
 }
 
 ------------------
@@ -2168,9 +2180,9 @@ cout << "ali"_s3 << "\n";
 
 #include "date.h"
 
-operator""_dt(const char *p, std::size_t)
+Date operator""_dt(const char *p, std::size_t)
 {
-return Daye{p};
+return Date{p};
 }
 
 int main()
@@ -2191,14 +2203,15 @@ int main()
 {
 using namespace std;
 
-cout << 'A' << "\n";
-cout << 'A'_i << "\n";
+cout << 'A' << "\n"; //bunun türü char
+cout << 'A'_i << "\n"; //bunun türü int
 
 }
 
 ---------------------
 
 uncooked mantığına bakıyoruz
+----------------------------
 
 void operator""_x(const char* p, size_t);
 void operator""_y(const char* p);
@@ -2208,7 +2221,7 @@ int main()
 "alican"_x;
 
 65423_y; //ikisi aynı anlamdadır
-operator""_y("32223"); //ikisi aynı anlamdadır
+operator""_y("32223"); //ikisi aynı anlamdadır, derleyici bu hale dönüştürür
 }
 
 ----------------
@@ -2237,7 +2250,7 @@ using namespace std::literals;
 while (*p) {
 char digit = *p;
 if (digit != '1'&& digit != '0') {
-throw std::runtime_error{"invalid character : "s }
+throw std::runtime_error{"invalid character : "s + digit}
 }
 result = result * 2 + (digit - '0');
 ++p;
@@ -2251,7 +2264,7 @@ using namespace std;
 
 try
 {
-    constexpr auto val = 100201010_b;
+auto val = 100203010_b;
 cout << val << "\n";
 }
 catch(const std::exception& e)
@@ -2282,8 +2295,8 @@ operator""_pr("898997");
 
 ------------------
 
-neden chrono kütüphanesinde duration türü var çünkü ana amaç sn, ms, doğrudan tam sayı primitif 
-türler ile ifade etmmek yerine kendisini bir tür yapmaktır
+neden chrono kütüphanesinde duration türü var çünkü ana amaç sn, ms, doğrudan primitif(tam sayı, gerçek sayı)
+türler ile ifade etmmek yerine onun kendisini bir tür yapmaktır
 
 ------------------
 //Bazı yasaklamalar yapmak istiyorum bunun için ctor explicit yapılabilir
@@ -2306,11 +2319,12 @@ Kilogram x(3.2233); //
 }
 
 ----------------
+//aşağıdaki yöntem kullanılır
 
 class Kilogram {
 public:
 class prevent_usage {};
-Kilogram(prevent_usage, double val) : mweight{val} {}
+constexpr Kilogram(prevent_usage, double val) : mweight{val} {}
 
 friend constexpr Kilogram operator+(const Kilogram& x, const Kilogram& y)
 {
@@ -2339,7 +2353,7 @@ return Kilogram{Kilogram::prevent_usage{}, static_cast<double>(x / 1000. / 1000.
 
 int main()
 {
-constexpr auto weighr = 4.5_kg + 1234.87_gr + 365'32_mg
+constexpr auto weight = 4.5_kg + 1234.87_gr + 365'332.55 _mg
 
 }
 
@@ -2363,13 +2377,15 @@ using namespace std::chrono;
 
 auto ms = 67767ms;
 
+second s = ms; //hata, bu hatayı düzeltmenin yolları
+
 seconds s(ms.count() / 1000);
 
-cout << s;
+cout << s << "\n";
 }
 
 --------------
-
+//duration cast
 int main()
 {
 using namespace std::chrono;
@@ -2379,9 +2395,11 @@ auto ms = 67767ms;
 auto sec = duration_cast<seconds>(ms);
 
 cout << sec.count() << " saniye\n";
+cout << sec << " saniye\n"; //c++20
 }
 
 --------------
+//chrono kütüphanesi kullanarak süreyi saat,saniye, ms, olarak yazdırılması isteniyor
 
 using namespace std;
 using namespace std::chrono;
@@ -2410,7 +2428,7 @@ cout << sec.count() << " saniye\n";
 }
 
 if (msx.count())
-cout << mins.count() << " mili saniye\n";
+cout << msx.count() << " mili saniye\n";
 }
 
 }
@@ -2431,6 +2449,8 @@ cout << round<seconds>(ms) << "\n";
 }
 
 -------------------
+
+time point : bir saatein ebokuyla iliştirilenmiş duration ifade ediyor
 //önemli bir kod
 
 
@@ -2532,11 +2552,12 @@ int main()
 auto tp1 = system_clock::now();
 auto tp2 = system_clock::now();
 
-tp2 - tp1
+tp2 - tp1 //bir duration elde edilir
 
 }
 
 ----------------------
+//saatlerin durationlarının ne olduğunu yazdırıyoruz
 
 using namespace std;
 using namespace std::chrono;
@@ -2548,7 +2569,6 @@ cout << typeid(high_resolution_clock::time_point).name() << "\n";
 cout << typeid(steady_clock::time_point).name() << "\n";
 
 }
-
 
 -------------------------
 
@@ -2604,13 +2624,13 @@ using namespace std::chrono;
 
 auto tp_start = steday_clock::now();
 
-auto vec = get_sorted_vector(2'450'000);
+auto vec = get_sorted_vector(2'450'000); //bu işlem kaç saniye sürecek onu ölçüceğiz
 
 auto tp_end = steday_clock::now();
 
 cout << duration_cast<milliseconds>(tp_end - tp_start).count() << " milisaniye\n";
 
-cout << duration<double, milli>(tp_end - tp_start).count() << " saniye\n";
+//cout << duration<double, milli>(tp_end - tp_start).count() << " saniye\n";
 //cout << duration<double, micro>(tp_end - tp_start).count() << " saniye\n";
 
 cout << "vec.size() = " << vec.size() << '\n';
@@ -2669,11 +2689,33 @@ cout << duration_cast<int, ratio<60 * 60 *24>(tp.time_since_epoch().count() << "
 
 ------------------------
 
-tekrar 
+std::vector<size_t> get_soreted_vector(std::size_t n)
+{
+std::vector<size_t> vec(n);
+
+std::generate_n(vec.begin(), n, rand);
+std::sort(vec.begin(), vec.end());
+
+return vec;
+}
+
+int main()
+{
+using namespace std;
+using namespace std::chrono;
 
 auto tp = system_clock::now()
 
+cout << tp.time_since_epoch().count() << "\n";
+
+cout << duration_cast<seconds(tp.time_since_epoch()).count() << "\n" //duration'dan geçen saniye sayısını elde ederiz
+cout << duration_cast<int, ratio(60 * 60 *24>>>(tp.time_since_epoch()).count() << "\n"; //epochtan geçen süreri gün olarak elde etmiş oldum
+
+}
 
 
+------------------------
+
+time_since_epoch duration ölçmez duration'ı time point durationa dönüştürür
 
 
