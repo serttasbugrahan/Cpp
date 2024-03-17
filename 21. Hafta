@@ -127,7 +127,7 @@ if (x) {
 std::cout << "dolu bir degere sahip\n";
 }
 else {
-std::cout << "bos bir degere sahip degil\n";
+std::cout << "bos bir degere sahip \n";
 }
 }
 
@@ -687,8 +687,7 @@ using otype = optional<Myclass<n>>; //alias template
 int main()
 {
 otype<10>
-std::optional<Myclass<10> //aynı anlamda alias template sayesind
-
+std::optional<Myclass<10> //aynı anlamda alias template sayesinde
 }
 
 ------------------
