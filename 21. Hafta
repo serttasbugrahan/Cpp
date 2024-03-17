@@ -1204,11 +1204,103 @@ int main()
 {
 using namespace std;
 
-any x1{23};
-any x2{2.3};
-any x3{"murathan"};
-any x4{"murathan"s};
+any x1{23}; //int
+any x2{2.3}; //double
+any x3{"murathan"}; //const char* 
+any x4{"murathan"s}; //std::string
 }
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+any x1;
+any x2{};
+any x3 =  {};
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+any x;
+
+if (x.has_value()) {
+std::cout << "dolu\n";
+}
+else {
+std::cout << "bos\n";
+}
+}
+
+-----------------
+
+//bu sınıfı nasıl implemente ederiz
+
+any türünden nesneye istediğim değeri atamaya type erasure deniyor
+
+int main()
+{
+using namespace std;
+
+any x(10);
+
+cout << x.type().name() << "\n";
+
+x = 4.5;
+
+cout << x.type().name() << "\n";
+
+x = bitset<16>{};
+cout << x.type().name() << "\n";
+}
+
+---------------
+
+nec ise neci double ise doublı nasıl kullanırız
+
+any_cast ile
+
+int main()
+{
+using namespace std;
+
+any x(10);
+
+cout << any_cast<int>(x) //ayn type'Ina bakar ve gerçekten o tğrden ise o tğrden değer verir tutmuyorsa exception throw eder
+
+x =  "necati"s;
+
+cout << ayn_cast<string>(x) << "\n";
+
+x = bitset<16>(456u);
+
+cout << any_cast<bitset<16>>(x) << "\n";
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+any x(10);
+
+try {
+cout << any_cast<double(x) << "\n";
+}
+
+castch (const std::bad_cast& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+
+
 
 
 
