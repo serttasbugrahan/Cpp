@@ -1012,6 +1012,204 @@ cout << ğptr << "\n";
 }
 }
 
+/////////////////////////////////////// 2. Ders /////////////////////////////
+
+
+//dk.45 devam
+
+using namespace std;
+
+template <typename ...Args>
+struct Overload : Args... {
+using Args::operator()...;
+};
+
+struct Nec{};
+struct Erg{};
+struct Tmr{};
+
+int main()
+{
+using namespace std;
+
+variant<int, double, float, Nec, Erg, Tmr> v;
+
+auto f = Overload{
+[](int) {return "int"; },
+[](double) {return "double"; },
+[](float) {return "float"; },
+[](Nec) {return "nec"; },
+[](Erg) {return "erg"; },
+[](Tmr) {return "tmr"; },
+};
+
+cout << visit(f,v) << '\n';
+v = 2.3f;
+cout << visit(f,v) << '\n';
+v = Nec{};
+cout << visit(f,v) << '\n';
+}
+
+----------------------
+
+using namespace std;
+
+struct Visitor {
+
+void operator()(const string&, int)
+{
+std::cout <<"string - int\n";
+}
+
+void operator()(int, double)
+{
+std::cout <<"int - double\n";
+}
+
+void operator()(int, float)
+{
+std::cout <<"int - float\n";
+}
+
+
+void operator()(double, int)
+{
+std::cout <<"double - int\n";
+}
+
+void operator()(float, double)
+{
+std::cout <<"float - double\n";
+}
+
+void operator()(auto x, auto y)
+{
+std::cout <<typeid(decltype(x)).name() << " - " << typeid(decltype(y)).name() << "\n";
+}
+};
+
+sturct Nec {};
+
+int main()
+{
+using namespace std;
+
+variant<int, double, float, char> v1{4.5};
+variant<float, int, char, Nec> v2{ Nec{} };
+
+visit(Visiter{}, v1, v2);
+}
+
+
+--------------------------------------------
+
+run time polymorifizinden kurtulmanın yolları vardır
+
+variant kullanmak
+
+---------------------
+// burada maaliyetler var, virtual, kalırım vs.
+
+// eğer pdf, excel gibi başak şeyler daha sonra eklemiycek isek bunlara closure hiyaraji
+
+class Document {
+public:
+virtual void print() = 0;
+virtual ~Document() = default;
+};
+
+class Pdf : public Document {
+virtaul void print() override {std::cout << "Pdf::print()\n";}
+};
+
+class Excel : public Document {
+virtaul void print() override {std::cout << "Excel::print()\n";}
+};
+
+class Word : public Document {
+virtaul void print() override {std::cout << "Word::print()\n";}
+};
+
+class Word : public Document {
+virtaul void print() override {std::cout << "Powerpoint::print()\n";}
+};
+
+void process(Document* p)
+{
+p->print();
+}
+
+int main()
+{
+auto *pdoc = new Excel{};
+
+process(pdoc);
+}
+
+----------------
+// 
+
+class Document {
+
+};
+
+class Pdf : {
+
+};
+
+class Excel {
+
+};
+
+class Word {
+
+};
+
+class Word  {
+
+};
+
+using Document = std::variant<Pdf, Excel, Word, Powerpoint>;
+
+sturct PrintVisitor {
+void operator()(Pdf x) {
+
+}
+
+void operator()(Excel x) {
+
+}
+
+void operator()(Word x) {
+public:
+void print
+}
+
+void operator()(Powerpoint x) {
+
+}
+};
+
+int main()
+{
+Document x{Word{} };
+visit(PrintVisitor{}, x);
+}
+
+=========================================================
+
+any 
+
+int main()
+{
+using namespace std;
+
+any x1{23};
+any x2{2.3};
+any x3{"murathan"};
+any x4{"murathan"s};
+}
+
 
 
 
