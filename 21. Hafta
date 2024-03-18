@@ -1014,6 +1014,154 @@ cout << ğptr << "\n";
 
 /////////////////////////////////////// 2. Ders /////////////////////////////
 
+#include <variant>
+
+ilk indextei tür alternatif yapmak istiyorsak onu default ctor yapmak gerekir
+bunun için monostate kullanıyorduk
+
+struct Data {
+Data(int x) : mx{x};
+
+int mx;
+};
+
+int main()
+{
+using namespace std;
+
+variant<monostate, long, Data, int, double> vx;
+
+vx = Data{45}; //bu şekilde dolu hale gelir
+vx = {}; //bu şekilde yine boş
+vx = monostate{}; //bu şekilde boş
+
+//boşmu sorusu 
+
+cout << "vx.index()= " << vx.index() << '\n';
+
+// if (!vx.index());
+
+if (holds_alternative<monostate>(vx)) {
+std::cout << "evet bombos\n";
+}
+else {
+std::cout << "ben sana bos degilim\n";
+}
+
+if (get_if<monostate>(&vx)) { //bu ifadenin türü monostate*
+std::cout << "bos\n";
+}
+else {
+std::cout << "bos_degil\n";
+}
+}
+
+---------------------------
+
+karşılaştırma operatörlerininde operandı olabiliyor
+
+int main()
+{
+using namespace std;
+
+//variant<int, double> v1;
+//variant<double, int> v2;
+//farklı tür ise karşılaştırılamaz, aynı tür olması lazım
+
+variant<int, double> v1(12), v2(1.2), v3;
+boolalpha(cout);
+
+cout << (v1 == v2) << '\n';
+cout << (v1 < v2) << '\n';
+}
+
+------------------------
+
+int main()
+{
+using namespace std;
+
+variant<int, double, long> vx;
+
+auto val = get<3>(vx); //hata
+}
+
+---------------------
+
+variant'a atama yapmak için ya bir atama, contruc etmem gerekiyor
+ya da emplace fonksiyonunu çağırmak gerekiyor
+
+-----------------
+
+struct Data {
+Data(int x) : mx{x} {}
+
+int mx;
+};
+
+int main()
+{
+using namespace std;
+
+variant<string, int, string> vx;
+
+vx.emplace<0>("neco");
+vx.emplace<string>("ali"); //hata
+
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+using age_t = int;
+using gender_t = char;
+using name_t = string;
+
+enum = size_t {idx_age, idx_gender, idx_name};
+
+variant<age_t, gender_t, name_t> p;
+
+get<age_t>(p);
+}
+
+---------------------
+
+ilginç bir seneryo var biraz karmaşık
+
+struct Nec {
+
+operator int()const
+{
+throw std::runtime_error{ "error error" };
+return 1;
+}
+};
+
+int main()
+{
+using namespace std;
+
+variant<int, double> vx{4.5};
+
+try {
+vx.emplace<0>(Nec{}); //yeni değer alıcak ancak eski değer detroy edilmeli ancak burada eski destroy edilir ama yeni değer exception throw edilir
+}
+catch(const std::exception& ex) {
+std::cout << "hata yakalandi : " << ex.what() << "\n";
+cout << vx.index() << "\n"; 
+cout << boolalpha << vx.valueless_by_exception() << "\n";
+cout << (vx.index() == variant_npos) << "\n";
+}
+}
+
+------------------------
+
+
+
+
 
 //dk.45 devam
 
@@ -1298,7 +1446,6 @@ castch (const std::bad_cast& ex) {
 std::cout << "exception caught: " << ex.what() << '\n';
 }
 }
-
 
 
 
