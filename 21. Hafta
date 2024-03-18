@@ -1369,18 +1369,195 @@ multi lambda
 necati hoca mülakatlarda soruyor dilin 6,7 özelliği bir arada bulunduğu için bu yapı
 
 //biraz eski konuların tekrarını yapıyoruz
+
 struct X {
 
 };
 
-struct Y : X {
+struct Y {
 
 };
---------------------------------------------------
 
+struct Z {
 
+};
 
-//dk.45 devam
+struct A: X, Y, Z {
+
+};
+
+int main()
+{
+A a;
+a.foo(2.3); //kalıtımda bu şekilde overloading hatalı olur
+a.foo(23);
+a.foo(56L);
+}
+
+--------------------
+bunu legal (int main içinde dokunmadan) kılmak için sınıf içi using bildirimi kullanılır
+
+struct X {
+
+};
+
+struct Y {
+
+};
+
+struct Z {
+
+};
+
+struct A: X, Y, Z {
+using X::foo;
+using Y::foo;
+using Z::foo;
+};
+
+int main()
+{
+A a;
+a.foo(2.3); //kalıtımda bu şekilde overloading hatalı olur
+a.foo(23);
+a.foo(56L);
+}
+
+------------------
+
+class A {};
+class B {};
+class C {};
+
+template <typename ...Args>
+class Der : public Args... {
+
+};
+
+int main()
+{
+Der<A,B,C> myder;
+}
+
+---------------
+
+class A {void foo();};
+class B {void bar();};
+class C {void baz();};
+
+template <typename ...Args>
+class Der : public Args... {
+
+};
+
+int main()
+{
+Der<A,B,C> myder;
+
+myder.baz(); //hiçbiri sentax hatası değil
+myder.foo();
+myder.bar();
+}
+
+-----------------
+
+struct A {void foo(int);};
+struct B {void bar(long);};
+struct C {void baz(double);};
+
+template <typename ...Args>
+class Der : public Args... {
+
+};
+
+int main()
+{
+Der<A,B,C> myder;
+
+myder.foo(12); //hata olma nedeni ambgios
+
+}
+
+----------------
+
+struct A {void foo(int);};
+struct B {void bar(long);};
+struct C {void baz(double);};
+
+template <typename ...Args>
+class Der : public Args... {
+using Args::foo...; //sentax hatası kalkar
+};
+
+int main()
+{
+Der<A,B,C> myder;
+
+myder.foo(12)
+myder.foo(34L);
+myder.foo(3.4);
+}
+
+------------------
+
+struct A {void foo(int);};
+struct B {void bar(long);};
+struct C {void baz(double);};
+
+template <typename ...Args>
+class Der : public Args... {
+using Args::foo...;
+};
+
+int main()
+{
+Der myder {A{}}; //ctad dan dolayı legal
+Der d2 {A{}, B{}};
+Der d3 {C{}, A{}, B{}};
+}
+
+---------------
+
+int main()
+{
+auto f = [](int x) {return x* x;};
+
+struct Nec : decltype(f1), decltype(f2),  decltype(f3) {}; //bir sınınftan bir sınıf kalıtım yolula elde ediliyor
+
+cout << typeid(decltype(f)).name() << "\n";
+}
+
+--------------
+
+//yukarıdaki anlatılanların hepsi multilambda idiomunda bize yardımcı olucak
+
+template <typename ...Args>
+struct MultiLambda : Args... {
+using Args::operator()...; //bununla aşağıdak hata kalkar
+};
+
+struct A{};
+struct B{};
+struct C{};
+
+int main()
+{
+MultiLambda mx{
+[](int x) {return x +1; },
+[](double x) {return x * 1.3;},
+[](long y) {return y + 5;}
+};
+
+mx(12); //hata olmasının nedeni ambigos 3 taban sınıfında ayrı operator çağrı fonksiyonu var
+
+auto val1 = mx(12);
+auto val2 = mx(4.5);
+auto val3 = mx(4L);
+
+//illa visitor gerek yoktur bu yapı ile de kullanılabilir
+}
+
+------------------
 
 using namespace std;
 
