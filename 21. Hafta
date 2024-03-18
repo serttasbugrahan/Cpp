@@ -1159,7 +1159,224 @@ cout << (vx.index() == variant_npos) << "\n";
 
 ------------------------
 
+int main()
+{
+using namespace std;
 
+variant<int,Date ,string> vx{3,5,1988}; //hata
+variant<int, string> vy{20 , 'm'}; //hta
+
+}
+
+-------------
+
+//Yukarıdaki durumu legal kılmak için
+
+int main()
+{
+using namespace std;
+
+variant<int,Date ,string> v1{in_place_indexz<1>3,5,1988}; 
+variant<int, string> v2{in_place_type<Date>,3,5,1988}; 
+variant<int, Date, string> v3{in_place_index<2>, 20, 'm'};
+variant<int, Date, string> v4{in_place_index<string>, 20, 'm'};
+}
+
+---------------
+
+konunun en zor alt konusuna geçiyoruz
+
+visit
+//amaç varianttaki öğeyi kullanmak ama öğeye ney ise onu göre kullanıcağız
+
+int main()
+{
+using namespace std;
+
+variant<int, Date, string, double> vx{4.5};
+
+if (vx.inde() == 0 {
+cout << "alternative int code\n";
+get<0>(vx) << "\n";
+}
+else if (vx (index() == 1) {
+cout << "alternative Date code\n";
+get<1>(vx) << "\n";
+}
+else if (vx (index() == 2) {
+cout << "alternative string code\n";
+get<2>(vx) << "\n";
+}
+else if (vx (index() == 3) {
+cout << "alternative double code\n";
+get<3>(vx) << "\n";
+}
+}
+
+----------------
+//burada böyle bir kod yerine hold alternative de kullanabilirdik
+
+int main()
+{
+using namespace std;
+
+variant<int, Date, string, double> vx{4.5};
+
+if (holds_alternative<int>(vx)) {
+cout << "alternative int code\n";
+get<0>(vx) << "\n";
+}
+else if (holds_alternative<Date>(vx)) {
+cout << "alternative Date code\n";
+get<1>(vx) << "\n";
+}
+else if (holds_alternative<string>(vx)) {
+cout << "alternative string code\n";
+get<2>(vx) << "\n";
+}
+else if (holds_alternative<double>(vx)) {
+cout << "alternative double code\n";
+get<3>(vx) << "\n";
+}
+}
+
+----------------------------
+//aşağıdaki şekilde de oolabilir
+
+int main()
+{
+using namespace std;
+
+variant<int, Date, string, double> vx{4.5};
+
+if (auto p = get_if<0>(&vx)) {
+cout << "alternative int code\n";
+get<0>(vx) << "\n";
+}
+else if (auto p = get_if<1>(&vx)) {
+cout << "alternative Date code\n";
+get<1>(vx) << "\n";
+}
+else if (auto p = get_if<2>(&vx)) {
+cout << "alternative string code\n";
+get<2>(vx) << "\n";
+}
+else if (auto p = get_if<3>(&vx)) {
+cout << "alternative double code\n";
+get<3>(vx) << "\n";
+}
+}
+
+------------------------------
+
+bunların yerine bize standart kütüphane  bize visit fonksiyonunu verir
+
+int main()
+{
+using namespace std;
+
+variant<int, Date, string, double> vx{Date{3,6,1998}};
+
+visit(callable, vx) //bu callable alternative çağrılmış olur
+
+}
+
+--------------------
+
+struct Visitor {
+
+void operator()(int)const //burayı auto yapabiliriiz
+{
+std::cout << "int alternative code\n";
+}
+
+void operator()(Date)const
+{
+std::cout << "Date alternative code\n";
+}
+
+void operator()(const std::string&)const
+{
+std::cout << "string alternative code\n";
+}
+
+void operator()(double)const
+{
+std::cout << "double alternative code\n";
+}
+};
+
+int main()
+{
+using namespace std;
+
+variant<int,Date, string, double> vx{Date{3,6,1998}};
+
+visit(visitor{}, vx);
+
+}
+
+-----------------
+
+struct Visitor {
+
+void operator()(auto x)const //bu şekilde olunca tüm parametreler için bu fonksiuon çağrılır
+{
+std::cout << x << "\n";
+}
+
+};
+
+int main()
+{
+using namespace std;
+
+variant<int,Date, string, double> vx{Date{3,6,1998}};
+
+vx = "necati"s;
+
+visit(visitor{}, vx);
+}
+
+----------------------
+#include <type_traits>
+
+class Visitor {
+void operator()(auto x)
+{
+if constexpr (std::is_same_v<decltype(x), int) {
+
+}
+else if constexpr (std::is_same_v<decltype(x), double>) {
+
+}
+}
+};
+
+int main()
+{
+using namespace std;
+
+variant<int,Date, string, double> vx{Date{3,6,1998}};
+
+visit(Visitor{}, vx);
+}
+
+-------------------------------
+
+multi lambda
+
+necati hoca mülakatlarda soruyor dilin 6,7 özelliği bir arada bulunduğu için bu yapı
+
+//biraz eski konuların tekrarını yapıyoruz
+struct X {
+
+};
+
+struct Y : X {
+
+};
+--------------------------------------------------
 
 
 
