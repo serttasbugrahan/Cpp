@@ -1559,6 +1559,32 @@ auto val3 = mx(4L);
 
 ------------------
 
+template <typename ...Args>
+struct MultiLambda : Args... {
+using Args::operator()...; 
+};
+
+struct A{};
+struct B{};
+struct C{};
+
+int main()
+{
+MultiLambda mx{
+[](int x) {cout << "int\n";},
+[](double x) {cout << "double\n";},
+[](long y) {cout << "auto\n";}
+};
+
+mx(12); 
+mx(3.1);
+mx(3L);
+MX(Nec{});
+mx(Erg{});
+mx{Tmr{});
+}
+
+--------------------
 using namespace std;
 
 template <typename ...Args>
@@ -1592,6 +1618,10 @@ v = Nec{};
 cout << visit(f,v) << '\n';
 }
 
+--------------------
+
+fonksiyona birden fazla variantı argüman olarak gönderebiliriz
+
 ----------------------
 
 using namespace std;
@@ -1612,7 +1642,6 @@ void operator()(int, float)
 {
 std::cout <<"int - float\n";
 }
-
 
 void operator()(double, int)
 {
@@ -1644,7 +1673,7 @@ visit(Visiter{}, v1, v2);
 
 
 --------------------------------------------
-
+run time polymorfizi maaliyetli bir işlemdir
 run time polymorifizinden kurtulmanın yolları vardır
 
 variant kullanmak
@@ -1652,7 +1681,8 @@ variant kullanmak
 ---------------------
 // burada maaliyetler var, virtual, kalırım vs.
 
-// eğer pdf, excel gibi başak şeyler daha sonra eklemiycek isek bunlara closure hiyaraji
+// eğer pdf, excel gibi başka şeyler daha sonra eklemiycek isek bunlara closure hiyaraji
+//genişlemeye kapalı
 
 class Document {
 public:
@@ -1672,7 +1702,7 @@ class Word : public Document {
 virtaul void print() override {std::cout << "Word::print()\n";}
 };
 
-class Word : public Document {
+class PowerPoint : public Document {
 virtaul void print() override {std::cout << "Powerpoint::print()\n";}
 };
 
@@ -1713,7 +1743,7 @@ class Word  {
 
 using Document = std::variant<Pdf, Excel, Word, Powerpoint>;
 
-sturct PrintVisitor {
+struct PrintVisitor {
 void operator()(Pdf x) {
 
 }
@@ -1741,15 +1771,16 @@ visit(PrintVisitor{}, x);
 =========================================================
 
 any 
+----
 
 int main()
 {
 using namespace std;
 
-any x1{23}; //int
-any x2{2.3}; //double
-any x3{"murathan"}; //const char* 
-any x4{"murathan"s}; //std::string
+any x1{23}; //int tutar
+any x2{2.3}; //double tutar
+any x3{"murathan"}; //const char* tutar
+any x4{"murathan"s}; //std::string tutar
 }
 
 -------------------
@@ -1764,6 +1795,8 @@ any x3 =  {};
 }
 
 -----------------
+any has_value fonksiyonu vardır
+boş olup olmadığına bakılır
 
 int main()
 {
@@ -1779,6 +1812,10 @@ std::cout << "bos\n";
 }
 }
 
+------------------
+any türünden nesneye istediğim değeri atamaya type erasure deniyor
+
+arka planda türün ne olduğunun sınanması type info ile yapılır
 -----------------
 
 //bu sınıfı nasıl implemente ederiz
@@ -1798,14 +1835,14 @@ x = 4.5;
 cout << x.type().name() << "\n";
 
 x = bitset<16>{};
+
 cout << x.type().name() << "\n";
 }
 
 ---------------
 
 nec ise neci double ise doublı nasıl kullanırız
-
-any_cast ile
+bunu any_cast ile yaparız
 
 int main()
 {
@@ -1813,7 +1850,7 @@ using namespace std;
 
 any x(10);
 
-cout << any_cast<int>(x) //ayn type'Ina bakar ve gerçekten o tğrden ise o tğrden değer verir tutmuyorsa exception throw eder
+cout << any_cast<int>(x) //ayn type'Ina bakar ve gerçekten o türden ise o türden değer verir tutmuyorsa exception throw eder
 
 x =  "necati"s;
 
@@ -1840,6 +1877,8 @@ castch (const std::bad_cast& ex) {
 std::cout << "exception caught: " << ex.what() << '\n';
 }
 }
+
+//////////////////////////////////////// 3. Ders //////////////////////////////
 
 
 
