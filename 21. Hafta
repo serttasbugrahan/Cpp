@@ -1880,8 +1880,763 @@ std::cout << "exception caught: " << ex.what() << '\n';
 
 //////////////////////////////////////// 3. Ders //////////////////////////////
 
+any
+----
+
+any direk bir sınıftır optional ve variant sınıf şablonudur
+
+any void pointera daha iyi bir alternatif olmak içindir
+
+void pointer hangi türden nesne tuttuğunu bilemez ancak any herhangi bir türü tutabilir ve türü bilebilir daha akıllıdır
+
+arka planda type info nesnesini kullanır
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+any a1;
+any a2{};
+any a3{"emracan"};
+any a4{bitset<32>(67567u)};
+any a5{vector<string>{}};
+any a6 = vector<any>{};
+}
 
 
+------------------
+
+int main()
+{
+using namespace std;
+
+any a(45);
+
+cout << a.type.name() << "\n";
+
+if (a.type() == typeid(int)) { // bu şekilde sınama yapabiliriz
+
+}
+}
+
+---------------------
+
+int main()
+{
+using namespace std;
+
+any a(45);
+int& r = any_cast<int>(a); //any r value'dur burada hata olur
+
+int& r = any_cast<int&>(a); //geçerli
+}
+
+----------------------
+
+int main()
+{
+using namespace std;
+
+any a(4.5);
+
+try {
+cout << any_cast<int>(a) << '\n'; //int yakalaması gerekir exception gönderirir
+}
+catch (const std::bad_any_cast& ex) {
+//catch (const std::bad_cast& ex) {
+//catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+ any a;
+
+if (a.has_value()) { //bış ise 0 döndürecek
+
+}
+else {
+std::cout << "deger tutmuyor\n";
+}
+
+a = "furkan";
+}
+
+----------------------
+
+int main()
+{
+using namespace std;
+
+any a;
+
+if (a.type() == typeid(void)) 
+std::cout << "bos\n";
+else 
+std::cout << "dolu\n";
+}
+}
+
+-------------------------
+
+int main()
+{
+using namespace std;
+
+any a = "bugrahan serttas";
+
+cout << (a.has_value() ? "dolu" : "bos") << '\n';
+
+a.reset(); //boş hale getirir
+
+cout << (a.has_value() ? "dolu" : "bos") << '\n';
+}
+
+--------------------
+
+void* operator new(std::size_t n)
+{
+std::cout << "operator new called... n = " << n << '\n';
+return std::malloc(n);
+}
+
+void operator delete(void* vp)
+{
+if (vp)
+std::free(vp);
+}
+
+struct Nec {
+unsigned char buffer[1024]{};
+};
+
+int main()
+{
+std::cout << "sizeof(any) = " << sizeof(any) << "\n";
+std::cout << "sizeof(type_info) = " << sizeof(type_info) << "\n"; //buradan çıkan sonuçlar ile 28 bytle'Lık buffer kullanııyor deriz
+
+any ax = 12;
+ax = 4.5;
+ax = bitset<128>{};
+
+std::cout << "sizeof(Nec) = " << sizeof(Nec) << "\n";
+
+ax = Nec{};
+}
+
+----------------
+void* operator new(std::size_t n)
+{
+std::cout << "operator new called... n = " << n << '\n';
+return std::malloc(n);
+}
+
+void operator delete(void* vp)
+{
+if (vp)
+std::free(vp);
+}
+
+struct Nec {
+unsigned char buffer[1024]{};
+};
+
+int main()
+{
+using namespace std;
+
+int arr[10]{};
+
+any a = arr;
+
+std::cout << "sizeof(arr) = " << sizeof(arr) << "\n";
+
+if (a.type() == typeid(int*)) {
+std::cout << "pointer tutuyor\n";
+}
+else if (a.type() == typeid(int[100])) {
+std::cout << "dizi tutuyor\n";
+}
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+any a;
+
+a = 4567;
+a = Date{2,2,1982};
+a.emplace<Date>(3,5,1987);
+make_any<Date>(2,5,1987);
+}
+
+--------------------
+
+using tvp = std::pair<std::string, std::any>;
+
+int main()
+{
+using namespace std;
+
+vector<tvp> vec;
+
+vec.emplace_back("name", "bugrahan serttas"s); //emplace back consturctora gönderilecek argümanı ister
+vec.emplace_back("birth_year", 1994);
+vec.emplace_back("month", 13);
+vec.emplace_back("price", 59.97);
+vec.emplace_back("town", "mugla");
+vec.emplace_back("gender", "male"s);
+
+for (const auto&[property, value] : vec) {
+if (value.type() == typeid(int)) {
+cout << property << " " << any_cast<int>(value) << '\n';
+}
+else if (value.type() == typeid(string)) {
+cout << property << " " << any_cast<string>(value) << '\n';
+}
+else if (value.type() == typeid(double)) {
+cout << property << " " << any_cast<double>(value) << '\n';
+}
+}
+}
+
+------------------------
+
+int main()
+{
+using namespace std;
+
+vector<tvp> vec;
+
+any ax{in_place_type<Date>,1,1,2024};
+}
+
+===============================================================
+
+std::random
+------------
+
+#include <random>
+
+true random generation : non-determenistik, ne olduğu daha önceden bilinemeyen
+
+sudo (sözde) random generation : rastgele falan değil verdiğin inputlara bağlı algoritmak olarak üretim olur, deterministik yapıdadır 
+
+hangi rastgele sayı üretimi olursa olsun tekrara düşücektir
+
+en az 10-12 tan efarklı kriter var rastgele sayı üretiminde
+
+mesela rastgele sayıların üretim hızı
+
+--------
+
+standart kütüphanenin random kütüphanesinde herkesin bilmesi gereken şeyle şunlar
+
+1-birden fazla rastegele sayı üretisici veriyor
+//URNG
+//Uniform Random Number Generator
+//1010010010111101010101010010
+//0 - 4294...
+//567097890
+
+//distrubtion model
+
+URNG bize uniform rastgele sayı veriyor ancak çok geniş bir aralıkta veriyor
+çok  geniş vermesi iyi değil bu yüzden ekstra algoritmalar kullanırız
+
+-kriptoloji tarafında standart kütüphane kullanıma uygun değil kriptoloji çok daha fazla şeyi desteklemesi gerekiyro
 
 
+--------------
+
+3 tane desteklenen algoritma vardır
+
+-linear congruential 
+-lagged fibonacci
+-mersenne twister
+
+---------------
+
+int main()
+{
+using namespace std;
+//çok sayıda template argümanı vardır
+mersenne_twister_engine<unsigned int, 24u,1086, //bunlarla uğrasşmıyoruz
+
+//bunlar yerine standart kütüphane tür eş bildirimleri ile bize bunları veriyor
+}
+
+--------------
+
+int main()
+{
+using namespace std;
+
+cout << typeid(mt19937).name() //bunu kullanırız mesela
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+cout << typeid(minstd_rand).name() //bunu kullanırız mesela
+}
+
+-----------
+
+hangi sınıfı kullanıcağımız birçok durumda önemli değildir
+
+----------
+#include <ostream>
+#include <string>
+#include <iomanip>
+#include <random>
+
+template<typename RG>
+void print_engine_info(std::ostream& os, const std::string name)
+{
+os << std::left << std::setw(16) << name << " = " << typeid(RG).name() << '\n';
+}
+
+#include <iostream>
+
+int main()
+{
+using namespace std;
+
+print_engine_info<minstd_rand0>(cout, "minstd_rand0);
+print_engine_info<minstd_rand>(cout, "minstd_rand);
+print_engine_info<mt19937>(cout, "mt19937);
+print_engine_info<mt19937_64>(cout, "mt19937_64);
+print_engine_info<ranlux24>(cout, "ranlux24);
+print_engine_info<ranlux24_base>(cout, "ranlux24_base);
+print_engine_info<ranlux48_base>(cout, "ranlux48_base);
+
+}
+
+----------------
+
+üretimde en çok kullanılan mt19937 olur
+
+----------------
+
+int main()
+{
+using namespace std;
+
+// default_random_engine, mt19937 yerine kullanılabilir
+
+cout << typeid(mt19937) == typeid(default_random_engine)) << '\n';
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng1; //default seed
+
+for (int i = 0; i < 10; ++i) {
+cout << eng() << "\n"; //bu değerler bir işimize yaramaz
+
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng1; //default seed
+
+for (int i = 0; i < 10000 - 1; ++i) {
+(void)eng();
+}
+cout << eng() << '\n'; //standart tüm kütüphanelerde bu sayı aynı olmaldıır
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng{ 7612 };
+
+eng.seed(8234u);
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+
+cout <<" min = " << mt19937::min() << '\n';
+cout <<" max = " << mt19937::min() << '\n';
+cout <<" default seed = " << mt19937::default_seed << '\n';
+
+}
+
+-----------------
+
+discard fonksiyonu rastegele sayıyı döndürmeden onları atıyır
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+eng.discard(9999);
+cout << eng() << "\n";
+}
+
+-----------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng{579981u};
+
+for (int i = 0; i < 10; ++i) {
+cout << enf() << "\n";
+}
+
+}
+
+-----------------
+//farklı tohum değerleri kullandığı iiçn farklı değerler gelicektir
+
+
+int main()
+{
+using namespace std;
+
+random_device rd;
+
+for (int i = 0; i < 5; ++i) {
+cout << rd() << '\n';
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+random_device rd;
+
+cout << rd.entropy() << "\n"; // true random generator değil ise 0 olur
+//0 olsa idi deterministik olurdu
+}
+
+--------------
+//mülakatlarda böyle yaz
+
+int main()
+{
+using namespace std;
+
+mt19937{random_device{}() }; 
+
+for (int i = 0; i < 10; ++i) {
+cout << eng() << "\n";
+}
+}
+
+----------------
+
+geçen zamanı tohum değeri olarak kullanmak da yaygın, geöen zamana endekslenmiş uapı
+
+int main()
+{
+mt19937 eng{static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch)().count())}; 
+
+for (int i = 0; i < 5; ++i) {
+std::cout << eng() << "\n";
+}
+}
+
+------------------
+mt19937 nesnelerinin kopyalanmasına izin vermemek gerekir
+bu yüzden fonksiyonlara geçerken referans yapmak gerekir
+
+void func(/**/std::mt19937 eng)
+{
+
+}
+
+----------------
+
+template <typename T>
+void engine_test(const char *pname, T& eng)
+{
+	constexpr int n = 1'000'000;
+	const auto tp_start = std::chrono::steady_clock::now();
+	using namespace std::literals;
+	int cnt{};
+	while (std::chrono::steady_clock::now() - tp_start < 1s) { // 1 saniye geçinceye kadar olan döngü
+		(void)eng();
+		++cnt;
+	}
+	std::cout << pname << "    " << cnt << '\n';
+
+}
+
+int main()
+{
+	std::ranlux24 rn24;
+	std::ranlux24_base rn24base;
+	std::mt19937 mt19;
+	std::minstd_rand mnrand;
+	std::minstd_rand0 mnrand0;
+	std::knuth_b knuth;
+
+	engine_test("ranlux24", rn24);
+	engine_test("ranlux24base", rn24base);
+	engine_test("mt19937", mt19);
+	engine_test("minstd_rand", mnrand);
+	engine_test("minstd_rand0", mnrand0);
+	engine_test("knuth_b", knuth);
+}
+
+----------------------
+
+rastgele sayı üreticilerinin "state"'leri karşılaştırılabilir
+
+int main()
+{
+using namespace std;
+
+mt19937 e1(35);
+mt19937 e2(35);
+
+boolalpha(cout);
+
+auto val = e1();
+++val;
+
+val = e2();
+
+cout << "e1 == e2 : " << (e1 == e2) << '\n';
+}
+
+-----------------
+
+int main()
+{
+	mt19937 eng{ 7654u };
+
+	for (int i = 0; i < 10; ++i)
+		cout << eng() << ' ';
+
+	stringstream ss;
+	ss << eng;
+
+	cout << "\ndevam etmek icin bir tusa basin "; static_cast<void>(getchar());
+
+
+	cout << "\n\n";
+
+	for (int i = 0; i < 10; ++i)
+		cout << eng() << ' ';
+
+	cout << "\n\n";
+
+	ss >> eng; //aynı state'e geri döndürdük yine aynı sayoları yazmasını bekleriz
+
+	for (int i = 0; i < 10; ++i)
+		cout << eng() << ' ';
+
+	cout << "\n\n";
+}
+
+-----------------------
+
+rasgele sayı üretileri bir state bilgisine sahip o state'i bir stream'e yazabiliyorum
+stream'den extrac edip tekrar o state'e getebiliyorum, ve bu statei başka state'ler ile karşılaştırabiliyorum
+
+---------------------------------
+
+birkaç tane distrubion sınıfına bakıyourz
+
+eğer bir tam sayı aralığında uniform dağılmış rastgele sayılar istiyorsak  uniform_int_distribution</**/> //kullanıcağız
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+
+uniform_int_distribution<int> dist{10, 14}; //10-14 aralığında 10 ve 14 dahil rastgele bir sayı
+
+dist(eng)
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+
+uniform_int_distribution<> dist; //default int parametresini alır
+
+dist(eng)
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+map<int, int> cmap;
+
+mt19937 eng;
+uniform_int_distribution dist{0, 20};
+
+for (int i = 0; i < 20'000'000; ++i) {
+++cmap[dist(eng)];
+}
+
+for (const auto[val, cnt] : cmap) {
+cout << val << " " << cnt << '\n';
+}
+}
+
+---------------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+
+uniform_real_distribution dist{5.6, 6.1};
+
+cout << fixed << setprecision(6);
+
+for (int i = 0; i < 100; ++i) {
+cout << dist(eng) << "\n";
+}
+
+}
+
+----------------------
+
+int main()
+{
+using namespace std;
+
+uniform_real_distribution dist{5.6, 5.8};
+
+cout << dist.a() << "\n"; //1.
+cout << dist.b() << "\n"; //2.
+}
+
+---------------------
+normal dağılım
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+
+normal_distribution<double> dist(50, 5.);
+
+map<int, int> cmap;
+
+for (int = 0; i < 1'000'000; ++i) {
+++cmap[static_cast<int>(round(dist(eng))];
+}
+
+std::ofstream ofs{ "out.txt"};
+if (!ofs) {
+std::cerr << "out.txt dosyasi olusturulmadi\n";
+exit(EXIT_FAILURE);
+}
+
+ofs << left;
+
+for (const auto [value, count] : cmap) {
+ofs << setw(6) << value << string(count / 1000, '*') << '\n';
+}
+}
+
+--------------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng(762143);
+
+uniform_int_distribution dist(1000, 5000); //uniform_int_distribution için aynı sayıların çıkma garantisi yoktur
+
+for (int i = 0; i < 10; ++i) {
+cout << eng() << '\n';
+}
+}
+
+----------------------
+
+oyun programlarında çok ihtiyaç duyulan distributionlar
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+//                         0    1   2   3  4   5
+discrete_disribution dist {10, 10, 10, 10,10, 11};
+
+for (int i = 0; i < 10; ++i) {
+cout << dist(eng) << '\n';
+}
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+mt19937 eng;
+discrete_disribution dist {10, 10, 10, 10,10, 11};
+//6. hileli
+//discrete_disribution dist {0,10, 10.1, 10.2, 10.3,10.4, 10.5};
+//                             . burası / hepsinin toplamı
+map<int,int> cmap;
+
+for (int i = 0; i < 6'000'000; ++i) {
+++cmap[dist(eng)];
+}
+
+for (const auto [value, count] : cmap) {
+cout << value << " " << count << '\n';
+}
+}
+
+---------------
 
