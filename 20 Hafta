@@ -2622,11 +2622,11 @@ using namespace std;
 using namespace std::chrono;
 
 
-auto tp_start = steday_clock::now();
+auto tp_start = steady_clock::now();
 
 auto vec = get_sorted_vector(2'450'000); //bu işlem kaç saniye sürecek onu ölçüceğiz
 
-auto tp_end = steday_clock::now();
+auto tp_end = steady_clock::now();
 
 cout << duration_cast<milliseconds>(tp_end - tp_start).count() << " milisaniye\n";
 
