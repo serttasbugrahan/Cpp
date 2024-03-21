@@ -248,9 +248,10 @@ tx.detach(); //ben bunun sorumluluğu ile ilgilenmiyorum arka planda bitene kada
 
 eğer bir iş yükü verilmişse ve başka bir yere taşıma yapılmış ise ya da join ya da detach fonksiyonlarından birisi çağrılmış ise
 
-thread nesnesinin dtoru çağrıldıysa dtor'un çağrıldığı thread nesnesi eğer joineble durumuda ise terminate çağrılır
+thread nesnesinin dtoru çağrıldıysa dtor'un çağrıldığı thread nesnesi eğer joineble durumuda değil ise terminate çağrılır
 
 -------------------
+//terminate çağrılır
 
 void nec_terminate()
 {
@@ -272,19 +273,463 @@ set_termiante(nec_terminate);
 
 {
 thread tx{ func };
+
+//tx.join(); //terminate çağrılmaz
 }
 
 std::cout << "main devam ediyor\n";
 }
 
+-------------------
+
+joineble durumunda olduğunu öğrenmek için joineble fonksiyonu çağrılır
+
+void nec_terminate()
+{
+std::cout << "nec terminate cagrildi\n";
+(void)getchar();
+std::abort();
+}
+
+void func()
+{
+std::cout << "ben func isleviyim beni cagirdilar\n";
+}
+
+int main()
+{
+using namespace std;
+
+boolalpha(cout);
+
+thread t;
+
+cout << t.joinable() << "\n"; //false yazar
+}
 
 
+---------------
+
+void nec_terminate()
+{
+std::cout << "nec terminate cagrildi\n";
+(void)getchar();
+std::abort();
+}
+
+void func()
+{
+std::cout << "ben func isleviyim beni cagirdilar\n";
+}
+
+int main()
+{
+using namespace std;
+
+boolalpha(cout);
+
+thread t{ [] {} };
+
+cout << t.joinable() << "\n";
+
+t.join();
+
+cout << t.joinable() << "\n"; //true olur  
+}
+
+--------------
+
+void nec_terminate()
+{
+std::cout << "nec terminate cagrildi\n";
+(void)getchar();
+std::abort();
+}
+
+void func()
+{
+std::cout << "ben func isleviyim beni cagirdilar\n";
+}
+
+int main()
+{
+using namespace std;
+
+boolalpha(cout);
+
+thread t1{ [] {} };
+thread t2{ move(t1) };
+
+cout << t1.joinable() << "\n"; 
+cout << t2.joinable() << "\n"; 
+
+t2.join();
+
+cout << t1.joinable() << "\n"; 
+cout << t2.joinable() << "\n"; 
+}
+
+------------------
+
+void nec_terminate()
+{
+std::cout << "nec terminate cagrildi\n";
+(void)getchar();
+std::abort();
+}
+
+void func()
+{
+std::cout << "ben func isleviyim beni cagirdilar\n";
+}
+
+int main()
+{
+using namespace std;
+
+thread tx{func};
+tx.join();
+
+try {
+tx.join();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+--------------------
+mülakatlarda kesinlikle RAII idiomu sorarlar
+-------------------
+thread nesnesini kullanmak yerine thread nesnesini sarmalayan jtthread türünden sınıf oluştuurlur
+
+void foo() 
+{
+//code
+}
+
+int main()
+{
+using namespace std;
+
+thread t{ foo };
+
+func();
 
 
+}
 
+int main()
+{
+using namespace std;
 
+try {
+bar();
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
 
+std::cout << "main devam ediyor\n";
+}
 
+--------------------
 
+void func(char c)
+{
+for (int i = 0; i < 1000; ++i) {
+std::cout.put(c);
+}
+}
 
+int main()
+{
+for (char c = 'a'; c <= 'z'; ++c) {
+func(c);
+}
+}
 
+-------------------
+
+func fonksiyonunu 26 ayrı thread'den çalıştırsaydım 
+
+void func(char c)
+{
+for (int i = 0; i < 1000; ++i) {
+std::cout.put(c);
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec(26);
+
+char c = 'A';
+
+for (auto& t : tvec) {
+t = thread{func, c++}
+}
+
+//join etmek lazım yoksa termiante çağrılır
+
+for (auto& t : tvec) {
+t.join();
+}
+
+}
+
+--------------------
+//aşağıdaki şekilde de olabilirdi
+
+void func(char c)
+{
+for (int i = 0; i < 1000; ++i) {
+std::cout.put(c);
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec(26);
+
+for (char c = 'A'; c <= 'Z'; ++c) {
+tvec.push_back(thread{func, c});
+}
+
+for (auto& t : tvec) {
+t.join();
+}
+}
+
+-----------------
+
+void func(char c)
+{
+for (int i = 0; i < 1000; ++i) {
+if (i == 456)
+throw std::runtime_error{"hata ki ne hata aman allahım!"};
+std::cout.put(c);
+}
+}
+
+int main()
+{
+using namespace std;
+
+try {
+thread tx{ func, 'S' };
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+----------------
+
+int foo(int x, int y)
+{
+//code
+return x* y;
+}
+
+int main()
+{
+using namespace std;
+
+thread tx{foo, 10, 56};
+
+tx.join();
+
+//Bu fonksiyonun geri dönüş degerini alma sansımız yok
+
+//farklı parametreler kullanabiliriz ancak hepsi başka bir alt başlıktır
+}
+
+--------------
+
+thread sınıfı move only bunun önemli durumları vardır
+
+std::thread make_thread()
+{
+std::thread tx{ [] {
+std::cout << "necati ders anlatiyor\n";
+}};
+
+return tx;
+}
+
+std::thread func(std::thread tx)
+{
+return tx;
+}
+
+int main()
+{
+auto t1 = make_thread();
+auto t2 = move(t1);
+t1 = func(move(t2));
+
+t1.join();
+}
+
+----------------
+
+herhangi bir callable verebiliriz derken burada kastedilen nedir
+
+void func(int x)
+{
+std::cout << x << '\n';
+}
+
+int main()
+{
+using namespace std;
+
+thread t1(func, 1);
+thread t2([](int x) {cout << x << '\n';}, 2);
+
+t1.join();
+t2.join();
+
+}
+
+-------------------
+
+class Funtor {
+public:
+void operator()(int x)const
+{
+std::cout << x;
+}
+};
+
+struct Nec {
+static void print(int x)
+{
+std::cout << x;
+}
+
+void display(int x)const
+{
+std::cout << x;
+}
+};
+
+void func(int x)
+{
+std::cout << x << '\n';
+}
+
+int main()
+{
+using namespace std;
+
+Nec mynec;
+thread t1(func, 1);
+thread t2([](int x) {cout << x << '\n';}, 2);
+thread t3(Functor{}, 3);
+thread t4(Nec::print, 4);
+thread t5(&Nec::display, mynec, 5);
+
+t1.join();
+t2.join();
+t3.join();
+t4.join();
+t5.join();
+
+}
+
+------------------
+//void func(int&&r) //hata kalkar
+void func(int& r)
+{
+r += 200;
+}
+
+int main()
+{
+int x = 67;
+
+thread t{ func, x}; //r value olarak gönderiri l value kabul etmez
+
+cout << "x = " << x << '\n'; //sentaxx hatası olur
+}
+
+---------------
+
+void func(int& r)
+{
+r += 200;
+}
+
+int main()
+{
+using namespace std;
+
+thread tx{func, ref(x)}; //legal
+
+tx.join();
+
+cout << "x = " << x << '\n';
+}
+
+---------------
+
+void func(int&& r)
+{
+std::cout << r.size() << '\n';
+}
+
+int main()
+{
+using namespace std;
+
+string name{"bugra serttas"}; //r value olarak göndeirir bu yüzden legal
+
+thread tx{func, name};
+}
+
+-----------------
+
+void func(int&& r)
+{
+std::cout << r.size() << '\n';
+}
+
+int main()
+{
+using namespace std;
+
+string name{"bugra serttas"}; 
+
+thread tx{func, name};
+
+tx.join();
+
+cout << name.size() << "\n";
+}
+
+------------------
+
+void func(int&& r)
+{
+auto x = std::move(r);
+std::cout << r.size() << '\n';
+}
+
+int main()
+{
+using namespace std;
+
+string name{"bugra serttas"}; 
+
+thread tx{func, name};
+
+tx.join();
+
+cout << name.size() << "\n";
+}
