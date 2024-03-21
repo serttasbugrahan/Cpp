@@ -1,0 +1,290 @@
+/////////////////////////////////////////////////////// 1. Ders //////////////////////////////////////////////
+
+int main()
+{
+using namespace std;
+
+mt19937 eng{ 78234u }; //kopyalamadan kaçın, 5000 bytlık bir yer kaplar
+mt19937 eng{sdt::chrono::steady_clock::now().time_since_epoch().count()}
+
+}
+
+----------------
+aşağıda kötü yazılmış kod vardır
+
+int main()
+{
+using namespace std;
+
+random_device rd;
+
+mt1993 eng{ rd() }; 
+}
+
+-------------
+
+int main()
+{
+using namespace std;
+
+mt1993 eng{ random_device{}() }; //böyle yap, scope leakage'dan kaçınmış olursun
+}
+
+-------------
+bernolli dağılımı
+random_device //bize non-determenistik bir sayı kaynağıda verebilir, ancak garanti değildir
+
+int main()
+{
+using namespace std;
+
+mt1993 eng{ random_device{}() };
+bernolli_distribution dist{ 0.81 }; //bize 0.81 olasıklla true değeri dağıtmasını sağlarız
+constexpr std::size_t n = 1'000'000u;
+int cnt{};
+
+for (size_t i{}; i < n; ++i) {
+if (dist(eng)) {
+++cnt;
+}
+}
+
+cout << static_cast<double>(cnt) / n << "\n";
+}
+
+--------------
+//bu şekilde kullanmanın avantajı sadece çağırdığımız zaman hayat gelicektir
+
+std::mt19937& engine()
+{
+static std::mt199937{std::random_device{}()};
+
+return eng;
+}
+
+int main()
+{
+using namespace std;
+
+uniform_int_distribution dist{0, 99};
+
+cout << dist(engine()) << "\n";
+cout << dist(engine()) << "\n";
+cout << dist(engine()) << "\n";
+
+}
+
+-----------------
+
+distruubiton nesnelerin param fonksiyonu vardır
+2 farklı distrubiton nesnesinin aynı parametreleri kullanmasını sağlayabiliriz
+
+int main()
+{
+using namespace std;
+
+uniform_int_distribution dist{0, 99};
+
+auto prm = dist1.param();
+
+uniform_int_distribution dist2{dist1.param()};
+}
+
+----------------
+
+int main()
+{
+using namespace std;
+
+discrete_distribution dist{1.2, 3.4, 5.6, 7.8};
+
+dist.param() //bütün değerleri paketlemiş olucam
+}
+
+------------
+
+int main()
+{
+using namespace std;
+
+vector<int> ivec(100'000);
+mt19937 eng;
+uniform_int_distribbution dist{4657, 8771};
+
+generate(ivec.begin(), ivec.end(), [&eng, &dist] {return dist(eng);})
+}
+
+-------------
+
+shuffle algoritması
+
+int main()
+{
+using namespace std;
+
+vector<string> svec{"bugra", "mete", "emre", "furkan","kutay", "mehmet","melike","cemal"};
+
+for (int i = 0; i < 1000; ++i) {
+shuffle(svec.begin(), svec.end(), mt19937{76265});
+copy(svec.begin(), svec.end(), ostream_iterator<string>{cout, " "});
+(voif)getchar();
+std::system("cls");
+}
+}
+
+=================================================
+
+concurrency
+-----------
+
+biraz giriş seviyesinde anlatılacak çok uzun bir konu
+
+belirli işlemlerin belirli bir zaman diliminde birlikte yapılması demektir
+
+mesela hem konuşuyorum hem yemek yiyorum burada birden fazla işşin zamanda çakışma olarak yapılmasıdır 
+
+concurrency denildiğinde belli bir zaman diliminde birden fazla işin yapılmsı demek 
+parallizm denildiğinde birden fazla işin gerçekten aynı zaman diliminde birlikte yapılması demek (tamamen aynı anda)
+
+
+concurrency : 1 expresso makinesi var 2 sıra var herkes oradan almak istiyor
+parallel : 2 expresso makinesi var 2 sıra var insanlar ikiye bölğnmüş bir şekilde kahve alıyor
+
+konu çok geniş sabırlı olmak lazım
+
+------------------
+
+burada kritik nokta işletim sisteminin concurrency ilgili apileri
+doğal olarak her şeyi yapabilir. ancak soyutlama yapmak üzere programlama dilinin
+kütüphanesini kullandığımız zaman flexiblity azalır. her şeyi standart kütüphane ile yapamayız ancak bu fark zamanla azalır
+
+-------------------
+
+diyelim ki hem standarat kütüphaneyi kullanmak istiyorum standart kütüpahenin yeterli olmadığı yerlerde pthreas kütüphanesini kullanmak istyorum 
+o standart kütüphanenin yetmediği yerde handle ile işletim sisteminin programlarını kullanabiliyoruz
+
+------------------
+
+thread : aynı uygulamada birden fazla bakış
+
+------------------
+
+neden kullanırız?
+
+-mesela bir yerden dosya indirirken aynı zamanda başka işler yapmak isteyebiliriz, bunları bloke etmemek için
+
+-işlemlerin daha hızlı yapabilmek için
+
+bu theradlerin oluşturmak maaliyetli bir işlemdir.
+
+------------------
+
+c++ concurrency kütüphanesi 3 farklı seviyede araç sunuyor
+
+- çok yüksek seviye (std::asics)
+
+- orta seviye (std::threads)
+
+- alt seviye
+
+--------------------------------
+
+// bir thread nesnesi başka bir threadle ilişkili veya ilişkisis olabilir
+1. thread nesnesine direk callable verebilirizi
+2. thread nesnesine başka bir nesneyi taşuaybiliriz
+3.thread copy delete edilmiştir, unique ptr gibi, move only type
+
+çalıştırabilmek için bir thread nesnesini argüman vermemiz gerekiyor
+
+#include <thread>
+
+int main()
+{
+using namespace std;
+
+thread th{/*callable*/} //callable, gerçek bir fonksiyon olabilir, function pointer olabilir, function object olabilir
+
+}
+
+---------------
+
+int main()
+{
+using namespace std;
+
+thread th1{[] {cout << "merhaba dunya";}}
+thread th2{[] {cout << "merhaba dunya";}}
+thread th3{[] {cout << "merhaba dunya";}}
+thread th4{[] {cout << "merhaba dunya";}}
+thread th5{[] {cout << "merhaba dunya";}}
+
+}
+
+-----------------
+
+//thread nesnesi hem callable ister hemde callable'a gönderilecek argümanları ister
+
+void func(int a, int b, int c) 
+{
+
+}
+
+int main()
+{
+using namespace std;
+
+thread tx{func, 10, 20, 30};
+
+// bu thread nesnesine 2 şey yapabiliriz
+//ya join ya detach
+
+th.join(); //akış burayı geçebilmesi için func fonksiyonunun kodunun bitmesi gerekiyor, iş yükü bitmemiş ise bitene kadar beklensin anlamına gelir
+//statment
+
+tx.detach(); //ben bunun sorumluluğu ile ilgilenmiyorum arka planda bitene kadar çalışsın demektir
+}
+
+-------------------
+
+eğer bir iş yükü verilmişse ve başka bir yere taşıma yapılmış ise ya da join ya da detach fonksiyonlarından birisi çağrılmış ise
+
+thread nesnesinin dtoru çağrıldıysa dtor'un çağrıldığı thread nesnesi eğer joineble durumuda ise terminate çağrılır
+
+-------------------
+
+void nec_terminate()
+{
+std::cout << "nec terminate cagrildi\n";
+(void)getchar();
+std::abort();
+}
+
+void func()
+{
+std::cout << "ben func isleviyim beni cagirdilar\n";
+}
+
+int main()
+{
+using namespace std;
+
+set_termiante(nec_terminate);
+
+{
+thread tx{ func };
+}
+
+std::cout << "main devam ediyor\n";
+}
+
+
+
+
+
+
+
+
+
+
+
+
