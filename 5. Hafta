@@ -516,7 +516,7 @@ void func(const Myclass&)
 std::cout << "const Myclass&\n";
 }
 
-void func(const Myclass&& r) //burası çağrılır
+void func(Myclass&& r) //burası çağrılır
 {
 std::cout << "const Myclass&&\n";
 }
@@ -524,8 +524,8 @@ std::cout << "const Myclass&&\n";
 int main()
 {
 Myclass m;
-func(std::move(m)); //hiçbir nesne çağrılmaz çünkü referans nesneye bağlanır
-Myclass &&r = std::move(m);
+func(std::move(m)); 
+Myclass &&r = std::move(m); //hiçbir nesne çağrılmaz çünkü referans nesneye bağlanır
 }
 
 ---------
@@ -538,9 +538,9 @@ void func(const Myclass&)
 std::cout << "const Myclass&\n";
 }
 
-void func(const Myclass&&) //burası çağrılır
+void func(Myclass&&r) //burası çağrılır
 {
-std::cout << "const Myclass&&\n";
+std::cout << "Myclass&&\n";
 }
 
 void foo(Myclass &&r ) 
