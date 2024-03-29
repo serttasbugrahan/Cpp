@@ -57,7 +57,7 @@ cout << static_cast<double>(cnt) / n << "\n";
 
 std::mt19937& engine()
 {
-static std::mt199937{std::random_device{}()};
+static std::mt199937 eng{std::random_device{}()};
 
 return eng;
 }
@@ -83,7 +83,7 @@ int main()
 {
 using namespace std;
 
-uniform_int_distribution dist{0, 99};
+uniform_int_distribution dist1{0, 99};
 
 auto prm = dist1.param();
 
@@ -109,7 +109,7 @@ using namespace std;
 
 vector<int> ivec(100'000);
 mt19937 eng;
-uniform_int_distribbution dist{4657, 8771};
+uniform_int_distribution dist{4657, 8771};
 
 generate(ivec.begin(), ivec.end(), [&eng, &dist] {return dist(eng);})
 }
@@ -127,7 +127,7 @@ vector<string> svec{"bugra", "mete", "emre", "furkan","kutay", "mehmet","melike"
 for (int i = 0; i < 1000; ++i) {
 shuffle(svec.begin(), svec.end(), mt19937{76265});
 copy(svec.begin(), svec.end(), ostream_iterator<string>{cout, " "});
-(voif)getchar();
+(void)getchar();
 std::system("cls");
 }
 }
@@ -679,7 +679,7 @@ cout << "x = " << x << '\n';
 
 ---------------
 
-void func(int&& r)
+void func(string&& r)
 {
 std::cout << r.size() << '\n';
 }
@@ -695,7 +695,7 @@ thread tx{func, name};
 
 -----------------
 
-void func(int&& r)
+void func(string&& r)
 {
 std::cout << r.size() << '\n';
 }
@@ -733,3 +733,14 @@ tx.join();
 
 cout << name.size() << "\n";
 }
+
+//////////////////////////////////////////////////// 2. Ders /////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
