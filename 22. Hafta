@@ -143,11 +143,11 @@ belirli işlemlerin belirli bir zaman diliminde birlikte yapılması demektir
 
 mesela hem konuşuyorum hem yemek yiyorum burada birden fazla işşin zamanda çakışma olarak yapılmasıdır 
 
-concurrency denildiğinde belli bir zaman diliminde birden fazla işin yapılmsı demek 
+concurrency denildiğinde belli bir zaman diliminde birden fazla işin yapılmsı demek
 parallizm denildiğinde birden fazla işin gerçekten aynı zaman diliminde birlikte yapılması demek (tamamen aynı anda)
 
 
-concurrency : 1 expresso makinesi var 2 sıra var herkes oradan almak istiyor
+concurrency : 1 expresso makinesi var 2 sıra var herkes oradan almak istiyor, paralellik yok
 parallel : 2 expresso makinesi var 2 sıra var insanlar ikiye bölğnmüş bir şekilde kahve alıyor
 
 konu çok geniş sabırlı olmak lazım
@@ -175,13 +175,14 @@ neden kullanırız?
 
 -işlemlerin daha hızlı yapabilmek için
 
-bu theradlerin oluşturmak maaliyetli bir işlemdir.
+!! her iş birden fazla thread kullanılırak daha hızlı yapılamaz çünkü bu işlemler maalitletlidir
+
 
 ------------------
 
 c++ concurrency kütüphanesi 3 farklı seviyede araç sunuyor
 
-- çok yüksek seviye (std::asics)
+- çok yüksek seviye (std::async)
 
 - orta seviye (std::threads)
 
@@ -212,11 +213,11 @@ int main()
 {
 using namespace std;
 
-thread th1{[] {cout << "merhaba dunya";}}
-thread th2{[] {cout << "merhaba dunya";}}
-thread th3{[] {cout << "merhaba dunya";}}
-thread th4{[] {cout << "merhaba dunya";}}
-thread th5{[] {cout << "merhaba dunya";}}
+thread th1{[] {cout << "merhaba dunya";}}; //hepsi ayrı threadlerdie
+thread th2{[] {cout << "merhaba dunya";}};
+thread th3{[] {cout << "merhaba dunya";}};
+thread th4{[] {cout << "merhaba dunya";}};
+thread th5{[] {cout << "merhaba dunya";}};
 
 }
 
@@ -224,7 +225,9 @@ thread th5{[] {cout << "merhaba dunya";}}
 
 //thread nesnesi hem callable ister hemde callable'a gönderilecek argümanları ister
 
-void func(int a, int b, int c) 
+//bu fonksiyonu ayrı bir workload(iş yükü) olarak çalıştırıcak ayrı bir thread olarak çalıştırmak istesek
+//thread nesnesini callable argüman olarak vermek gerekir
+void func(int, int, int) 
 {
 
 }
@@ -236,15 +239,16 @@ using namespace std;
 thread tx{func, 10, 20, 30};
 
 // bu thread nesnesine 2 şey yapabiliriz
-//ya join ya detach
+// ya join ya detach
 
 th.join(); //akış burayı geçebilmesi için func fonksiyonunun kodunun bitmesi gerekiyor, iş yükü bitmemiş ise bitene kadar beklensin anlamına gelir
-//statment
+//statment, yani buraya gelebilmesi için func fonksiyonun kodunun bitmesi gerekir
 
 tx.detach(); //ben bunun sorumluluğu ile ilgilenmiyorum arka planda bitene kadar çalışsın demektir
 }
 
 -------------------
+thread nesnesi joineble durumdadır veya değildir
 
 eğer bir iş yükü verilmişse ve başka bir yere taşıma yapılmış ise ya da join ya da detach fonksiyonlarından birisi çağrılmış ise
 
@@ -304,23 +308,10 @@ boolalpha(cout);
 
 thread t;
 
-cout << t.joinable() << "\n"; //false yazar
+cout << t.joinable() << "\n"; //false yazar, iş yüküne sahip değil
 }
 
-
----------------
-
-void nec_terminate()
-{
-std::cout << "nec terminate cagrildi\n";
-(void)getchar();
-std::abort();
-}
-
-void func()
-{
-std::cout << "ben func isleviyim beni cagirdilar\n";
-}
+-------------
 
 int main()
 {
@@ -330,11 +321,27 @@ boolalpha(cout);
 
 thread t{ [] {} };
 
-cout << t.joinable() << "\n";
+cout << t.joinable() << "\n"; //true
 
 t.join();
+cout << t.joinable() << "\n"; //false, artık join edilmiş
+}
 
-cout << t.joinable() << "\n"; //true olur  
+-------------
+
+int main()
+{
+using namespace std;
+
+boolalpha(cout);
+
+thread t{ [] {} };
+
+cout << t.joinable() << "\n"; //true
+
+t.deatch();
+
+cout << t.joinable() << "\n"; //false, 
 }
 
 --------------
@@ -360,16 +367,17 @@ boolalpha(cout);
 thread t1{ [] {} };
 thread t2{ move(t1) };
 
-cout << t1.joinable() << "\n"; 
-cout << t2.joinable() << "\n"; 
+cout << t1.joinable() << "\n";  //false
+cout << t2.joinable() << "\n";  //true
 
 t2.join();
 
-cout << t1.joinable() << "\n"; 
-cout << t2.joinable() << "\n"; 
+cout << t1.joinable() << "\n"; //false
+cout << t2.joinable() << "\n"; //false
 }
 
 ------------------
+//joinable değilken join çağırırsak exception throw eder
 
 void nec_terminate()
 {
@@ -402,13 +410,19 @@ std::cout << "exception caught: " << ex.what() << '\n';
 mülakatlarda kesinlikle RAII idiomu sorarlar
 -------------------
 thread nesnesini kullanmak yerine thread nesnesini sarmalayan jtthread türünden sınıf oluştuurlur
+burada RAII gerekir
+
+void func()
+{
+throw std::runtime_error{ "hataaa"};
+}
 
 void foo() 
 {
 //code
 }
 
-int main()
+void bar()
 {
 using namespace std;
 
@@ -416,7 +430,7 @@ thread t{ foo };
 
 func();
 
-
+t.join();
 }
 
 int main()
@@ -469,7 +483,7 @@ vector<thread> tvec(26);
 char c = 'A';
 
 for (auto& t : tvec) {
-t = thread{func, c++}
+t = thread{func, c++} //pr value taşıma semantiği devreye girer hata olmaz
 }
 
 //join etmek lazım yoksa termiante çağrılır
@@ -477,7 +491,6 @@ t = thread{func, c++}
 for (auto& t : tvec) {
 t.join();
 }
-
 }
 
 --------------------
@@ -494,10 +507,11 @@ int main()
 {
 using namespace std;
 
-vector<thread> tvec(26);
+vector<thread> tvec;
 
 for (char c = 'A'; c <= 'Z'; ++c) {
-tvec.push_back(thread{func, c});
+tvec.push_back(thread{func, c}); //push_back l value geçersek hata olur
+//tvec.emplace_back(func, c); //bu şekilde olur
 }
 
 for (auto& t : tvec) {
