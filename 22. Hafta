@@ -750,6 +750,524 @@ cout << name.size() << "\n";
 
 //////////////////////////////////////////////////// 2. Ders /////////////////////////////////////////////
 
+eğer l value olarak geçicek isek ve fonksiyonun parametresi l value ise kesinlikle l value geçmenin yolu referace wrapper kullanmak
+bu kullanılmaz ise r value olarak kullanılır
+
+class Myclass {
+public:
+Myclass() = default;
+Myclass(const Myclass&)
+{
+std::cout << "copy ctor\n";
+}
+
+Myclass(Myclass&&)
+{
+std::cout << "move ctor\n";
+}
+};
+//buraları dene teker teker
+//void foo(Myclass&) //sentax hatası olur, r value expressin l value ya bağlanamaz
+//void foo(const Myclass &) 
+void foo(Myclass)
+{
+
+}
+
+int main()
+{
+using namespace std;
+
+Myclass m;
+//const Myclass m;
+
+thread t{foo ,m}; //önce dikey copy olur, copy ctor çağrılır
+
+t.join();
+}
+
+---------------------
+
+this_thread namespace'inin get_id isimli sınıfı vardır
+
+get_id şu türden değer üretir
+
+void func()
+{
+
+}
+
+int main()
+{
+using namespace std;
+
+thread t1{func};
+auto x = t1.get_id();
+cout << x << "\n";
+
+t1.join();
+}
+
+-----------------
+#include <syncstream>
+
+void func()
+{
+osycstream{cout} << this_thread::get_id() <<'\n';
+}
+
+int main()
+{
+using namespace std;
+
+thread t1{func}; 
+cout << t1.get_id() << "\n"; //aynu çıkar
+
+t1.join();
+}
+
+-----------------------
+
+//birden fazla thread oluşturalım
+
+void func()
+{
+osycstream{cout} << this_thread::get_id() <<'\n';
+}
+
+int main()
+{
+using namespace std;
+
+func(); //buradaki func'da thread tarafından çalıştırıldı main'de bir thread'dir
+
+vector<thread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(func);
+}
+
+for (auto& t : tvec)
+t.join();
+}
+
+---------------------
+
+std::thread::id main_thread_id;
+
+void func()
+{
+if (std::this_thread::get_id() == main_thread_id) {
+std::cout << "main thread\n";
+}
+else {
+std::cout << "ikicil thread\n";
+}
+}
+
+int main()
+{
+using namespace std;
+
+main_thread_id = std::this_thread::get_id();
+func();
+thread t{func};
+
+t.join();
+}
+
+--------------------
+
+thread t{foo, exp};
+
+... for //bizden duration ister
+... until //bizden timepoint ister
+
+-------------------
+
+using namespace std;
+
+void func()
+{
+std::this_thread::sleep_for(2300ms); //thread'İ uyutur
+std::cout << "tamer dundar\n";
+}
+
+int main()
+{
+using namespace std;
+
+thread t{func};
+
+t.join();
+}
+
+------------------
+
+void func(char c, int val)
+{
+for (int i = 0; i < 1000; ++i) {
+this_thread::sleep_for(milliseconds{ val });
+cout.put(c);
+}
+}
+
+int main()
+{
+using namespace std;
+
+jthread t1{func, 'a', 100}; //fonksiyonu sarmalar ve dtor'u join çağırır
+jthread t2{func, 'b', 300};
+jthread t3{func, 'c', 500};
+jthread t4{func, 'd', 799};
+jthread t5{func, 'e', 950};
+
+t.join();
+}
+
+-----------------
+//öğretici bir kod cppreferance 'dan
+
+auto now()
+{
+return std::chrono::steady_clock::now();
+}
+
+auto awake_time()
+{
+using std::chrono::operator""ms;
+return now() + 2000ms;
+}
+
+int main()
+{
+std::cout << "Hello\n" << std::flush;
+const auto start{now() };
+std::this_thread::sleep_until(aweke_time());
+std::chrono::duration<double, std::milli> elapsed{now() - start};
+std::cout << "Waited " << elapsed.count() << " ms\n";
+}
+
+-------------------
+
+void func()
+{
+std::this_thread::yield(); //başka thread'lere öncelik ver anlamaında kullanılır   
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+thread t{ [] {} };
+
+auto handle = t.native_handle(); //işletim sistemlerinin api'lerine argüman olarak gönderilebilir
+
+}
+
+-------------------
+
+int main()
+{
+using namespace std;
+
+thread t{ [] {} };
+
+cout << thread::hardware_councurrency() //gerçek anlamda paralel olarka kaç thread çalıştırabilir ona bakar
+
+}
+
+-------------------
+
+//örneğin n tane thread oluşturmak istiyoruz hepsinin hardware tarafında paralel çalışmasını istiyoruz
+//kaç tane thread oluşturabilirimin cevabını aşağıdaki şekilde alabiliriz
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec(thread::harware_concurerency());
+}
+
+---------------------
+
+bir thread exception gönderirse o exception yakalama şansımız yok bu yüzden terminate çağrılır
+
+void func(int x)
+{
+if (x % 2 == 0)
+throw std::runtime_error{"even number error\n"};
+}
+
+void nec_terminate()
+{
+std::cout << "nec_terminate\n";
+abort();
+}
+
+int main()
+{
+using namespace std;
+
+try {
+thread t{func, 12};
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+-----------------------
+
+bunu yakalayan bir araç var
+
+exception'ı exception_ptr türünden nesne ile sarmalayabiliyoruz
+
+int main()
+{
+std::exception_ptr eptr;
+
+current_exception() //exception_ptr döndürüyor, exception yakalanması durumunda exception_ptr nesnesi döndürür
+
+retrow_exception() // bizden sarmalanan exception_ptr ister onu retrow eder
+}
+
+---------------------
+
+void handle_saved_exception(std::exception_ptr eptr)
+{
+try{
+if (eptr) {
+std::rethrow_exception(eptr);
+}
+}
+catch (const std::exception& ex) {
+std::cout << "hata yakalandi: " << ex.what() << "\n";
+}
+}
+
+int main()
+{
+std::exception_ptr eptr;
+
+try {
+std::string name{"furkan"};
+auto c = name.at(45);
+}
+catch(...) {
+eptr = std::current_exception();
+}
+handle_saved_exception(eptr);
+}
+
+-----------------
+
+std::exception_ptr eptr{ nullptr };
+
+void func(int x)
+{
+std::cout << "func cagrildi x = " << x << "\n";
+
+if (x % 2 != 0) {
+throw std::runtime_error{"hatali arguman " + std::to_string(x) };
+}
+}
+catch(...) {
+eptr = std::current_exception();
+}
+
+std::cout << "func islevi sona eriyor\n";
+}
+
+int main()
+{
+using namespace std;
+
+thread tx{func, 121};
+
+tx.join();
+
+try {
+if (eptr) {
+rethrow_exception(eptr);
+}
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+
+--------------------
+
+std::vector<std::exception_ptr> g_epvec;
+std::mutex mtx;
+void f1()
+{
+void f1() {throw std::runtime_error{ "hata" };};
+void f2() {throw std::invalid_argument{ "gecersiz arguman" };};
+void f3() {throw std::out_of_range{ "aralik disi deger" };};
+}
+
+void tfunc1()
+{
+try {
+f1();
+}
+catch (...) {
+std::lock_guard guard{ mtx };
+g_epvec.push_back(std::current_exception());
+}
+}
+
+
+void tfunc2()
+{
+try {
+f2();
+}
+catch (...) {
+g_epvec.push_back(std::current_exception());
+}
+}
+
+void tfunc3()
+{
+try {
+f3();
+}
+catch (...) {
+g_epvec.push_back(std::current_exception());
+}
+}
+
+int main()
+{
+using namespace std;
+
+thread t1{tfunc1};
+thread t2{tfunc2};
+thread t3{tfunc3};
+
+t1.join();
+t2.join();
+t3.join();
+
+for (const auto& ex : g_epvec) {
+try {
+rethrow_exception(ex);
+}
+catch (const std::exception& ex) {
+std::cout << "exception caught: " << ex.what() << '\n';
+}
+}
+}
+
+---------------------
+
+int main()
+{
+using namespace std;
+
+exception_ptr eptr;
+
+try {
+throw std::runtime_error{"hata hata hata"};
+}
+catch(...) {
+eptr = current_exception();
+}
+
+//yukarıdakiler ile aşağıdaki aynı anlamda
+
+auto eptr = make_exception_ptr(std::runtime_error{ "hata hata hata"});
+}
+
+------------------------------------------------------
+
+storage class
+
+otomatik storage : 
+static storage : gloabal, değişkenler
+dynamic storage : 
+
+//daha sonradan aşağıdaki'de eklendi
+
+thread_local storage : her thread için ayrı bir değişken, thread çaşoştığı sürece o değişken hayatta kalıyor
+
+
+------------
+
+using namespace std;
+
+void func(int x)
+{
+int ival = 10;
+
+osyncstream{ cout } << "x = " << x << "\n";
+osyncstream{ cout } << "ival = " << ival << "\n";
+}
+
+int main()
+{
+jthread t1{ func, 1 };
+jthread t2{ func, 2 };
+jthread t3{ func, 3 };
+jthread t4{ func, 4 };
+}
+
+----------------
+
+using namespace std;
+
+void func(int &x)
+{
+
+}
+
+int main()
+{
+int ival = 5;
+
+jthread t1{func, ref(ival) };
+jthread t2{func, ref(ival) };
+
+}
+
+----------------
+
+static ömürlü değişkenler birden fazla thread tarafından kullanıldığında senkronizazyon mekanizması gerekiyor
+
+otomatik ömürlü değişkenler için bir koruma mekanizması gerekmez
+
+----------------
+
+thread_local 
+
+thread_local int x = 5; //hata olmaz çünkü thread_local keyword
+
+-----------------
+
+thread_local int y{ 10 };
+
+
+void foo()
+{
+thread_local int x{ 0 };
+}
+
+int main()
+{
+
+}
+
+
+
+
+
+
+
 
 
 
