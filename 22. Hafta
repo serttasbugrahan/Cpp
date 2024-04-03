@@ -1249,25 +1249,350 @@ thread_local int x = 5; //hata olmaz çünkü thread_local keyword
 
 -----------------
 
-thread_local int y{ 10 };
-
-
-void foo()
-{
 thread_local int x{ 0 };
+
+void foo(const std::string& thread_name)
+{
+++x; //treat safe oldu, nir koruma gerektirmez
+
+osyncstream{cout} << "thread" << name << " x = " << x << "\n";
 }
 
 int main()
 {
+jthread tx{foo, "tx"};
+jthread ty{foo, "ty"};
+jthread tm{foo, "tm"};
+jthread tz{foo, "tz"};
+
+osyncstream{cout} << "main thread x = " << x << "\n";
 
 }
 
+-----------------------------------
+
+//puzzle sorusu neacti hocanın
+
+thread_local int ival = 0;
+
+void thread_func(int* p)
+{
+*p = 42;
+std::cout << "*p = " << *p << '\n';
+std::cout << "ival = " << ival << '\n'; //thread'İn ivali
+}
+
+int main()
+{
+std::cout << "ival = " << ival << '\n';
+ival = 9;
+std::cout << "ival = " << ival << '\n';
+std::thread t(thread_func, &ival);
+t.join();
+std::cout << "ival = " << ival << '\n';
+}
+
+-------------------------
+
+void foo()
+{
+int x = 0;                //automatic storage
+static int y = 0;         //static storage
+thread_local int z = 0;   //Thread_local 
+
+++x;
+++z;
+++y;
+}
+
+---------------
+
+std::mutex mtx;
+
+void foo()
+{
+int x = 0;                //automatic storage
+static int y = 0;         //static storage
+thread_local int z = 0;   //Thread_local 
+
+++x;
+++z;
+mtx.lock();
+++y;
+std::cout << "thread id : << id << " x(automatic) = " << x << '\n';
+std::cout << "thread id : << id << " y(static) = " << x << '\n';
+std::cout << "thread id : << id << " z(thread_local) = " << x << '\n';
+
+mtx.unlock();
+}
+
+int main()
+{
+using namespace std;
+
+jthread t1{foo, 1};
+jthread t2{foo, 2};
+jthread t3{foo, 3};
+jthread t4{foo, 4};
+
+}
+
+----------------------
+#include <syncstream>
+
+thread_local std::string name {"cemal"};
+
+void func(const std::string& surname)
+{
+name += surname;
+
+std::osyncstream{std::cout} << name << " &name = " << &name << "\n";
+}
+
+int main()
+{
+using namespace std;
+
+const char* const pa[] = {"akkan", "toprak", "kurtkaya", "ersoy", "canberk", "hasturk", "candan"};
+
+vector<thread> tvec;
+
+for (auto psurname : pa) {
+tvec.emplace_back(func, psurname);
+}
+
+for (auto& t : tvec)
+t.join();
+}
+
+------------------
+
+class Myclass {
+public:
+Myclass(int)
+{
+std::osyncstream{std::cout} << "Myclass ctor x = " << x << " this = " << this << "\n";
+}
+~Myclass()
+{
+std::osyncstream{std::cout} << "Myclass destructor this = " << this << "\n";
+}
+};
+
+void func(int x)
+{
+thread_local Myclass m{ x };
+}
+
+void foo(int x)
+{
+std::osyncstream{std::cout} << "foo(int) cagrildi x = " << x << "\n
+func(x);
+std::osyncstream{std::cout} << "foo(int) sona eriyor x = " << x << "\n
+}
+
+int main()
+{
+using namespace std;
+{
+jthread t1{foo, 1};
+jthread t1{foo, 2};
+jthread t1{foo, 3};
+jthread t1{foo, 4};
+}
+
+std::cout << "main devam ediyor\n";
+}
+
+--------------------
+
+thread_local değişken yerel değişken de olabilir.
+böyle bir yerel değişkenin hayatl kapsamı sonunda bitmez.
+threadin yürütülmesi sonunda hayatl sona erer .
+
+-------------------
+
+thread local std:mt19937 eng{454255u};
+
+void foo()
+{
+std::uniform_int_distribution dist{10, 99};
+
+for (int i = 0; i < 10; ++i) {
+std::cout << dist(eng) << '\n';
+}
+}
+
+int main()
+{
+std::thread t1{foo};
+t1.join();
+std::cout << '\n';
+std::thread t2{ foo };
+t2.join();
+}
+
+--------------------
+
+class Myclass {
+public:
+Myclass()
+{
+std::osyncstream{std::cout} << "Myclass constructor this: " << this << '\n';
+}
+
+~Myclass()
+{
+std::osyncstream{std::cout} << "Myclass constructor this: " << this << '\n';
+}
+};
+
+void foo()
+{
+std::osynctream{ std::cout } << "foo called\n";
+thread_local Myclass m;
+std::osynctream{ std::cout } << "foo ends\n";
+}
+
+void bar()
+{
+using namespace std::chrono_literals;
+std:osyncstream{std::cout} << "bar called\n";
+foo();
+std::this_thread::sleep_for(3s);
+std:osyncstream{std::cout} << "bar cends\n";
+}
+
+int main()
+{
+std::thread t{bar};
+t.join();
+}
 
 
+-------------------------------------
 
+paylaşımlı değişkenler
 
+threadlerde paylaşımlı değişkenler büyük sorun yaratır
 
+-aşağıdaki durumlar var ise sıkıntı olmaz
 
+a) bütün değişkenlerimiz otomatik ömürlü
+b) workload olarak çalıştırılacak fonksiyonlara referans semantiği ile çağrı yapmıyoruz
+c) threadler thread_local değişkenkeri kullanıyr
+d) dinamik ömürlü değişkenler paylaşımlı olarak kullanılmıyor
+e) statik ömürlü değişkenler paylaşımlı olarak kullanılmıyor
+
+paylaşımlı değişkenler tüm threadler tarafından sadece okuma amaçlı kullanılıyor
+
+--------------------
+
+std::atomic gcount = 0; // arayaa başka bir işlem giremez
+
+void foo()
+{
+for (int i = 0; i < 100'000; ++i) {
+++gcount;
+}
+}
+
+void foo()
+{
+for (int i = 0; i < 100'000; ++i) {
+++gcount;
+}
+}
+
+void bar()
+{
+for (int i = 0; i < 100'000; ++i) {
+---gcount;
+}
+}
+
+int main()
+{
+using namespace std;
+{
+jthread t1{foo};
+jthread t2{foo};
+}
+
+cout << "gcount = " << gcount << '\n';
+}
+}
+
+=========================================
+
+mutual exceplusion
+
+birden fazla kişi var lavabo kullanılacak lavaboda olan kişi kilitlediği için içeri kimse giremez
+ne zmaan lavabo kullanan kilidi açınca kullanılabilir durumda olabilir
+
+acqurie : kilidi edinmeli
+//critical section  
+release : kilidi serbest bırakmak
+
+------------------
+
+int gcount = 0;
+
+std::mutex mtx;
+
+void func()
+{
+mtx.lock();
+cout << this_thread::get_id() << "kilidi edindi\n"
+++gcount;
+cout << this_thread::get_id() << "kilidi serbest bıraktı\n"
+mtx.unlock();
+}
+
+using namespace std;
+
+int main()
+{
+thread t1{ func };
+thread t2{ func };
+thread t3{ func };
+thread t4{ func };
+
+t1.join();
+t2.join();
+t3.join();
+t4.join();
+}
+
+------------------
+
+int gcount = 0;
+
+std::mutex mtx;
+
+void func(int id)
+{
+mtx.lock();
+cout << this_thread::get_id() << "kilidi edindi\n"
+++gcount;
+cout << this_thread::get_id() << "kilidi serbest bıraktı\n"
+mtx.unlock();
+}
+
+using namespace std;
+
+int main()
+{
+thread t1{ func, 1 };
+thread t2{ func, 2 };
+thread t3{ func, 3 };
+thread t4{ func, 4 };
+
+t1.join();
+t2.join();
+t3.join();
+t4.join();
+}
 
 
 
