@@ -2124,7 +2124,214 @@ std::jthread t1{ foo };
 std::jthread t2{ bar };
 }
 
+----------------------
 
+class List {
+
+private:
+std::mutex mtx; //her list sınıfınn ayrı mutex'i var
+static std::mutex mtx; //her list sınıfınnı aynı mutexi olur
+};
+
+---------------------
+//mülakatlarda aşağıdaki gibi kod yazıp thread safe ile ilgili bir problem var mı soruus soruyorlar
+
+class List {
+public:
+void push_back(int x)
+{
+std::lock_guard lg{mtx};
+mlist.push_back(x);
+} //burada unlock olur
+void print()const
+{
+std::lock_guard lg{ mtx };
+for (const auto val : mlist)
+{
+std::cout << val << ' ';
+}
+std::cout << '\n';
+}
+private:
+mutable std::mutex mtx;
+std::list<int> mlist;
+};
+
+void func(List& list, int x)
+{
+for (int i = 0; i < 10; ++i) {
+list.push_back();
+}
+}
+
+-----------------------
+
+deadlock : bir threadin ilerleyememesi
+
+-----------------------
+
+tipik bir deadlock kodu
+
+using namespace std;
+
+mutex a_mtx;
+mutex b_mtx;
+
+void foo()
+{
+std::osyncstream{cout} << this_thread::get_id() << " is trying to lock a_mtx\n";
+a_mtx.lock();
+std::osyncstream{cout} << this_thread::get_id() << " has locked a_mtx\";
+td::sleep_for(600ms);
+std::osyncstream{cout} << this_thread::get_id() << " is trying to lock b_mtx\n";
+b_mtx.lock();
+std::osyncstream{cout} << this_thread::get_id() << " has locked b_mtx\";
+a_mtx.unlock();
+std::osyncstream{cout} << this_thread::get_id() << " has unlock a_mtx\n";
+b_mtx.unlock();
+osyncstream{cout} << this_thread::get_id() << " has unlock b_mtx\n";
+}
+
+void bar()
+{
+std::osyncstream{cout} << this_thread::get_id() << " is trying to lock b_mtx\n";
+b_mtx.lock();
+std::osyncstream{cout} << this_thread::get_id() << " has locked b_mtx\";
+td::sleep_for(600ms);
+std::osyncstream{cout} << this_thread::get_id() << " is trying to lock b_mtx\n";
+a_mtx.lock();
+std::osyncstream{cout} << this_thread::get_id() << " has locked a_mtx\";
+b_mtx.unlock();
+std::osyncstream{cout} << this_thread::get_id() << " has unlock b_mtx\n";
+a_mtx.unlock();
+osyncstream{cout} << this_thread::get_id() << " has unlock a_mtx\n";
+}
+
+int main()
+{
+jthread t2{foo};
+jthread t2{bar};
+
+}
+
+//zaten kilitli dosyalar tekrar kilitlenmeye çalışılıyor, deadlock oluşur
+
+----------------
+
+//bunlarla baş etmenin yolları var
+
+std::lock()
+
+using namespace std;
+
+mutex a_mtx;
+mutex b_mtx;
+
+void foo()
+{
+std::lock(a_mtx, b_mtx);
+}
+
+int main()
+{
+std::lock(a_mtx, b_mtx);
+}
+
+-----------------
+
+mutex m;
+timed_mutex tm;
+recursive_mutex rm;
+
+void foo()
+{
+scoped_lock<std::mutex, std::timed_mutex, std::recursive_mutex>
+}
+
+-------------------
+
+class Myclass {
+public:
+void foo()
+{
+mtx.lock();
+bar();
+mtx.unlock();
+}
+
+void bar()
+{
+mtx.lock();
+ //tanımsız davranış olur
+mtx.unlock();
+}
+
+private:
+mutable std::mutex mtx;
+};
+
+int main()
+{
+using namespace std;
+
+Myclass m;
+
+thread t{ &Myclass::foo, ref(m)};
+
+t.join();
+}
+
+--------------------
+
+recursive mutex yaparsak doğru çalışır
+
+class Myclass {
+public:
+void foo()
+{
+mtx.lock();
+bar();
+mtx.unlock();
+}
+
+void bar()
+{
+mtx.lock();
+mtx.unlock();
+}
+
+private:
+mutable std:recursive_mutex mtx;
+};
+
+int main()
+{
+using namespace std;
+
+Myclass m;
+
+thread t{ &Myclass::foo, ref(m)};
+
+t.join();
+}
+
+--------------------
+
+std::mutex mtx;
+//std::recursive_mutex mtx; //ub kalkar
+int factoriyal(int x) //tanımsız davranış
+{
+lock_guard lg{ mtx };
+
+return x < 2 ? 1 : x * factorial(x - 1);
+}
+
+int main()
+{
+thread tx{factorial, 5};
+
+tx.join();
+}
 
 
 
