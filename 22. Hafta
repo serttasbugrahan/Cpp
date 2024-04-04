@@ -943,7 +943,7 @@ int main()
 {
 std::cout << "Hello\n" << std::flush;
 const auto start{now() };
-std::this_thread::sleep_until(aweke_time());
+std::this_thread::sleep_until(awake_time());
 std::chrono::duration<double, std::milli> elapsed{now() - start};
 std::cout << "Waited " << elapsed.count() << " ms\n";
 }
@@ -975,7 +975,7 @@ using namespace std;
 
 thread t{ [] {} };
 
-cout << thread::hardware_councurrency() //gerçek anlamda paralel olarka kaç thread çalıştırabilir ona bakar
+cout << thread::hardware_concurrency() //gerçek anlamda paralel olarka kaç thread çalıştırabilir ona bakar
 
 }
 
@@ -1595,6 +1595,534 @@ t4.join();
 }
 
 
+//////////////////////////////////////////////////// 3. Ders ////////////////////////////////////////
+
+void foo(int &x)
+{
+
+}
+
+using namespace std;
+
+int main()
+{
+int x{ 35 };
+
+jthread t1{foo, ref(x) };
+jthread t2{foo, ref(x) };
+jthread t3{foo, ref(x) };
+}
+
+-------------------
+
+ortada birden fazla thread varsa tanımsız davranış olmaması için aşağıdaki koşullardan birisinin sağlanması gerekir
+bu koşullardan birisi sağlanmıyorsa oluşan duruma data race deniyor, ub
+
+a) const (immutuable)
+b) yazma amaçlı bir tane bile thread yok
+c) değişken atomic değil ise
+---------
+
+std::atomic x{0}; //Burası atomic olmasaydı ub olurdu
+
+int main()
+{
+//Birden fazla thread kullanılıyor
+}
+
+-----------------------
+
+bu durumlar multithread progrmalamının büyük problemlerinde  birisi
+
+---------------------
+
+bu durumların önüne geçebilmek için mutex kullanır
+
+---------------------
+
+mesela 
+
+t1 => x = 59;  23.45.18 saatinde set edilmiş
+
+t2 => x     ;  23.45.19 saatinde kullanılmış
+
+bu t2'nin 59 kullanıcağı anlamına gelmez
+
+bir işlemin daha önce yapılması daha sonra yapıalcak işlem tarafından kullanılacağı anlamına gelmiyor
+
+-----------------------
+
+sequneced-before relationship : aynı thread içinde oluşturulan sonucun aynı thread iiççinde değiştirilmesi
+
+intra-thread : 
+
+statement1;
+
+statement2;
+
+happends-before : zmaansal olarak önce olması demek değildir, A happens before B
+
+
+----------------------
+standart kütüphane birden fazla mutex sınıfı sunar
+
+bunlardan en basici
+
+std::mutex 'dir
+
+diğer mutex sınıfları
+
+MUTEX SINIFLARI
+---------------
+1- std::mutex
+2- std::timed_mutex
+3- std::recursive_mutex
+4- std::recursive_timed_mutex
+5- shared_mutex
+6- shared_timed_mutex
+
+aşağıya indikçe maaliyet artıyor en basic yetiyor ise onu kullan
+
+-----------------------
+
+std::mutex mtx;
+
+int main()
+{
+mtx.lock; //mutex edinir
+//critical area
+//buradaki kod miktarını azaltmamız lazım
+mtx.unlock; //mutex bırakır
+}
+
+//kritik bölgeyi ne kadar uzun tutarsak maaliyet o kadar artat
+
+--------------------
+
+std::mutex mtx;
+
+int main()
+{
+while (mtx.try_lock()) { //true döndüğü sürece burası yürütülür
+
+}
+}
+
+-----------------
+
+std::mutex mtx;
+
+int main()
+{
+mtx.native_handle()
+}
+
+------------------
+
+mutex sınıfın non copy, non move
+
+std::mutex mtx;
+
+int main()
+{
+auto x = move(mtx); //Hata
+
+}
+
+----------------
+//aşağıdaki gibi seneryolar ile karşılalabiliriz
+
+using namespace std;
+
+class Myclass {
+public:
+void foo() const
+{
+mtx.lock();
+mtx.unlock();
+}
+
+private:
+muatble std::mutex mtx;
+};
+
+-----------------
+
+int cnt = 0;
+
+void func()
+{
+for (int i = 0; i < 100'000; ++i) {
+++cnt;
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(func);
+}
+
+for (auto& t : tvec) {
+t.join();
+}
+
+cout << "count = " << cnt << '\n';
+}
+
+-------------------
+
+//aşağıdaki işlem mantıklı değildir olayı anlatmak içindir yoksa çok maaliyetli bir işlem
+
+using namespace std;
+
+std::mutex mtx;
+
+int cnt = 0;
+
+void func()
+{
+mtx.lock();
+for (int i = 0; i < 100'000; ++i) {
+++cnt;
+mtx.unlokc();
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(func);
+}
+
+for (auto& t : tvec) {
+t.join();
+}
+
+cout << "count = " << cnt << '\n';
+}
+
+-------------------
+
+using namespace std;
+
+std::mutex mtx;
+int cnt = 0;
+
+void foo()
+{
+for (int i = 0; i < 10'000; ++i) {
+++cnt;
+}
+}
+
+void bar()
+{
+for (int i = 0; i < 10'000; ++i) {
+--cnt;
+}
+}
+
+int main()
+{
+//yukarıdaki kodlar ayrı fonksiyon diye senk. gerekmiyor diye düşenebilirsin ama senk. gerekiyor
+std::thread t2{ foo };
+std::thread t2{ bar };
+
+t1.join();
+t2.join();
+
+std::cout << "x = " << x  << "\n";
+}
+
+------------------
+//burada paylaşımlı değişken üzerinde bir korumaya gerek yoktur
+
+std::mutex mtx1;
+std::mutex mtx2;
+
+
+void foo()
+{
+mtx1.lock();
+for (int i = 0; i < 10'000; ++i) {
+++cnt;
+mtx1.unlock();
+}
+}
+
+void bar()
+{
+mtx2.lock();
+for (int i = 0; i < 10'000; ++i) {
+--cnt;
+mtx2.unlock();
+}
+}
+
+int main()
+{
+//yukarıdaki kodlar ayrı fonksiyon diye senk. gerekmiyor diye düşenebilirsin ama senk. gerekiyor
+std::thread t2{ foo };
+std::thread t2{ bar };
+
+t1.join();
+t2.join();
+
+std::cout << "x = " << x  << "\n";
+}
+
+------------------
+//kendi senk. kendisi halleder
+
+using namespace std;
+
+void func(std::string str)
+{
+for (int i = 0; i < 1000; ++i) {
+cout << str << "\n";
+}
+}
+
+int main()
+{
+jthread t1{func, "emracan suster"};
+jthread t2{func, "tamer dundar"};
+jthread t3{func, "furkanmert"};
+}
+
+----------------------
+//böyle durumlarda deaclock denir kilit bırakılmıyor
+//bu durumları engellemk için raıı idiomu kullanılır
+
+using namespace std;
+
+std::mutex mtx;
+
+void foo()
+{
+throw std::runtime_error{ "error from foo" };
+}
+
+void func()
+{
+mtx.lock();
+try {
+foo();
+mtx.unlock();
+}
+catch(const std::exception& ex) {
+mtx.unlock();
+}
+}
+
+----------------
+raıı
+
+void foo()
+{
+throw std::runtime_error{"error from foo"};
+}
+
+void func()
+{
+//lock_guard lg(mtx);
+try {
+foo();
+
+mtx.unlock();
+}
+catch (const std::exception& ex) {
+
+}
+}
+
+--------------------
+
+std::mutex içinde onu kilitleyen ve dtor çağrıldığında onu unlcok eden raıı sınıfı dediğimiz sınıflar var
+
+MUTEX SARMALAYAN RAII SINIFLARI
+-------------------------------
+1- lock_guard
+2- unique_lock
+3- scoped_lock
+4- shared_lock
+
+--------------------
+
+using namespace std;
+
+std::mutex mtx;
+
+void foo()
+{
+lock_guard<mutex> lock{ mtx };
+//statements
+//statements
+//statements
+}
+
+void func()
+{
+lock_guard<timed_mutex> lg(mtx); //bu şekilde yazmaya gerek yok
+lock_guard lg(mtx);
+try{
+foo();
+
+mtx.unlock();
+}
+}
+
+-------------------
+
+using namespace std;
+
+std::timed_mutex mtx;
+
+void func()
+{
+lock_guard lg(mtx);
+
+auto x = move(lg);
+}
+
+-------------------
+
+using namespace std;
+
+std::mutex mtx;
+
+void func()
+{
+mtx.lock();
+
+lock_guard lg(mtx); //burada tekrar kilitlemiş oluruz sakıncalı bir durum
+lock_guard lg(mtx, adopt_lock); //burada zaten kilitlenmiş olduğunu biliyor
+}
+
+--------------------
+
+using namespace std;
+
+void func()
+{
+std::timed_mutex mtx;
+
+if (mtx.try_lock_for(50ms)) { //50ms boyunca lock eder
+
+}
+
+}
+
+---------------------
+
+using namespace std;
+using namespace chrono;
+
+int cnt{};
+
+void try_increment()
+{
+for (int i = 0; i < 100'000; ++i) {
+if (mtx.try_lock()) {
+++cnt;
+mtx.unlock();
+}
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(tyr_incerement);
+}
+
+for (auto& t : tvec)
+t.join();
+
+cout << "x = " << x << '\n';
+
+}
+
+---------------------
+
+
+using namespace std;
+using namespace chrono;
+
+int cnt{};
+std::timed_mutex mtx;
+
+void try_increment()
+{
+for (int i = 0; i < 100'000; ++i) {
+if (mtx.try_lock(1us)) {
+++cnt;
+mtx.unlock();
+}
+}
+}
+
+int main()
+{
+using namespace std;
+
+vector<thread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(tyr_incerement);
+}
+
+for (auto& t : tvec)
+t.join();
+
+cout << "x = " << x << '\n';
+
+}
+
+-------------------
+
+std::mutex mtx;
+
+void foo()
+{
+std::cout << "foo is trying to lock the mutex\n";
+mtx.lock();
+std::cout << "foo has locked the mutex\n";
+std::this_thread::sleep_for(600ms);
+std::cout << "foo has unlocked the mutex\n";
+mtx.unlock();
+}
+
+void bar()
+{
+std::this_thread::sleep_for(100ms);
+std::cout << "bar is trying to lock the mutex\n";
+while (!mtx.tyr_lock()) { 
+std::cout << "bar could not lock the mutex\n";
+std::this_thread::sleep_for(100ms);
+}
+std::cout << "bar has locked the mutex\n"; //buraktığı zaman ancak lock eder
+mtx.unlock(); 
+}
+
+int main()
+{
+std::jthread t1{ foo };
+std::jthread t2{ bar };
+}
 
 
 
