@@ -1,0 +1,475 @@
+////////////////////////////////////////////////// 1. Ders ////////////////////////////////////
+
+shared_mutex
+
+iki amaçlı geliyor
+-yazma amaçlı (tek bri thread girebilir)
+-okuma amaçlı (birden fazla thread girebilir)
+
+maaliyetli bir işlemdir okuma amaçlı threadlerin sayısının fazla olması durumunda olur
+
+#include <shared_mutex>
+
+std::shared_mutex mtx;
+
+int main()
+{
+std::shared_guard lock{mtx};
+
+}
+
+---------------------
+
+int cnt = 0;
+std::shared_mutex mtx;
+
+void writer()
+{
+for (int i = 0; i < 10; ++i)
+{
+std::scoped_lock lock(mtx);
+++cnt;
+}
+std::this_thred::sleep_for(100ms);
+}
+}
+
+void reader() 
+{
+for (int i = 0; i < 100; ++i) 
+int c;
+{
+std::shared_lock lokc(mtx);
+c = cnt;
+}
+std::osyncstream{std::cout} << std::this_thread::get_id() << ' ' << c << '\n';
+std::this_thread::sleep_for(10ms);
+}
+
+
+-----------------------
+
+unique_lock sarmaladığı mutexi unlock edebiliyor ve birden fazla lock çağırabilir
+
+std::mutex mtx;
+
+int main()
+{
+unique_lock<mutex> ulokc(mtx, defer_lock);
+ulock.
+
+}
+
+-----------------------
+
+diğer lock sınıflarından farkı taşınabilir olmasısıdır 
+
+//birden fazla şekilde olabilir
+
+std::mutex mtx;
+
+void foo()
+{
+unique_lock<mutex> lock{ mtx };
+}
+
+-------------
+
+void foo()
+{
+unique_lock<mutex> lock{ mtx, adopt_lock }; //kilidi edinmiş şekilde alıyor
+}
+
+-------------
+
+void foo()
+{
+unique_lock<mutex> lock{ mtx, defer_lock };
+}
+
+--------------
+
+void foo()
+{
+unique_lokc{mtx, try_to_lock};
+//burada kilidi edinmişde olabilir edinmemişte
+
+if (lock.owns_lock()) {
+//...
+
+lock.unlock();
+}
+}
+
+---------------
+
+using namespace std;
+using namespace std::chrono;
+
+std::timed_mutex tmtx;
+
+int main()
+{
+unique_lock ulock{ tmtx, 300ms };
+}
+
+
+----------------
+
+int cnt{};
+std::mutex mtx;
+
+void func()
+{
+for (int i = 0; i < 1'000'000; ++i) {
+std::unique_lock lock{mtx, std::defer_lock };
+ulock.lock();
+++cnt;
+ulock.unlock();
+//some code here
+ulock.lock();
+++cnt;
+unlock.unlock();
+}
+}
+
+int main()
+{
+{
+std::jthread t1 {func };
+std::jthread t2 {func };
+std::jthread t3 {func };
+std::jthread t4 {func };
+std::jthread t5 {func };
+}
+
+std::cout << cnt << "\n";
+}
+
+-----------------------------
+
+öyle durumlar varki bizim bir fonksiyonu sadece bir kere çağırmamız gereken durumlar oluyor
+2. kez çağrılmayacak
+
+call_once() ile bu yapılır
+
+std::once_flag flag;
+
+call_once(flag, foo); //bu şekilde olur
+
+------------------
+
+using namespace std;
+
+unique_ptr<string> uptr;
+once_flag flag;
+
+void initialize()
+{
+osyncstream{cout} << "initialize " <<this_thread::get_id() << '\n';
+uptr = make_unique<string>("damla kubat");
+}
+
+const string& get_value()
+{
+call_once(flag, initialize);
+return *uptr;
+}
+
+void worload()
+{
+const std::string& rs = get_value();
+osyncstream{cout} << &rs << '\n';
+}
+
+int main()
+{
+vector<jthread> tvec;
+tvec.reserve(20);
+
+for (int i = 0; i < 16; ++i) {
+tvec.emplace_back(workload);
+}
+}
+
+--------------------
+
+singleton implementasyonu
+
+class Singleton {
+public:
+Singleton(const Singleton&) = delete;
+Singleton& operator=(const Singleton&) = delete;
+
+static Singleton* get_instance()
+{
+call_once(m_init_flag, Sigleton::init);
+return m_instance;
+}
+
+static void init()
+{
+m_instance = new Singleton();
+}
+private:
+static std::once_flag m_init_flag;
+static Singleton* m_instance;
+Singleton() = defaukt;
+};
+
+Singleton* Singleton::m_instance{};
+std::once_flag Singleton::m_init_flag;
+
+void func()
+{
+std::osyncstream{ std::cout } << Singleton::get_instance() << '\n';
+}
+
+int main()
+{
+std::vector<std::thread> tvec;
+for (int i = 0; i < 100; ++i) {
+tvec.emplace_back(func);
+}
+}
+
+----------------------
+
+class Singleton {
+public:
+static Singleton& get_instance()
+{
+static Singleton s;
+
+return s;
+}
+};
+
+-------------------
+//call once kullanmadan bir kere çağrıma işlemi nasıl yapılır
+
+using namespace std;
+
+void func()
+{
+osyncstream {cout} << "func cagrildi " << this_thread::get::id() << "\n";
+}
+
+void foo()
+{
+std::this_thread::sleep_for(50ms);
+static auto f = [] {func(); return 0;}();
+}
+
+int main()
+{
+vector<jthread> tvec;
+
+for (int i = 0; i < 10; ++i) {
+tvec.emplace_back(foo);
+}
+}
+
+==========================================
+
+#include <future>
+
+futue bir operasyonun sonucunu temsil ediyor
+2 farklı şekilde olabilir
+-1 değer olabilir
+-çalıştırıldığında bir exception aktarabilir
+
+!! future ve promis sınıflarını kullanarak 1 kez değer iletebiliriz
+
+int main()
+{
+using namespace std;
+
+std::promise<int> prom; //ben sana bir değer veya exception vermeyi vaat ediyorum
+
+auto ft = prom.get_future()
+//future<int> ft = prom.get_future()
+
+ft.get(); 
+}
+
+------------------
+
+int main()
+{
+using namespace std;
+
+std::promise<int> prom; 
+
+auto ft = prom.get_future()
+
+prom.set_value(12); //bunun ile kanalın bir ucuna sonucu koymuş oluurz
+
+int val = ft.get();
+}
+
+--------------------
+
+void produce(std::promise<double> prm, double dval)
+{
+prm.set_value(dval * dval);
+}
+
+int main()
+{
+using namespace std;
+
+promise<double> prom;
+auto ft = prom.get_future();
+
+thread t{produce, move(prom), 4.544 };
+
+auto val = ft.get();
+//değerin üretildiğinden ve kullanılabileceğinden eminiz
+
+cout << "value = " << val << "\n";
+
+t.join();
+}
+
+----------------------
+
+double square(double d)
+{
+return d * d;
+}
+
+void produce(std::promise<double> prm, double dval)
+{
+prm.set_value(dval * dval);
+}
+
+int main()
+{
+using namespace std;
+
+promise<double> prom;
+
+auto ft = prom.get_future();
+cout << "main basladi\n";
+thread t{produce, move(prom), 4.544 };
+
+auto val = ft.get();
+cout << "value = " << val << "\n";
+
+t.join();
+}
+
+------------------------
+
+std::string foo(const std::string& str)
+{
+auto temp = str;
+reverse(str.begin(), str.end());
+
+return temp + str;
+}
+
+void bar(std::promise<string>&& prom, std::string str)
+{
+//other code
+prom.set_value(foo(str));
+}
+
+int main()
+{
+using namespace std;
+
+promise<string> prom;
+
+future<string> ft = prom.get_future();
+
+thread t{bar, move(prom), "tamer"};
+
+cout << ft.get() << "\n";
+
+t.join();
+}
+
+-------------------
+
+struct Div {
+void operator()(std::promise<int>&& prom, int a, int b)
+{
+if (b == 0) {
+auto str = "divide by zero error" + std::to_string(a) + "\n" + std::to_string(b)
+prom.set_exception(std::make_exception_ptr(std::runtime_error(str)));
+}
+else {
+prom.set_value(a / b);
+}
+}
+};
+
+using namespace std;
+
+int main()
+{
+promise<int> prom;
+auto ft = prom.get_future();
+
+thread th{Div{}, move(prom), 12, 3};
+
+cout << ft.get() << "\n";
+
+th.join();
+}
+
+========================================
+
+async
+-----
+
+int foo(int x, int y)
+{
+//
+return x * y + 5;
+}
+
+int main()
+{
+using namespace std;
+
+async(foo, 10, 30); //ben senin için foo'yu asenkron olarak çalıştırıcam ancak sana kendi oluşturduğum promisin future'unu veriyorum
+
+}
+
+========================================
+
+int foo(int, int);
+
+int main()
+{
+using namespace std;
+
+packaged_task mytask(foo, 2, 5); //callable'ı asenkron olacak şekilde çalıştırıyor, istediğimiz yerde çalışabilir
+}
+
+----------------------
+
+int main()
+{
+using namespace std;
+
+packaged_task<int(int, int)> task{foo};
+
+thread th{task, 3, 6};
+}
+
+-------------
+int foo(int, int);
+
+int main()
+{
+using namespace std;
+
+future<int> ft;
+
+ft.eait_for()
+}
+
