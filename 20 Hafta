@@ -424,8 +424,9 @@ ofs.tellp;
 
 --------
 
-okuma tarafı için konumlandırma taradında seekg
-okuma tarafı için konumlandırma taradında seekp
+- Istream sınıfından kalıtım yoluyla elde edilen sınıflarda dosya konum göstericisini set eden funcların ismi seekg. Okuma amaçlı dosya konum göstericisinin konumunu seekg set ediyor.
+
+- Ostreamden kalıtımal elde edilen sınıflarda ise dosya konum göstericisini konumlandıran funca seekp deniyor.2 Overlodu var ikisininde
 
 ---------
 
@@ -2506,9 +2507,9 @@ int main()
 using namespace std;
 using namespace std::chrono;
 
-//system_clock
-//high_resolution_clock
-//steady_clcok
+System_clock : Ayarlanabilir saat yani ayarlanabilir.Sistem saati değişince system clockta ona göre değer verecek.Gerçek dakika saniye gün işlemleri bununla yapılıyor.
+Steady_clock : Ayarlanamayan saat.Sistem saati değiştirsekte bu değişmeyecek.Monotonik saat.Kullanım amacı süre ölçmek
+High_resolution_clock : Aslında yukarıdakilerden birinin eş ismi
 
 //cpp 23 öncesinde sadece 3 tane saat türü var
 }
