@@ -1984,7 +1984,8 @@ functional:
 function adaptor (fonksiyon uyumlandırıcısı)
 ----------------
 
-bizden collable alıp collable verir
+öyle bir fonksiyonki bizden collable alıp collable verir
+
 !!pc'de fotosu var
 
 bir çok function kaldırıldı cppref'den kontrol et
@@ -1996,7 +1997,7 @@ reference_wrapper
 std::bind
 mem_fn
 not_fn
-std::invoke
+std::invoke 
 
 -----------
 
@@ -2041,7 +2042,7 @@ class ReferenceWrapper {
 
 int main()
 {
-std::vector<ReferenceWrapper> myvec;
+std::vector<ReferenceWrapper> myvec; //bu şekilde hata kalkar
 }
 
 ----------
@@ -2128,9 +2129,9 @@ int ival = 20;
 
 int& r = ival;
 
-foo(r);
+foo(r); 
 
-cout << "ival = " << ival << '\n';
+cout << "ival = " << ival << '\n'; //20 çıkar
 }
 
 -----------
@@ -2146,9 +2147,10 @@ int ival = 20;
 
 int& r = ival;
 
-foo<int &>(r);
-foo(ReferenceWrapper<int>{ival}); //bu şekilde de yazar
-foo(ReferenceWrapper{ival}); //cidat gerçekleşir
+foo<int &>(r); //120 çıkar açık şekilde belirtiyoruz ref olduğunu
+
+foo(reference_wrapper<int>{ival}); //bu şekilde de yazar
+foo(reference_wrapper{ival}); //cidat gerçekleşir
 foo(ref(ival)); //fabrika fonksiyonunu çağırabiliriz  
 
 cout << "ival = " << ival << '\n';
