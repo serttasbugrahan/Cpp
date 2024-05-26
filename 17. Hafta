@@ -237,21 +237,21 @@ int main()
 {
 using namespace std;
 
-//function<int(int)> f(foo);
+//function<int(int)> f(foo); //f çağrıldığı zaman foo çağrılmış olur
 //function<int(int)> f{foo}; //bu işlemler yapılabilir
 function<int(int)> f = foo;
 
-auto ret = f(90);
+auto ret = f(90); //foo çağrılır
 cout << "ret = " << ret << '\n';
 
 f = bar;
-ret = f(90);
+ret = f(90);//bar çağrılır
 cout << "ret = " << ret << '\n';
 }
 
 -------------------
 
-//ctad olur
+//CTAD olur
 
 int foo(int x)
 {
@@ -272,7 +272,7 @@ int main()
 {
 using namespace std;
 
-function f = foo;
+function f = foo; //CTAD
 
 }
 
