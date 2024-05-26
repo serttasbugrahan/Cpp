@@ -2173,7 +2173,6 @@ char buf[2 * 4096]{};
 };
 
 
-
 int main()
 {
 using namespace std;
@@ -2238,7 +2237,7 @@ sort(myvec.begin(), myvec.end(), [](auto r1, auto r2) {
 return r1.get() < r2.get();
 });
 
-for (const auto & s : myvec) {
+for (const auto &s : myvec) {
 cout << s.get() << " "; 
 }
 
@@ -2317,7 +2316,7 @@ cout << "y = " << y << '\n'; //4690
 
 ---------------
 
-referance wrapper r value bağlanamaz
+!! referance wrapper r value bağlanamaz
 
 int foo();
 
@@ -2418,7 +2417,7 @@ auto r2 = cref(x);
 
 std::bind
 ---------
-
+ bind bize function object döndürecek ve 1. parametresine de collable geçeceğiz
 --------------
 
 int foo(int x, int y, int z)
