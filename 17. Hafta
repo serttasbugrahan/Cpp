@@ -478,7 +478,7 @@ auto val = mf(12);
 }
 
 private:
-std::function<int(int)> mf;
+std::function<int(int)> mf; //bu şekilde olması en tipik sneryoladan birisi
 };
 
 ---------
@@ -496,7 +496,7 @@ int main()
 {
 using namespace std;
 
-vector<int (*)(int)> myvec{f1, f2, f3, f4, f5};
+vector<int (*)(int)> myvec{f1, f2, f3, f4, f5}; //bu vektör fonksiyon adresleri tutar
 }
 
 -----------
@@ -514,7 +514,7 @@ int main()
 {
 using namespace std;
 
-vector<fntype> vec;
+vector<fntype> vec; //her şeyi tutabiliyoruz içerisinde
 
 vec.push_back(foo);
 vec.push_back([](int x) {return x * 5; });
@@ -542,13 +542,13 @@ using namespace std;
 
 Myclass m;
 
-function<int(Myclass&, int)> f1{&Myclass::foo };
+function<int(Myclass&, int)> f1{&Myclass::foo};
 function<int(const Myclass&, int)> f2{&Myclass::foo};
 function<int(const Myclass*, int)> f2{&Myclass::bar};
 
 }
 
------------------------------------
+---------------------------------------------
 
 mem_fn ve not_fn adaptörleri
 
@@ -584,7 +584,7 @@ f2(ptr, 778);
 }
 
 -----------------
-mem_fn algoritmalarda kullanılır
+mem_fn kullanıldığı tipik seneryo, algoritmalarda kullanılmasıdır
 
 int main()
 {
@@ -1144,7 +1144,7 @@ int main()
 std::tuple<int, double, long, Date> f1;
 //4 öğe var tp bir arada tutuyor
 //ilk 3 öğe value init edilir sıfır ile hayata gelir
-//date için default ctor getirili
+//date için default ctor çağrıldı, sınıf nesnesi olduğu içinx 
 
 }
 
@@ -1806,7 +1806,9 @@ int main()
 int (*fp)(int) = &Nec::foo; //hata, non static tutamaz static olmalı
 }
 
+!! sınıfların static adreslerinin türleri ile sınfların non-static adresleri aynı türden değil
 --------------
+yeni konu sınıfların non-static üyelerinin adreslerinin tutulması
 
 non static yapıların pointer değişkende tutulması
 
@@ -1820,7 +1822,7 @@ int bar(int);
 int main()
 {
 auto fp1 = &Nec::foo;
-int (Nec::*fp2)(int) = &Nec::foo;
+int (Nec::*fp2)(int) = &Nec::foo; //bu şekilde tutuluyor
 }
 
 -----------
@@ -1878,6 +1880,8 @@ int (Nec::*fp)(int) = &Nec::foo; //bu şekilde de olur
 Nec mynec;
 
 //mynec.fp(12); //hata nec scopeunda arar
+
+!! eğer elimizde bir sınıf nesnesi var ise (mynec) ve bir üye fonksiyon göstericisi(fp) var ise ayrı bir operatör kullanmamız gerekir (.*)
 
 //bunun doğru yollunu bulmak için .* operarörü kullanılır
 
