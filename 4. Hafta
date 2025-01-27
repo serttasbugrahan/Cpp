@@ -558,22 +558,27 @@ foo(&m); //549 çağrılı
 
 -----
 
-class Myclass {
+class Myclass
+{
 public:
-void foo();
-void foo()const; //ovarloading olur
-
+    void foo() {
+        std::cout << "foo" << '\n';
+    }
+    void foo() const{
+        std::cout << "const foo"<< '\n';
+    }
 private:
 };
 
 int main()
 {
-Myclass m;
-m.foo();//562 çağrılır
+    Myclass m;
+    m.foo(); // 562 çağrılır
 
-const Myclass m;
-m.foo(); //564 çağrılır
+    const Myclass y;
+    y.foo(); // 564 çağrılır
 }
+
 
 ------
 
@@ -612,7 +617,7 @@ name.front() = 'A'; // hata olmaz
 class String {
 public:
 char & front();
-const char & front()const;
+const char & front()const; // const bir nesne üzerinde çağrılabileceğini ve const bir nesne döndüreceği anlaşılır
 };
 
 int main()
