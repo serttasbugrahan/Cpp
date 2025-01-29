@@ -1021,7 +1021,7 @@ std::cout << ++cnt << ' ';
 
 int main()
 {
-int a[100]; //her nesne hayata geldiğinde contructar meydana gelicek 
+Myclass m[100] //her nesne hayata geldiğinde contructar meydana gelicek 
 }
 
 --------------------------------
@@ -1483,7 +1483,7 @@ Myclass m;
 --------
 user declared :
 
-class Mycşlass {
+class Myclass {
 public:
 //deafult bildirimi derleyicye bunu bildiyorum ama emrediyorum sen tanımlıycaksın demek
 Myclass() = default; //user decalred
