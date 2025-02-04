@@ -1362,6 +1362,8 @@ int main()
 Nec mynec;
 mynec.Nec::foo(); //geçerlidir
 mynec.Nec::x //geçerli  
+Nec::foo(); //geçerli, değil foo() fonksiyonu static değil, yani nesne üzerinden çağrılmalıdır. üye fonksiyonlar nesneye (instance) bağlıdır.
+
 }
 
 ------
