@@ -411,8 +411,8 @@ int main()
 
 class Myclass{
 public:
-void foo()const;
-void bar()const;
+void foo()const; // myclass sınıfında değişikil yapmayacağım demek
+void bar()const; // myclass sınıfında değişikil yapmayacağım demek
 
 private:
 int mx;
@@ -547,7 +547,7 @@ private:
 };
 
 void foo(Myclass*); //function overloading olur
-void foo(const Myclass*);
+void foo(const Myclass*);     
 
 int main()
 {
